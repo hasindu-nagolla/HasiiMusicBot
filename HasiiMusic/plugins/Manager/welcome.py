@@ -1,7 +1,7 @@
 import os
 import asyncio
 from datetime import datetime, timedelta, timezone
-from turtle import delay
+# from turtle import delay
 
 from PIL import Image, ImageDraw, ImageFont
 from pyrogram import enums, filters
