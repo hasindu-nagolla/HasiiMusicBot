@@ -19,6 +19,18 @@ FONT_PATH    = "HasiiMusic/assets/hasii/ArialReg.ttf"
 BTN_VIEW     = "๏ ᴠɪᴇᴡ ɴᴇᴡ ᴍᴇᴍʙᴇʀ ๏"
 BTN_ADD      = "๏ ᴋɪᴅɴᴀᴘ ᴍᴇ ๏"
 
+# CAPTION_TXT = """
+# **❅────✦ ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ✦────❅
+# {chat_title}
+# ▰▰▰▰▰▰▰▰▰▰▰▰▰
+# ➻ Nᴀᴍᴇ ✧ {mention}
+# ➻ Iᴅ ✧ `{uid}`
+# ➻ Usᴇʀɴᴀᴍᴇ ✧ @{uname}
+# ➻ Tᴏᴛᴀʟ Mᴇᴍʙᴇʀs ✧ {count}
+# ▰▰▰▰▰▰▰▰▰▰▰▰▰**
+# **❅─────✧❅✦❅✧─────❅**
+# """
+
 CAPTION_TXT = """
 **╔═══❖•ೋ° °ೋ•❖═══╗**
       ✦ ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ✦  
