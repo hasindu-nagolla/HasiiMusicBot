@@ -1,0 +1,58 @@
+Deploy HasiiXMusic on a fresh Ubuntu VPS
+
+1. Install System Dependencies
+	sudo apt update && sudo apt install git curl python3-pip ffmpeg -y
+
+2. Install Node.js (using nvm)
+	curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+	source ~/.bashrc
+	nvm install node
+
+3. Clone Repo
+	git clone <repo link>
+	cd HasiiXMusic
+
+
+4. Install Python Packages
+	pip3 install -U -r requirements.txt
+
+If raise error when installing the py pkgs: use a virtual env
+	
+ Install python3-venv (if needed):
+	sudo apt install python3-venv
+ Create and activate a virtual environment:
+	python3 -m venv venv
+	source venv/bin/activate
+ Install the Python requirements inside the venv:
+	pip install -U pip  # upgrade pip in your venv
+	pip install -U -r requirements.txt
+ Every time you log back in to your server and want to use the bot, activate the venv first:
+	source venv/bin/activate
+
+5. Install tmux for Background Operation
+	sudo apt install tmux -y # tmux is a terminal multiplexer that lets you keep programs running even after disconnecting SSH.
+
+6. Run the Setup Script
+	sudo bash setup or bash setup
+
+If not asking the env fields, Manually Configure .env
+ Copy sample.env to .env:
+	cp sample.env .env
+ Edit .env:
+	nano .env
+
+7. Start the Music Bot in tmux
+	tmux new -s musicbot
+	sudo bash start
+
+	To detach from tmux and leave the bot running, press: Ctrl+B, then release, then press D.
+
+Useful tmux Commands;
+Stop the bot tmux session:
+	tmux kill-session -t musicbot
+
+Reconnect to the running session:
+	tmux attach-session -t musicbot
+
+	
+	
