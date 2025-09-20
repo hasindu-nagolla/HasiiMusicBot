@@ -62,10 +62,11 @@ AUTO_LEAVE_ASSISTANT_TIME = int(os.getenv("ASSISTANT_LEAVE_TIME", "11500"))
 DEBUG_IGNORE_LOG = True
 
 # ───── Spotify Credentials ───── #
-SPOTIFY_CLIENT_ID = os.getenv(
-    "SPOTIFY_CLIENT_ID", "22b6125bfe224587b722d6815002db2b")
-SPOTIFY_CLIENT_SECRET = os.getenv(
-    "SPOTIFY_CLIENT_SECRET", "c9c63c6fbf2f467c8bc68624851e9773")
+SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+SPOTIFY_REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
+
+
 
 # ───── Session Strings ───── #
 STRING1 = os.getenv("STRING_SESSION")
@@ -118,7 +119,7 @@ DURATION_LIMIT = time_to_seconds(f"{DURATION_LIMIT_MIN}:00")
 # AYU = ["Processing", "Searching", "Loading", "Connecting", "Preparing", "Almost Done", "Verifying", "Starting", "Getting Ready", "Just a Moment", "Hopping", "Warming Up", "Booting Up", "Optimizing"]
 # AYU = ["Processing...", "Searching...", "Loading...", "Connecting...", "Preparing...", "Almost Done...", "Verifying...", "Starting...", "Getting Ready...", "Just a Moment...", "Hopping...", "Warming Up...", "Booting Up...", "Optimizing..."]
 AYU = [
-     "▰▱▱▱▱▱▱▱▱ Processing... 💞",
+    "▰▱▱▱▱▱▱▱▱ Processing... 💞",
     "▰▰▱▱▱▱▱▱▱ Searching... 🔍",
     "▰▰▰▱▱▱▱▱▱ Loading... ⚡",
     "▰▰▰▰▱▱▱▱▱ Connecting... 🌐",
