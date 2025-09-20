@@ -104,19 +104,38 @@ def _download_ytdlp(link: str, opts: Dict) -> Optional[str]:
         return None
 
 
-async def yt_dlp_download(link: str, type: str, format_id: str = None, title: str = None) -> Optional[str]:
+# async def yt_dlp_download(link: str, type: str, format_id: str = None, title: str = None) -> Optional[str]:
+#     loop = asyncio.get_running_loop()
+
+#     if type == "audio":
+#         opts = {
+#             "format": "bestaudio/best",
+#             "outtmpl": f"{download_folder}/%(id)s.%(ext)s",
+#             "quiet": True,
+#             "no_warnings": True,
+#             "cookiefile": cookies_file,
+#             "noplaylist": True,
+#             "concurrent_fragment_downloads": 5,
+#         }
+#         return await loop.run_in_executor(None, _download_ytdlp, link, opts)
+
+async def yt_dlp_download(link: str, type: str, format_id: str = None, title: str = None, use_cookies: bool = True) -> Optional[str]:
     loop = asyncio.get_running_loop()
 
+    base_opts = {
+        "outtmpl": f"{download_folder}/%(id)s.%(ext)s",
+        "quiet": True,
+        "no_warnings": True,
+        "noplaylist": True,
+        "concurrent_fragment_downloads": 5,
+    }
+
+    if use_cookies:
+        base_opts["cookiefile"] = cookies_file
+
     if type == "audio":
-        opts = {
-            "format": "bestaudio/best",
-            "outtmpl": f"{download_folder}/%(id)s.%(ext)s",
-            "quiet": True,
-            "no_warnings": True,
-            "cookiefile": cookies_file,
-            "noplaylist": True,
-            "concurrent_fragment_downloads": 5,
-        }
+        opts = base_opts.copy()
+        opts["format"] = "bestaudio/best"
         return await loop.run_in_executor(None, _download_ytdlp, link, opts)
 
     elif type == "video":
