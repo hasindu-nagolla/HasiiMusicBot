@@ -42,4 +42,5 @@ tgcrypto
 unidecode
 wget
 yt-dlp==2025.9.5
+playwright
 git+https://github.com/CertifiedCoders/youtube-search-python
