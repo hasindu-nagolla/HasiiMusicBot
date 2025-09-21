@@ -10,7 +10,7 @@ COOKIES_PATH = os.path.join(os.path.dirname(__file__), '../assets/cookies.txt')
 
 def fetch_new_cookies():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=False)
         context = browser.new_context()
         page = context.new_page()
         page.goto('https://accounts.google.com/signin/v2/identifier?service=youtube')
