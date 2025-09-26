@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: AnnieXMusic
+    plan: free
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start
