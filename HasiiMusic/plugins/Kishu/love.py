@@ -6,21 +6,21 @@ from HasiiMusic import app
 def get_random_message(love_percentage):
     if love_percentage <= 30:
         return random.choice([
-            "Love is in the air but needs a little spark.",
-            "A good start but there's room to grow.",
-            "It's just the beginning of something beautiful."
+            "Love? I’ve seen stronger Wi-Fi signals.",
+            "Not much spark, maybe just friendship.",
+            "This looks weaker than instant noodles."
         ])
     elif love_percentage <= 70:
         return random.choice([
-            "A strong connection is there. Keep nurturing it.",
-            "You've got a good chance. Work on it.",
-            "Love is blossoming, keep going."
+            "Good, but don’t expect a movie ending.",
+            "It’s working… kinda like a cheap phone.",
+            "Better than nothing, I guess."
         ])
     else:
         return random.choice([
-            "Wow! It's a match made in heaven!",
-            "Perfect match! Cherish this bond.",
-            "Destined to be together. Congratulations!"
+            "Wow, perfect! Until you argue about food.",
+            "Great match… let’s see how long it lasts.",
+            "True love? Or just today’s mood?"
         ])
 
 

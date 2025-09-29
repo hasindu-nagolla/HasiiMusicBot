@@ -26,7 +26,8 @@ from pyrogram.enums import ChatMemberStatus, ChatMembersFilter
 from HasiiMusic import app
 from HasiiMusic.utils.permissions import is_owner_or_sudoer, mention
 
-MASS_CMDS = ["kickall", "banall", "unbanall", "muteall", "unmuteall", "unpinall"]
+MASS_CMDS = ["kickall", "banall", "unbanall",
+             "muteall", "unmuteall", "unpinall"]
 
 
 def _confirmation_keyboard(cmd: str) -> InlineKeyboardMarkup:
@@ -131,7 +132,6 @@ async def _do_banall(client, chat_id: int):
             errors += 1
         await asyncio.sleep(0.05)
     await client.send_message(chat_id, f"Banned: {banned}\nFailures: {errors}")
-
 
 
 async def _do_unbanall(client, chat_id: int):

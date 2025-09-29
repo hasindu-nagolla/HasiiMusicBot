@@ -48,12 +48,14 @@ _USAGES = {
     "kickme": "/kickme — kick yourself from the group",
 }
 
+
 def _usage(cmd: str) -> str:
     return _USAGES.get(cmd, "Invalid usage.")
 
+
 def _format_success(action: str, msg: Message, uid: int, name: str, reason: Optional[str]) -> str:
     chat = msg.chat.title
-    user_m  = mention(uid, name)
+    user_m = mention(uid, name)
     admin_m = mention(msg.from_user.id, msg.from_user.first_name)
     text = (
         f"» {action} ᴀ ᴜsᴇʀ ɪɴ {chat}\n"
@@ -64,15 +66,18 @@ def _format_success(action: str, msg: Message, uid: int, name: str, reason: Opti
         text += f"\nReason: {reason}"
     return text
 
+
 async def _get_member_safe(client, chat_id: int, user_id: int):
     try:
         return await client.get_chat_member(chat_id, user_id)
     except (UserNotParticipant, RPCError):
         return None
 
+
 async def _get_bot_member(client, chat_id: int):
     me = await client.get_me()
     return await _get_member_safe(client, chat_id, me.id)
+
 
 def _is_admin_status(status: enums.ChatMemberStatus) -> bool:
     return status in (enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER)
@@ -80,6 +85,8 @@ def _is_admin_status(status: enums.ChatMemberStatus) -> bool:
 # ────────────────────────────────────────────────────────────
 # /ban
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("ban"))
 @admin_required("can_restrict_members")
 async def ban_cmd(client, message: Message):
@@ -108,6 +115,8 @@ async def ban_cmd(client, message: Message):
 # ────────────────────────────────────────────────────────────
 # /unban
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("unban"))
 @admin_required("can_restrict_members")
 async def unban_cmd(client, message: Message):
@@ -130,6 +139,8 @@ async def unban_cmd(client, message: Message):
 # ────────────────────────────────────────────────────────────
 # /mute
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("mute"))
 @admin_required("can_restrict_members")
 async def mute_cmd(client, message: Message):
@@ -158,6 +169,8 @@ async def mute_cmd(client, message: Message):
 # ────────────────────────────────────────────────────────────
 # /unmute
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("unmute"))
 @admin_required("can_restrict_members")
 async def unmute_cmd(client, message: Message):
@@ -188,23 +201,25 @@ async def unmute_cmd(client, message: Message):
 # ────────────────────────────────────────────────────────────
 # /tmute
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("tmute"))
 @admin_required("can_restrict_members")
 async def tmute_cmd(client, message: Message):
     if ((not message.reply_to_message and len(message.command) < 3) or
-        (message.reply_to_message and len(message.command) < 2)):
+            (message.reply_to_message and len(message.command) < 2)):
         return await message.reply_text(_usage("tmute"))
 
     if message.reply_to_message:
-        user    = message.reply_to_message.from_user
-        time_arg= message.command[1]
-        reason  = message.text.partition(time_arg)[2].strip()
+        user = message.reply_to_message.from_user
+        time_arg = message.command[1]
+        reason = message.text.partition(time_arg)[2].strip()
     else:
         user = await client.get_users(message.command[1])
         if not user:
             return await message.reply_text("I can’t find that user.")
-        time_arg= message.command[2]
-        reason  = message.text.partition(time_arg)[2].strip()
+        time_arg = message.command[2]
+        reason = message.text.partition(time_arg)[2].strip()
 
     target = await _get_member_safe(client, message.chat.id, user.id)
     if target and _is_admin_status(target.status):
@@ -226,6 +241,8 @@ async def tmute_cmd(client, message: Message):
 # ────────────────────────────────────────────────────────────
 # /kick
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("kick"))
 @admin_required("can_restrict_members")
 async def kick_cmd(client, message: Message):
@@ -253,14 +270,17 @@ async def kick_cmd(client, message: Message):
 # ────────────────────────────────────────────────────────────
 # /dban
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("dban"))
 @admin_required("can_restrict_members", "can_delete_messages")
 async def dban_cmd(client, message: Message):
     if not message.reply_to_message:
         return await message.reply_text(_usage("dban"))
 
-    user   = message.reply_to_message.from_user
-    reason = message.text.split(None, 1)[1] if len(message.command) > 1 else None
+    user = message.reply_to_message.from_user
+    reason = message.text.split(None, 1)[1] if len(
+        message.command) > 1 else None
 
     target = await _get_member_safe(client, message.chat.id, user.id)
     if target and _is_admin_status(target.status):
@@ -278,6 +298,8 @@ async def dban_cmd(client, message: Message):
 # ────────────────────────────────────────────────────────────
 # /sban
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("sban"))
 @admin_required("can_restrict_members")
 async def sban_cmd(client, message: Message):
@@ -303,6 +325,8 @@ async def sban_cmd(client, message: Message):
 # ────────────────────────────────────────────────────────────
 # /kickme
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("kickme"))
 async def kickme_cmd(client, message: Message):
     if message.chat.type == enums.ChatType.PRIVATE:
@@ -329,23 +353,25 @@ async def kickme_cmd(client, message: Message):
 # ────────────────────────────────────────────────────────────
 # /tban
 # ────────────────────────────────────────────────────────────
+
+
 @app.on_message(filters.command("tban"))
 @admin_required("can_restrict_members")
 async def tban_cmd(client, message: Message):
     if ((not message.reply_to_message and len(message.command) < 3) or
-        (message.reply_to_message and len(message.command) < 2)):
+            (message.reply_to_message and len(message.command) < 2)):
         return await message.reply_text(_usage("tban"))
 
     if message.reply_to_message:
-        user    = message.reply_to_message.from_user
-        time_arg= message.command[1]
-        reason  = message.text.partition(time_arg)[2].strip()
+        user = message.reply_to_message.from_user
+        time_arg = message.command[1]
+        reason = message.text.partition(time_arg)[2].strip()
     else:
         user = await client.get_users(message.command[1])
         if not user:
             return await message.reply_text("I can’t find that user.")
-        time_arg= message.command[2]
-        reason  = message.text.partition(time_arg)[2].strip()
+        time_arg = message.command[2]
+        reason = message.text.partition(time_arg)[2].strip()
 
     target = await _get_member_safe(client, message.chat.id, user.id)
     if target and _is_admin_status(target.status):
