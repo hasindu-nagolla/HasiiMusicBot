@@ -53,7 +53,7 @@ async def init():
     await JARVIS.start()
 
     try:
-        await JARVIS.stream_call("https://te.legra.ph/file/29f784eb49d230ab62e9e.mp4")
+        await JARVIS.stream_call("https://files.catbox.moe/c3nt3q.mp4")
     except NoActiveGroupCall:
         LOGGER("Tune").error(
             "ᴘʟᴇᴀsᴇ ᴛᴜʀɴ ᴏɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴏғ ʏᴏᴜʀ ʟᴏɢ ɢʀᴏᴜᴘ/ᴄʜᴀɴɴᴇʟ.\n\nᴀɴɴɪᴇ ʙᴏᴛ sᴛᴏᴘᴘᴇᴅ..."
