@@ -1,200 +1,40 @@
-<!-- ✨ Animated Header (Top) -->
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" />
-</p>
-
-<!-- 👤 Avatar + Typing Banner -->
-
-<div align="center">
-  <table>
-    <tr>
-      <td align="center">
-        <img src="https://files.catbox.moe/r2ga8f.jpg" width="90px" style="border-radius: 50%;" />
-      </td>
-      <td>
-        <img src="https://readme-typing-svg.herokuapp.com?color=00BFFF&width=600&lines=Hey+There,+This+is+Certified+Coder+%F0%9F%A5%80+%E2%9D%97%EF%B8%8F" />
-      </td>
-    </tr>
-  </table>
-</div>
-
-<!-- 👁 Visitor Counter -->
-
-<p align="center">
-  <img src="https://komarev.com/ghpvc/?username=CertifiedCoders&style=flat-square" />
-</p>
-
-<h1 align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?color=FF69B4&width=500&lines=Welcome+to+TuneViaBot+%F0%9F%8E%B6;The+Ultimate+Telegram+Music+Bot" />
-</h1>
-
-
-<p align="center">
-  <a href="https://t.me/CertifiedCoders">
-    <img src="https://files.catbox.moe/d0ynvn.jpg" width="600">
+  <a href="https://t.me/musicxhasii">
+    <img src="https://files.catbox.moe/und0yt.jpg" width="600">
   </a>
 </p>
 
-<p align="center">
-  <a href="https://t.me/TuneViaBot"><img src="https://img.shields.io/badge/Try%20Bot-@TuneViaBot-blue?style=for-the-badge&logo=telegram" /></a>
-</p>
+## 🌟 Intro about application?
 
+**HasiiMusicBot** is a modern Telegram music bot built using Pyrogram and PyTgCalls. It streams high quality music in group voice chats. it supports various platforms like YouTube, Spotify.
 
-<p align="center">
-  <a href="https://github.com/CertifiedCoders/TuneViaBot/stargazers"><img src="https://img.shields.io/github/stars/CertifiedCoders/TuneViaBot?style=flat-square"/></a>
-  <a href="https://github.com/CertifiedCoders/TuneViaBot/network/members"><img src="https://img.shields.io/github/forks/CertifiedCoders/TuneViaBot?style=flat-square"/></a>
-  <a href="https://github.com/CertifiedCoders/TuneViaBot/issues"><img src="https://img.shields.io/github/issues/CertifiedCoders/TuneViaBot?style=flat-square"/></a>
-  <a href="https://github.com/CertifiedCoders/TuneViaBot/commits/main"><img src="https://img.shields.io/github/last-commit/CertifiedCoders/TuneViaBot?style=flat-square"/></a>
-  <a href="https://github.com/CertifiedCoders/TuneViaBot/actions"><img src="https://img.shields.io/badge/CI-Status-grey?style=flat-square"/></a>
-</p>
-
-## 🌟 What is TuneViaBot?
-
-**TuneViaBot** is a blazing fast, modern Telegram music bot built with **Pyrogram** and **PyTgCalls**. It streams high-quality music into your group voice chats and supports various platforms like YouTube, Spotify, Apple Music, and more.
-
-## 🚀 Features
-<table>
-<tr>
-<td>
-  <img src="https://files.catbox.moe/la0sxq.jpg" width="300" />
-</td>
-<td>
-
-| 🌟 Feature                | 🔎 Description                              |
-| ------------------------- | ------------------------------------------- |
-| 🎶 HQ Music Streaming     | Lag‑free HD audio in group voice chats      |
-| 🌐 Multi‑Platform Sources | YouTube, Spotify, Apple Music, Resso, etc.  |
-| ⚡ Fast Setup              | One‑click Heroku, VPS, or Docker deployment |
-| 🔄 Auto Config            | Quick setup script with pre‑checks          |
-
-</td>
-</tr>
-</table>
 
 ## 🔑 Environment Variables
 
 Below are the required and optional environment variables for deployment.
 
 ```env
-API_ID=              # Required - Get from https://my.telegram.org
-API_HASH=            # Required - From https://my.telegram.org
-BOT_TOKEN=           # Required - Get t.me/BotFather
-OWNER_ID=            # Required - Your Telegram user ID
+API_ID=              # Required
+API_HASH=            # Required
+BOT_TOKEN=           # Required
+OWNER_ID=            # Required - Telegram user ID
 LOGGER_ID=           # Required - Log group/channel ID
-STRING_SESSION=      # Required - Generate from @SessionBuilderbot
-MONGO_DB_URI=        # Required - MongoDB connection string
-COOKIE_URL=          # Required - YT Cookies url
+STRING_SESSION=      # Required 
+MONGO_DB_URI=        # Required 
+COOKIE_URL=          # Required 
 
-API_KEY=             # Optional - External API key for music Download
-API_URL=             # Optional - External API url for music Download
+API_KEY=             # Optional
+API_URL=             # Optional
 ```
 
-⚠️ **Never expose raw cookies or tokens in public repos.** Use safe paste services like [Pastebin](https://pastebin.com) or [Batbin](https://batbin.me).
+⚠️ Use safe paste services like [Pastebin](https://pastebin.com) or [Batbin](https://batbin.me) for save cookies (YT Cookies).
 
-##
-
-<details>
-  <summary><b>Where do I get each key?</b></summary>
-
-  <!-- Added: Well‑organized helper table -->
-
-  <br/>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Key</th>
-        <th>Where to Get It</th>
-        <th>Steps</th>
-        <th>Notes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><code>API_ID</code> &amp; <code>API_HASH</code></td>
-        <td><a href="https://my.telegram.org" target="_blank">my.telegram.org</a> → <i>API Development Tools</i></td>
-        <td>
-          1) Log in with Telegram →
-          2) Open <b>API Development Tools</b> →
-          3) Create app →
-          4) Copy values
-        </td>
-        <td>Keep these private. Needed by both userbot &amp; bot client.</td>
-      </tr>
-      <tr>
-        <td><code>BOT_TOKEN</code></td>
-        <td><a href="https://t.me/BotFather" target="_blank">@BotFather</a></td>
-        <td>
-          1) <b>/newbot</b> →
-          2) Set name &amp; username →
-          3) Copy the token
-        </td>
-        <td>Rotate if leaked. Store in <code>.env</code>.</td>
-      </tr>
-      <tr>
-        <td><code>STRING_SESSION</code></td>
-        <td><a href="https://t.me/SessionBuilderbot" target="_blank">@SessionBuilderbot</a></td>
-        <td>
-          1) Start bot →
-          2) Provide <code>API_ID</code>/<code>API_HASH</code> →
-          3) Complete login →
-          4) Copy string
-        </td>
-        <td>Userbot auth for Pyrogram.</td>
-      </tr>
-      <tr>
-        <td><code>LOGGER_ID</code></td>
-        <td>Telegram <b>Channel/Group</b> you own</td>
-        <td>
-          1) Create private channel/group →
-          2) Add your bot as admin →
-          3) Get ID via <code>@AnnieXRobot</code> or <code>@MissRose_Bot</code>
-        </td>
-        <td>Use a private space so logs aren’t public.</td>
-      </tr>
-      <tr>
-        <td><code>MONGO_DB_URI</code></td>
-        <td><a href="https://www.mongodb.com/atlas/database" target="_blank">MongoDB Atlas</a></td>
-        <td>
-          1) Create free cluster →
-          2) Add database user &amp; IP allowlist →
-          3) Copy connection string (<code>mongodb+srv://...</code>)
-        </td>
-        <td>Required for persistence (queues, configs, etc.).</td>
-      </tr>
-      <tr>
-        <td><code>COOKIE_URL</code></td>
-        <td>Any secure host (e.g., <a href="https://pastebin.com" target="_blank">Pastebin</a>, <a href="https://batbin.me" target="_blank">Batbin</a>)</td>
-        <td>
-          1) Upload your <code>cookies.txt</code> privately →
-          2) Set paste visibility to <b>Unlisted</b> →
-          3) Copy the <b>raw</b> URL
-        </td>
-        <td>Improves YouTube reliability. Never commit raw cookies.</td>
-      </tr>
-      <tr>
-        <td><code>API_KEY</code> / <code>API_URL</code></td>
-        <td>Provider of your choice</td>
-        <td>generate key → paste here</td>
-        <td>Optional integrations.</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <br/>
-</details>
-
-##
 
 ### ☕ VPS Setup Guide
 
-<img src="https://img.shields.io/badge/Show%20/Hide-VPS%20Steps-0ea5e9?style=for-the-badge" alt="Toggle VPS Steps"/>
-<div align="left">
-  <details>
-
 ```bash
-🎵 Deploy TuneViaBot on VPS
+🎵 Deploy  on VPS
 
 ### Step 1: Update & Install Packages
 sudo apt update && sudo apt upgrade -y
@@ -204,9 +44,9 @@ sudo apt install -y nodejs
 npm install -g npm
 
 ### Step 2: Clone Repo
-git clone https://github.com/CertifiedCoders/TuneViaBot
-cd TuneViaBot
-tmux new -s tune
+git clone repo_link
+cd file_name
+tmux new -s bot_name
 
 ### Step 3: Setup & Run
 python3 -m venv venv
