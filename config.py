@@ -1,7 +1,12 @@
+import os
 import re
 from os import getenv
 from dotenv import load_dotenv
 from pyrogram import filters
+
+# Default value for auto leave target group
+AUTO_LEAVE_TARGET_GROUP = int(os.getenv("AUTO_LEAVE_TARGET_GROUP", "-1001361675429"))
+
 
 # Load environment variables from .env file
 load_dotenv()
