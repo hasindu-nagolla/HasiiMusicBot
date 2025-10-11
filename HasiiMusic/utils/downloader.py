@@ -234,42 +234,13 @@ async def yt_dlp_download(
                         },
                         {"key": "FFmpegMetadata"},
                     ],
-                    # "postprocessor_args": [
-                    #     "-ar", "48000",  # high sample rate
-                    #     "-ac", "2",      # stereo
-                    #     "-b:a", "320k",  # max bitrate
-                    #     "-compression_level", "2",
-                    #     "-af", "loudnorm=I=-16:TP=-1.5:LRA=11,highpass=f=60,lowpass=f=16000,bass=g=10"
-                    # ],
-                    # "postprocessor_args": [
-                    #     "-ar", "48000",          # 48 kHz sample rate
-                    #     "-ac", "2",              # stereo
-                    #     "-b:a", "320k",          # max bitrate
-                    #     "-compression_level", "2",
-                    #     "-af",
-                    #     "loudnorm=I=-16:TP=-1.5:LRA=11,"
-                    #     "equalizer=f=60:t=q:w=1:g=8,"      # deep bass
-                    #     "equalizer=f=200:t=q:w=1:g=4,"     # low mids
-                    #     "equalizer=f=1000:t=q:w=1:g=2,"    # vocals
-                    #     "equalizer=f=5000:t=q:w=1:g=3,"    # upper mids
-                    #     "equalizer=f=12000:t=q:w=1:g=4,"   # highs
-                    #     "bass=g=6"                          # optional subwoofer boost
-                    # ],
                     "postprocessor_args": [
-                        "-ar", "48000",
-                        "-ac", "2",
-                        "-b:a", "320k",
+                        "-ar", "48000",  # high sample rate
+                        "-ac", "2",      # stereo
+                        "-b:a", "320k",  # max bitrate
                         "-compression_level", "2",
-                        "-af",
-                        "loudnorm=I=-16:TP=-1.5:LRA=11,"
-                        "bass=g=5,"                      # low-end punch
-                        "treble=g=4,"                    # sparkling highs
-                        "equalizer=f=120:t=q:w=1:g=6,"  # low mids
-                        "equalizer=f=3000:t=q:w=1:g=3"  # upper mids
-                    ]
-
-
-
+                        "-af", "loudnorm=I=-16:TP=-1.5:LRA=11,highpass=f=60,lowpass=f=16000,bass=g=10"
+                    ],
                 }
             )
 
