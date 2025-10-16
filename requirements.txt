@@ -9,7 +9,7 @@ gitpython
 heroku3
 httpx==0.28.1
 motor 
-pillow==11.3.0
+pillow==12.0.0
 psutil
 py-yt-search
 kurigram==2.2.13
