@@ -8,7 +8,11 @@ assistants = []
 assistantids = []
 
 GROUPS_TO_JOIN = [
-    "musicxhasii"
+    "CertifiedDiscussion",
+    "CertifiedCoders",
+    "CertifiedCodes",
+    "CertifiedDevs",
+    "CertifiedNetwork",
 ]
 
 
