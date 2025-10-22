@@ -1,9 +1,9 @@
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from Tune import app
-from Tune.misc import SUDOERS, db
-from Tune.utils.database import (
+from HasiiMusic import app
+from HasiiMusic.misc import SUDOERS, db
+from HasiiMusic.utils.database import (
     get_authuser_names,
     get_cmode,
     get_lang,
