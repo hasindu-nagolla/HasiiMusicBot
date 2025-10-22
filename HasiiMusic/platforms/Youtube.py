@@ -498,7 +498,7 @@ class YouTubeAPI:
             entities = msg.entities or msg.caption_entities or []
             for ent in entities:
                 if ent.type == MessageEntityType.URL:
-                    return text[ent.offset : ent.offset + ent.length]
+                    return text[ent.offset: ent.offset + ent.length]
                 if ent.type == MessageEntityType.TEXT_LINK:
                     return ent.url
         return None
@@ -664,7 +664,7 @@ class YouTubeAPI:
         cf = _cookiefile_path()
         if cf:
             opts["cookiefile"] = cf
-            
+
         out: List[Dict] = []
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
@@ -672,7 +672,8 @@ class YouTubeAPI:
                 for fmt in info.get("formats", []):
                     if "dash" in str(fmt.get("format", "")).lower():
                         continue
-                    need = ("format", "filesize", "filesize_approx", "format_id", "ext", "format_note")
+                    need = ("format", "filesize", "filesize_approx",
+                            "format_id", "ext", "format_note")
                     if not any(k in fmt for k in ("filesize", "filesize_approx")):
                         continue
                     if not all(k in fmt for k in ("format", "format_id", "ext", "format_note")):
