@@ -5,9 +5,9 @@ from pyrogram.types import (
 )
 from py_yt import VideosSearch
 
-from Tune.utils.inlinequery import answer
+from HasiiMusic.utils.inlinequery import answer
 from config import BANNED_USERS
-from Tune import app
+from HasiiMusic import app
 
 
 @app.on_inline_query(~BANNED_USERS)

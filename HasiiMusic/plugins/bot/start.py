@@ -9,11 +9,11 @@ from py_yt import VideosSearch
 import config
 from config import BANNED_USERS, HELP_IMG_URL, START_VIDS, STICKERS
 from strings import get_string
-from Tune import app
-from Tune.misc import _boot_
-from Tune.plugins.sudo.sudoers import sudoers_list
-from Tune.utils import bot_sys_stats
-from Tune.utils.database import (
+from HasiiMusic import app
+from HasiiMusic.misc import _boot_
+from HasiiMusic.plugins.sudo.sudoers import sudoers_list
+from HasiiMusic.utils import bot_sys_stats
+from HasiiMusic.utils.database import (
     add_served_chat,
     add_served_user,
     blacklisted_chats,
@@ -23,10 +23,10 @@ from Tune.utils.database import (
     is_banned_user,
     is_on_off,
 )
-from Tune.utils.decorators.language import LanguageStart
-from Tune.utils.formatters import get_readable_time
-from Tune.utils.inline import private_panel, start_panel
-from Tune.utils.inline.help import help_keyboard
+from HasiiMusic.utils.decorators.language import LanguageStart
+from HasiiMusic.utils.formatters import get_readable_time
+from HasiiMusic.utils.inline import private_panel, start_panel
+from HasiiMusic.utils.inline.help import help_keyboard
 
 
 async def delete_sticker_after_delay(message, delay):
