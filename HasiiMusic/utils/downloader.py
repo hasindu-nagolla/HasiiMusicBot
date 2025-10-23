@@ -230,6 +230,10 @@ async def yt_dlp_download(
                             "preferredquality": "192",
                         }
                     ],
+                    "postprocessor_args": [
+                        "-af",
+                        "bass=g=8, dynaudnorm=f=150",  # Bass boost + normalization
+                    ],
                 }
             )
             await _with_sem(
