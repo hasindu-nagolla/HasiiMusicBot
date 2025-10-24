@@ -162,7 +162,8 @@ def PlayWrapper(command):
                             return await message.reply_text(_["call_1"])
                         except Exception as e:
                             return await message.reply_text(
-                                _["call_3"].format(app.mention, type(e).__name__)
+                                _["call_3"].format(
+                                    app.mention, type(e).__name__)
                             )
 
                 if invitelink.startswith("https://t.me/+"):

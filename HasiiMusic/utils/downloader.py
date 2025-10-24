@@ -230,26 +230,8 @@ async def yt_dlp_download(
                         {
                             "key": "FFmpegExtractAudio",
                             "preferredcodec": "mp3",
-                            "preferredquality": "320",
+                            "preferredquality": "192",
                         }
-                    ],
-                    "postprocessor_args": [
-                        "-af",
-                        (
-                            # Dolby-like EQ + Stronger Bass + Dynamic Normalization
-                            # Deep sub-bass (thunder feel)
-                            "equalizer=f=32:width_type=h:width=50:g=14,"
-                            "equalizer=f=64:width_type=h:width=50:g=11,"   # Punchy low bass
-                            "equalizer=f=125:width_type=h:width=50:g=8,"   # Warmth & fullness
-                            "equalizer=f=250:width_type=h:width=50:g=3,"   # Body
-                            "equalizer=f=500:width_type=h:width=50:g=0,"   # Neutral mids
-                            "equalizer=f=1000:width_type=h:width=50:g=0,"
-                            "equalizer=f=2000:width_type=h:width=50:g=1,"  # Slight vocal lift
-                            "equalizer=f=4000:width_type=h:width=50:g=3,"  # Clarity boost
-                            "equalizer=f=8000:width_type=h:width=50:g=5,"  # Brightness
-                            "equalizer=f=16000:width_type=h:width=50:g=6,"  # Air & sparkle
-                            "dynaudnorm=f=200:g=15"                        # Dynamic volume normalization
-                        ),
                     ],
                 }
             )
