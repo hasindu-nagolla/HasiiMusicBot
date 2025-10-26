@@ -12,7 +12,13 @@ from yt_dlp import YoutubeDL
 from HasiiMusic.core.dir import DOWNLOAD_DIR as _DOWNLOAD_DIR, CACHE_DIR
 from HasiiMusic.utils.cookie_handler import COOKIE_PATH
 from HasiiMusic.utils.tuning import CHUNK_SIZE, SEM
-from config import API_KEY, API_URL
+from config import (
+    API_KEY,
+    API_URL,
+    YTDLP_AUDIO_FORMAT,
+    YTDLP_PREFERRED_AUDIO_BITRATE,
+    YTDLP_VIDEO_FORMAT,
+)
 
 USE_API: bool = bool(API_URL and API_KEY)
 
@@ -69,6 +75,7 @@ def _ytdlp_base_opts() -> Dict[str, Union[str, int, bool]]:
         "retries": 3,
         "fragment_retries": 3,
         "cachedir": str(CACHE_DIR),
+        "prefer_ffmpeg": True,
     }
     cookiefile = _cookiefile_path()
     if cookiefile:
@@ -174,7 +181,16 @@ async def yt_dlp_download(
 
         async def run():
             opts = _ytdlp_base_opts()
-            opts.update({"format": "bestaudio/best"})
+            opts.update({"format": YTDLP_AUDIO_FORMAT})
+            bitrate = YTDLP_PREFERRED_AUDIO_BITRATE
+            if bitrate.isdigit():
+                opts.setdefault("postprocessors", []).append(
+                    {
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "mp3",
+                        "preferredquality": bitrate,
+                    }
+                )
             return await _with_sem(
                 loop.run_in_executor(None, _download_ytdlp, link, opts)
             )
@@ -186,7 +202,7 @@ async def yt_dlp_download(
 
         async def run():
             opts = _ytdlp_base_opts()
-            opts.update({"format": "best[height<=?720][width<=?1280]"})
+            opts.update({"format": YTDLP_VIDEO_FORMAT})
             return await _with_sem(
                 loop.run_in_executor(None, _download_ytdlp, link, opts)
             )
