@@ -1,6 +1,8 @@
 import re
 from os import getenv
 from dotenv import load_dotenv
+from typing import Iterable, Iterator, Set
+
 from pyrogram import filters
 
 # Load environment variables from .env file
@@ -109,7 +111,61 @@ DURATION_LIMIT = time_to_seconds(f"{DURATION_LIMIT_MIN}:00")
 AYU = ["💞", "🦋", "🔍", "🧪", "⚡️", "🎩", "🍷", "🥂", "🕊️", "🪄", "🧨"]
 
 # ───── Runtime Structures ───── #
-BANNED_USERS = filters.user()
+class BannedUsersManager:
+    """Manage banned user IDs while exposing a Pyrogram filter."""
+
+    def __init__(self) -> None:
+        self._ids: Set[int] = set()
+
+        def _checker(_, __, update) -> bool:
+            user = getattr(update, "from_user", None)
+            return bool(user and user.id in self._ids)
+
+        self._filter = filters.create(_checker)
+
+    def add(self, user_id: int) -> None:
+        self._ids.add(int(user_id))
+
+    def remove(self, user_id: int) -> None:
+        self._ids.remove(int(user_id))
+
+    def discard(self, user_id: int) -> None:
+        self._ids.discard(int(user_id))
+
+    def update(self, user_ids: Iterable[int]) -> None:
+        for user_id in user_ids:
+            self.add(user_id)
+
+    def clear(self) -> None:
+        self._ids.clear()
+
+    def __contains__(self, user_id: object) -> bool:  # type: ignore[override]
+        try:
+            return int(user_id) in self._ids
+        except (TypeError, ValueError):
+            return False
+
+    def __len__(self) -> int:
+        return len(self._ids)
+
+    def __iter__(self) -> Iterator[int]:
+        return iter(self._ids)
+
+    def __bool__(self) -> bool:
+        return bool(self._ids)
+
+    def __invert__(self):
+        return ~self._filter
+
+    def __repr__(self) -> str:
+        return f"BannedUsersManager(total={len(self)})"
+
+    @property
+    def filter(self):
+        return self._filter
+
+
+BANNED_USERS = BannedUsersManager()
 adminlist, lyrical, votemode, autoclean, confirmer = {}, {}, {}, [], {}
 
 # ── Minimal validation ─────────────────────────────────────────────────────────
