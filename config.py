@@ -33,6 +33,26 @@ TG_AUDIO_FILESIZE_LIMIT = int(getenv("TG_AUDIO_FILESIZE_LIMIT", "157286400"))
 TG_VIDEO_FILESIZE_LIMIT = int(getenv("TG_VIDEO_FILESIZE_LIMIT", "1288490189"))
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "30"))
 
+# ── Streaming quality preferences ────────────────────────────────────────────
+STREAM_AUDIO_ONLY_QUALITY = getenv(
+    "STREAM_AUDIO_ONLY_QUALITY", "studio"
+).strip().lower()
+STREAM_VIDEO_AUDIO_QUALITY = getenv(
+    "STREAM_VIDEO_AUDIO_QUALITY", "studio"
+).strip().lower()
+STREAM_VIDEO_QUALITY = getenv(
+    "STREAM_VIDEO_QUALITY", "fhd_1080p"
+).strip().lower()
+YTDLP_AUDIO_FORMAT = getenv(
+    "YTDLP_AUDIO_FORMAT", "bestaudio[abr>=256]/bestaudio/best"
+).strip()
+YTDLP_VIDEO_FORMAT = getenv(
+    "YTDLP_VIDEO_FORMAT", "best[height<=?1080][width<=?1920]"
+).strip()
+YTDLP_PREFERRED_AUDIO_BITRATE = getenv(
+    "YTDLP_PREFERRED_AUDIO_BITRATE", "320"
+).strip()
+
 # ── External APIs ──────────────────────────────────────────────────────────────
 COOKIE_URL = getenv("COOKIE_URL")  # required (paste link)
 API_URL = getenv("API_URL")        # optional
