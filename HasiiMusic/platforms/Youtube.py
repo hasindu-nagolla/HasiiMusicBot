@@ -7,6 +7,7 @@ import time
 from typing import Dict, List, Optional, Tuple, Union
 
 import yt_dlp
+import config
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
 from py_yt  import VideosSearch
@@ -191,7 +192,7 @@ class YouTubeAPI:
             *(_cookies_args()),
             "-g",
             "-f",
-            "best[height<=?720][width<=?1280]",
+            config.YTDLP_VIDEO_FORMAT,
             link,
         )
         return (1, stdout.decode().split("\n")[0]) if stdout else (0, stderr.decode())

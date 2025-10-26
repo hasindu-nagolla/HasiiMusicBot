@@ -37,12 +37,44 @@ from HasiiMusic.utils.errors import capture_internal_err, send_large_error
 autoend = {}
 counter = {}
 
+_AUDIO_QUALITY_MAP = {
+    "studio": AudioQuality.STUDIO,
+    "high": AudioQuality.HIGH,
+    "medium": AudioQuality.MEDIUM,
+    "low": AudioQuality.LOW,
+}
+
+_VIDEO_QUALITY_MAP = {
+    "fhd_1080p": VideoQuality.FHD_1080p,
+    "hd_720p": VideoQuality.HD_720p,
+    "sd_480p": VideoQuality.SD_480p,
+    "sd_360p": VideoQuality.SD_360p,
+}
+
+
+def _resolve_audio_quality(pref: str, fallback: AudioQuality) -> AudioQuality:
+    return _AUDIO_QUALITY_MAP.get(pref, fallback)
+
+
+def _resolve_video_quality(pref: str, fallback: VideoQuality) -> VideoQuality:
+    return _VIDEO_QUALITY_MAP.get(pref, fallback)
+
+
 def dynamic_media_stream(path: str, video: bool = False, ffmpeg_params: str = None) -> MediaStream:
+    audio_pref = (
+        config.STREAM_VIDEO_AUDIO_QUALITY if video else config.STREAM_AUDIO_ONLY_QUALITY
+    )
+    video_pref = config.STREAM_VIDEO_QUALITY
+
     return MediaStream(
         audio_path=path,
         media_path=path,
-        audio_parameters=AudioQuality.MEDIUM if video else AudioQuality.STUDIO,
-        video_parameters=VideoQuality.HD_720p if video else VideoQuality.SD_360p,
+        audio_parameters=_resolve_audio_quality(audio_pref, AudioQuality.STUDIO),
+        video_parameters=(
+            _resolve_video_quality(video_pref, VideoQuality.HD_720p)
+            if video
+            else VideoQuality.SD_360p
+        ),
         video_flags=(MediaStream.Flags.AUTO_DETECT if video else MediaStream.Flags.IGNORE),
         ffmpeg_parameters=ffmpeg_params,
     )
