@@ -2,7 +2,9 @@ import asyncio
 import contextlib
 import os
 import re
-from typing import Dict, Optional, Union
+from functools import partial
+from glob import glob
+from typing import Dict, Iterable, Optional, Union
 
 import aiofiles
 import aiohttp
@@ -48,12 +50,45 @@ def _cookiefile_path() -> Optional[str]:
     return None
 
 
-def file_exists(video_id: str) -> Optional[str]:
-    for ext in ("mp3", "m4a", "webm"):
-        path = f"{_DOWNLOAD_DIR}/{video_id}.{ext}"
+_DEFAULT_AUDIO_EXTS: tuple[str, ...] = ("mp3", "m4a", "webm", "opus", "mka")
+_DEFAULT_VIDEO_EXTS: tuple[str, ...] = ("mp4", "mkv", "webm", "mov")
+
+
+def _find_downloaded_file(
+    video_id: str,
+    *,
+    preferred_exts: Optional[Iterable[str]] = None,
+    expected_ext: Optional[str] = None,
+) -> Optional[str]:
+    base = f"{_DOWNLOAD_DIR}/{video_id}"
+    order: list[str] = []
+
+    def _append(ext: Optional[str]) -> None:
+        if not ext:
+            return
+        ext = ext.lstrip(".").lower()
+        if ext and ext not in order:
+            order.append(ext)
+
+    if preferred_exts:
+        for ext in preferred_exts:
+            _append(ext)
+    _append(expected_ext)
+
+    for ext in order:
+        candidate = f"{base}.{ext}"
+        if os.path.exists(candidate):
+            return candidate
+
+    for path in glob(f"{base}.*"):
         if os.path.exists(path):
             return path
+
     return None
+
+
+def file_exists(video_id: str) -> Optional[str]:
+    return _find_downloaded_file(video_id, preferred_exts=_DEFAULT_AUDIO_EXTS)
 
 
 def _safe_filename(name: str) -> str:
@@ -132,17 +167,31 @@ async def api_download_song(link: str) -> Optional[str]:
         return None
 
 
-def _download_ytdlp(link: str, opts: Dict) -> Optional[str]:
+def _download_ytdlp(
+    link: str,
+    opts: Dict,
+    *,
+    preferred_exts: Optional[Iterable[str]] = None,
+) -> Optional[str]:
     try:
         with YoutubeDL(opts) as ydl:
             info = ydl.extract_info(link, download=False)
-            ext = info.get("ext") or "webm"
             vid = info.get("id")
-            path = f"{_DOWNLOAD_DIR}/{vid}.{ext}"
-            if os.path.exists(path):
-                return path
+            if not vid:
+                ydl.download([link])
+                return None
+
+            expected_ext = str(info.get("ext") or "").lower() or None
+            existing = _find_downloaded_file(
+                vid, preferred_exts=preferred_exts, expected_ext=expected_ext
+            )
+            if existing:
+                return existing
+
             ydl.download([link])
-            return path
+            return _find_downloaded_file(
+                vid, preferred_exts=preferred_exts, expected_ext=expected_ext
+            )
     except Exception:
         return None
 
@@ -192,7 +241,15 @@ async def yt_dlp_download(
                     }
                 )
             return await _with_sem(
-                loop.run_in_executor(None, _download_ytdlp, link, opts)
+                loop.run_in_executor(
+                    None,
+                    partial(
+                        _download_ytdlp,
+                        link,
+                        opts,
+                        preferred_exts=_DEFAULT_AUDIO_EXTS,
+                    ),
+                )
             )
 
         return await _dedup(key, run)
@@ -204,7 +261,15 @@ async def yt_dlp_download(
             opts = _ytdlp_base_opts()
             opts.update({"format": YTDLP_VIDEO_FORMAT})
             return await _with_sem(
-                loop.run_in_executor(None, _download_ytdlp, link, opts)
+                loop.run_in_executor(
+                    None,
+                    partial(
+                        _download_ytdlp,
+                        link,
+                        opts,
+                        preferred_exts=_DEFAULT_VIDEO_EXTS,
+                    ),
+                )
             )
 
         return await _dedup(key, run)

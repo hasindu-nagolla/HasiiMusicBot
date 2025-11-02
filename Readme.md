@@ -31,6 +31,27 @@ API_URL=             # Optional
 ⚠️ Use safe paste services like [Pastebin](https://pastebin.com) or [Batbin](https://batbin.me) for save cookies (YT Cookies).
 
 
+### 🎧 Recommended streaming quality overrides
+
+To get the clearest playback, drop these keys in your `.env` (or keep the same values from `sample.env`). They align with PyTgCalls’ highest quality presets and yt-dlp’s high-bitrate formats while staying compatible with most hosting setups.
+
+```env
+# Audio-only voice chats
+STREAM_AUDIO_ONLY_QUALITY=studio
+
+# Audio track inside video calls
+STREAM_VIDEO_AUDIO_QUALITY=studio
+
+# Outgoing video resolution
+STREAM_VIDEO_QUALITY=fhd_1080p
+
+# yt-dlp format preferences
+YTDLP_AUDIO_FORMAT=bestaudio[abr>=256]/bestaudio/best
+YTDLP_VIDEO_FORMAT=best[height<=?1080][width<=?1920]
+YTDLP_PREFERRED_AUDIO_BITRATE=320
+```
+
+
 ### ☕ VPS Setup Guide
 
 ```bash
