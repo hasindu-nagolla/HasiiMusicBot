@@ -12,7 +12,7 @@
 # pillow==11.3.0
 # psutil
 # py-yt-search
-# kurigram==2.2.13
+# kurigram==2.2.15
 # python-dotenv
 # ntgcalls==2.0.6
 # py-tgcalls==2.2.8
@@ -37,7 +37,7 @@ motor
 pillow==12.0.0
 psutil
 git+https://github.com/CertifiedCoders/youtube-search-python
-kurigram==2.2.13
+kurigram==2.2.15
 python-dotenv
 ntgcalls==2.0.6
 py-tgcalls==2.2.8
