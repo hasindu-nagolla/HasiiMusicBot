@@ -48,3 +48,4 @@ spotipy
 tgcrypto
 unidecode
 yt-dlp==2025.11.12
+
