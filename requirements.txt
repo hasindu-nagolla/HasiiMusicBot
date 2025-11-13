@@ -1,50 +1,50 @@
-# aiofiles
-# aiohttp
-# apscheduler
-# asyncio
-# bs4
-# ffmpeg-python
-# future==1.0.0
-# gitpython
-# heroku3
-# httpx==0.28.1
-# motor 
-# pillow==11.3.0
-# psutil
-# py-yt-search
-# kurigram==2.2.13
-# python-dotenv
-# ntgcalls==2.0.6
-# py-tgcalls==2.2.8
-# pyyaml==6.0.3
-# requests
-# speedtest-cli
-# spotipy
-# tgcrypto
-# unidecode
-# yt-dlp==2025.10.22
-aiofiles
-aiohttp
-apscheduler
-asyncio
-bs4
-ffmpeg-python
-future==1.0.0
-gitpython
-heroku3
-httpx==0.28.1
-motor 
+# Core async & I/O
+aiofiles>=24.1.0
+aiohttp>=3.10.0
+asyncio>=3.4.3
+
+# Task scheduling
+apscheduler>=3.10.4
+
+# Web scraping & parsing
+beautifulsoup4>=4.12.0
+
+# Media processing
+ffmpeg-python>=0.2.0
 pillow==12.0.0
-psutil
+
+# Utilities
+future==1.0.0
+psutil>=6.0.0
+unidecode>=1.3.8
+
+# Git & Heroku
+gitpython>=3.1.40
+heroku3>=5.2.0
+
+# HTTP clients
+httpx==0.28.1
+requests>=2.32.0
+
+# Database
+motor>=3.6.0
+
+# YouTube & music sources
 git+https://github.com/CertifiedCoders/youtube-search-python
-kurigram==2.2.13
-python-dotenv
+yt-dlp==2025.11.12
+spotipy>=2.24.0
+
+# Telegram bot framework
+pyrogram==2.2.13
+tgcrypto>=1.2.5
 ntgcalls==2.0.6
 py-tgcalls==2.2.8
+
+# Configuration & validation (NEW - Modern config management)
+python-dotenv>=1.0.0
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
+
+# Other
 pyyaml==6.0.3
-requests
-speedtest-cli
-spotipy
-tgcrypto
-unidecode
-yt-dlp==2025.11.12
+speedtest-cli>=2.1.3
