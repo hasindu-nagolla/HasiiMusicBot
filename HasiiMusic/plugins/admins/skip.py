@@ -3,7 +3,7 @@ from pyrogram.types import InlineKeyboardMarkup, Message
 
 import config
 from HasiiMusic import YouTube, app
-from HasiiMusic.core.call import JARVIS
+from HasiiMusic.core.call import StreamController
 from HasiiMusic.misc import db
 from HasiiMusic.utils.database import get_loop
 from HasiiMusic.utils.decorators import AdminRightsCheck
@@ -14,7 +14,8 @@ from config import BANNED_USERS
 
 
 @app.on_message(
-    filters.command(["skip", "cskip", "next", "cnext"], prefixes=["/", "!"]) & filters.group & ~BANNED_USERS
+    filters.command(["skip", "cskip", "next", "cnext"], prefixes=[
+                    "/", "!"]) & filters.group & ~BANNED_USERS
 )
 @AdminRightsCheck
 async def skip(cli, message: Message, _, chat_id):
@@ -48,7 +49,7 @@ async def skip(cli, message: Message, _, chat_id):
                                         ),
                                         reply_markup=close_markup(_),
                                     )
-                                    await JARVIS.stop_stream(chat_id)
+                                    await StreamController.stop_stream(chat_id)
                                 except:
                                     return
                                 break
@@ -75,7 +76,7 @@ async def skip(cli, message: Message, _, chat_id):
                     reply_markup=close_markup(_),
                 )
                 try:
-                    return await JARVIS.stop_stream(chat_id)
+                    return await StreamController.stop_stream(chat_id)
                 except:
                     return
         except:
@@ -86,7 +87,7 @@ async def skip(cli, message: Message, _, chat_id):
                     ),
                     reply_markup=close_markup(_),
                 )
-                return await JARVIS.stop_stream(chat_id)
+                return await StreamController.stop_stream(chat_id)
             except:
                 return
     queued = check[0]["file"]
@@ -111,7 +112,7 @@ async def skip(cli, message: Message, _, chat_id):
         except:
             image = None
         try:
-            await JARVIS.skip_stream(chat_id, link, video=status, image=image)
+            await StreamController.skip_stream(chat_id, link, video=status, image=image)
         except:
             return await message.reply_text(_["call_6"])
         button = stream_markup(_, chat_id)
@@ -144,7 +145,7 @@ async def skip(cli, message: Message, _, chat_id):
         except:
             image = None
         try:
-            await JARVIS.skip_stream(chat_id, file_path, video=status, image=image)
+            await StreamController.skip_stream(chat_id, file_path, video=status, image=image)
         except:
             return await mystic.edit_text(_["call_6"])
         button = stream_markup(_, chat_id)
@@ -164,7 +165,7 @@ async def skip(cli, message: Message, _, chat_id):
         await mystic.delete()
     elif "index_" in queued:
         try:
-            await JARVIS.skip_stream(chat_id, videoid, video=status)
+            await StreamController.skip_stream(chat_id, videoid, video=status)
         except:
             return await message.reply_text(_["call_6"])
         button = stream_markup(_, chat_id)
@@ -186,7 +187,7 @@ async def skip(cli, message: Message, _, chat_id):
             except:
                 image = None
         try:
-            await JARVIS.skip_stream(chat_id, queued, video=status, image=image)
+            await StreamController.skip_stream(chat_id, queued, video=status, image=image)
         except:
             return await message.reply_text(_["call_6"])
         if videoid == "telegram":

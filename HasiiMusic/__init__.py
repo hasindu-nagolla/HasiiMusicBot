@@ -1,16 +1,16 @@
-from HasiiMusic.core.bot import JARVIS
-from HasiiMusic.core.dir import dirr
+from HasiiMusic.core.bot import MusicBotClient
+from HasiiMusic.core.dir import StorageManager
 from HasiiMusic.core.git import git
 from HasiiMusic.core.userbot import Userbot
 from HasiiMusic.misc import dbb, heroku
 from HasiiMusic.logging import LOGGER
 
-dirr()
+StorageManager()
 git()
 dbb()
 heroku()
 
-app = JARVIS()
+app = MusicBotClient()
 userbot = Userbot()
 
 

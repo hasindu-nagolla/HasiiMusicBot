@@ -11,7 +11,8 @@ from HasiiMusic import app
 BOT_INFO: Optional[types.User] = None
 BOT_ID: Optional[int] = None
 
-PHOTOS = "https://files.catbox.moe/139oue.png"
+img = "https://files.catbox.moe/139oue.png"
+
 
 def _is_valid_url(url: Optional[str]) -> bool:
     if not url:
@@ -22,6 +23,7 @@ def _is_valid_url(url: Optional[str]) -> bool:
     except Exception:
         return False
 
+
 async def _ensure_bot_info() -> None:
     global BOT_INFO, BOT_ID
     if BOT_INFO is None:
@@ -30,6 +32,7 @@ async def _ensure_bot_info() -> None:
             BOT_ID = BOT_INFO.id
         except Exception as e:
             print(f"Failed to get bot info: {e}")
+
 
 async def safe_send_photo(chat_id, photo, caption, reply_markup=None, max_retries=3):
     for attempt in range(max_retries):
@@ -52,6 +55,7 @@ async def safe_send_photo(chat_id, photo, caption, reply_markup=None, max_retrie
             if attempt == max_retries - 1:
                 raise
             await asyncio.sleep(1)
+
 
 @app.on_message(filters.new_chat_members)
 async def join_watcher(_, message: Message):
@@ -93,18 +97,20 @@ async def join_watcher(_, message: Message):
             reply_markup = None
             if _is_valid_url(invite_link):
                 reply_markup = InlineKeyboardMarkup(
-                    [[InlineKeyboardButton("sᴇᴇ ɢʀᴏᴜᴘ 👀", url=invite_link.strip())]]
+                    [[InlineKeyboardButton(
+                        "sᴇᴇ ɢʀᴏᴜᴘ 👀", url=invite_link.strip())]]
                 )
 
             await safe_send_photo(
                 LOGGER_ID,
-                photo=PHOTOS,
+                photo=img,
                 caption=caption,
                 reply_markup=reply_markup
             )
     except Exception as e:
         pass
-    
+
+
 @app.on_message(filters.left_chat_member)
 async def on_left_chat_member(_, message: Message):
     try:
@@ -135,6 +141,7 @@ async def on_left_chat_member(_, message: Message):
                 await asyncio.sleep(e.value + 1)
             except Exception as e:
                 if attempt == max_retries - 1:
-                    print(f"Failed to send left chat message after {max_retries} attempts: {e}")
+                    print(
+                        f"Failed to send left chat message after {max_retries} attempts: {e}")
     except Exception as e:
         pass

@@ -10,7 +10,7 @@ from pytgcalls.exceptions import NoActiveGroupCall
 import config
 from config import AYU, BANNED_USERS, lyrical
 from HasiiMusic import Apple, Resso, SoundCloud, Spotify, Telegram, YouTube, app
-from HasiiMusic.core.call import JARVIS
+from HasiiMusic.core.call import StreamController
 from HasiiMusic.utils import seconds_to_min, time_to_seconds
 from HasiiMusic.utils.channelplay import get_channeplayCB
 from HasiiMusic.utils.decorators.language import languageCB
@@ -206,7 +206,8 @@ async def play_command(
 
                 plist_type = "yt"
                 plist_id = (
-                    (url.split("="))[1].split("&")[0] if "&" in url else (url.split("="))[1]
+                    (url.split("="))[1].split("&")[
+                        0] if "&" in url else (url.split("="))[1]
                 )
                 img = config.PLAYLIST_IMG_URL
                 cap = _["play_9"]
@@ -220,7 +221,8 @@ async def play_command(
                     return await mystic.edit_text(_["play_3"])
 
                 img = details["thumb"]
-                cap = _["play_10"].format(details["title"], details["duration_min"])
+                cap = _["play_10"].format(
+                    details["title"], details["duration_min"])
                 u = url.lower()
                 internal_type = "youtube"
                 log_label = "Youtube shorts" if "youtube.com/shorts/" in u else "Youtube Track"
@@ -239,7 +241,8 @@ async def play_command(
                     return await mystic.edit_text(_["play_3"])
 
                 img = details["thumb"]
-                cap = _["play_10"].format(details["title"], details["duration_min"])
+                cap = _["play_10"].format(
+                    details["title"], details["duration_min"])
                 internal_type = "youtube"
                 log_label = "Spotify Track"
 
@@ -251,7 +254,8 @@ async def play_command(
 
                 plist_type = "spplay"
                 img = config.SPOTIFY_PLAYLIST_IMG_URL
-                cap = _["play_11"].format(app.mention, message.from_user.mention)
+                cap = _["play_11"].format(
+                    app.mention, message.from_user.mention)
                 internal_type = "playlist"
                 log_label = "Spotify playlist"
 
@@ -263,7 +267,8 @@ async def play_command(
 
                 plist_type = "spalbum"
                 img = config.SPOTIFY_ALBUM_IMG_URL
-                cap = _["play_11"].format(app.mention, message.from_user.mention)
+                cap = _["play_11"].format(
+                    app.mention, message.from_user.mention)
                 internal_type = "playlist"
                 log_label = "Spotify album"
 
@@ -290,7 +295,8 @@ async def play_command(
                     return await mystic.edit_text(_["play_3"])
 
                 img = details["thumb"]
-                cap = _["play_10"].format(details["title"], details["duration_min"])
+                cap = _["play_10"].format(
+                    details["title"], details["duration_min"])
                 internal_type = "youtube"
                 log_label = "Apple Music"
 
@@ -303,7 +309,8 @@ async def play_command(
 
                 plist_type = "apple"
                 img = url
-                cap = _["play_12"].format(app.mention, message.from_user.mention)
+                cap = _["play_12"].format(
+                    app.mention, message.from_user.mention)
                 internal_type = "playlist"
                 log_label = "Apple Music playlist"
 
@@ -317,7 +324,8 @@ async def play_command(
                 return await mystic.edit_text(_["play_3"])
 
             img = details["thumb"]
-            cap = _["play_10"].format(details["title"], details["duration_min"])
+            cap = _["play_10"].format(
+                details["title"], details["duration_min"])
             internal_type = "youtube"
             log_label = "Resso"
 
@@ -358,7 +366,7 @@ async def play_command(
 
         else:
             try:
-                await JARVIS.stream_call(url)
+                await StreamController.stream_call(url)
             except NoActiveGroupCall:
                 await mystic.edit_text(_["black_9"])
                 return await app.send_message(
@@ -420,7 +428,8 @@ async def play_command(
                 duration_sec = time_to_seconds(details["duration_min"])
                 if duration_sec and duration_sec > config.DURATION_LIMIT:
                     return await mystic.edit_text(
-                        _["play_6"].format(config.DURATION_LIMIT_MIN, app.mention)
+                        _["play_6"].format(
+                            config.DURATION_LIMIT_MIN, app.mention)
                     )
             else:
                 buttons = livestream_markup(
@@ -633,7 +642,7 @@ async def anonymous_check(client, CallbackQuery):
         pass
 
 
-@app.on_callback_query(filters.regex("TuneViaPlaylists") & ~BANNED_USERS)
+@app.on_callback_query(filters.regex("HasiiMusicViaPlaylists") & ~BANNED_USERS)
 @languageCB
 @capture_callback_err
 async def play_playlists_command(client, CallbackQuery, _):
@@ -747,7 +756,8 @@ async def slider_queries(client, CallbackQuery, _):
             query, query_type
         )
 
-        buttons = slider_markup(_, vidid, user_id, query, query_type, cplay, fplay)
+        buttons = slider_markup(_, vidid, user_id, query,
+                                query_type, cplay, fplay)
         med = InputMediaPhoto(
             media=thumbnail,
             caption=_["play_10"].format(

@@ -3,7 +3,7 @@ from pyrogram.types import Message
 
 from config import BANNED_USERS, adminlist
 from HasiiMusic import app
-from HasiiMusic.core.call import JARVIS
+from HasiiMusic.core.call import StreamController
 from HasiiMusic.misc import SUDOERS, db
 from HasiiMusic.utils import AdminRightsCheck
 from HasiiMusic.utils.database import is_active_chat, is_nonadmin_chat
@@ -14,7 +14,8 @@ checker = []
 
 
 @app.on_message(
-    filters.command(["cspeed", "speed", "cslow", "slow", "playback", "cplayback"])
+    filters.command(["cspeed", "speed", "cslow",
+                    "slow", "playback", "cplayback"])
     & filters.group
     & ~BANNED_USERS
 )
@@ -94,7 +95,7 @@ async def manage_callback(client, CallbackQuery, _):
         text=_["admin_32"].format(CallbackQuery.from_user.mention),
     )
     try:
-        await JARVIS.speedup_stream(
+        await StreamController.speedup_stream(
             chat_id,
             file_path,
             speed,

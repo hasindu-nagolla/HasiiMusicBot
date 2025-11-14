@@ -18,7 +18,7 @@ from config import (
 )
 from strings import get_string
 from HasiiMusic import YouTube, app
-from HasiiMusic.core.call import JARVIS
+from HasiiMusic.core.call import StreamController
 from HasiiMusic.misc import SUDOERS, db
 from HasiiMusic.utils.database import (
     get_active_chats,
@@ -150,7 +150,7 @@ async def manage_callback(client, callback: CallbackQuery, _):
             return await callback.answer(_["admin_1"], show_alert=True)
         await callback.answer()
         await music_off(chat_id)
-        await JARVIS.pause_stream(chat_id)
+        await StreamController.pause_stream(chat_id)
         await callback.message.reply_text(_["admin_2"].format(user_mention), reply_markup=close_markup(_))
 
     elif command == "Resume":
@@ -158,12 +158,12 @@ async def manage_callback(client, callback: CallbackQuery, _):
             return await callback.answer(_["admin_3"], show_alert=True)
         await callback.answer()
         await music_on(chat_id)
-        await JARVIS.resume_stream(chat_id)
+        await StreamController.resume_stream(chat_id)
         await callback.message.reply_text(_["admin_4"].format(user_mention), reply_markup=close_markup(_))
 
     elif command in ["Stop", "End"]:
         await callback.answer()
-        await JARVIS.stop_stream(chat_id)
+        await StreamController.stop_stream(chat_id)
         await set_loop(chat_id, 0)
         await callback.message.reply_text(_["admin_5"].format(user_mention), reply_markup=close_markup(_))
         await callback.message.delete()
@@ -173,7 +173,7 @@ async def manage_callback(client, callback: CallbackQuery, _):
             return await callback.answer(_["admin_45"], show_alert=True)
         await callback.answer()
         await mute_on(chat_id)
-        await JARVIS.mute_stream(chat_id)
+        await StreamController.mute_stream(chat_id)
         await callback.message.reply_text(_["admin_46"].format(user_mention))
 
     elif command == "Unmute":
@@ -181,7 +181,7 @@ async def manage_callback(client, callback: CallbackQuery, _):
             return await callback.answer(_["admin_47"], show_alert=True)
         await callback.answer()
         await mute_off(chat_id)
-        await JARVIS.unmute_stream(chat_id)
+        await StreamController.unmute_stream(chat_id)
         await callback.message.reply_text(_["admin_48"].format(user_mention))
 
     elif command == "Loop":
@@ -227,18 +227,20 @@ async def handle_skip_replay(callback: CallbackQuery, _, chat_id: int, command: 
             if not playlist:
                 await callback.edit_message_text(text_msg)
                 await callback.message.reply_text(
-                    _["admin_6"].format(user_mention, callback.message.chat.title),
+                    _["admin_6"].format(
+                        user_mention, callback.message.chat.title),
                     reply_markup=close_markup(_)
                 )
-                return await JARVIS.stop_stream(chat_id)
+                return await StreamController.stop_stream(chat_id)
         except Exception:
             try:
                 await callback.edit_message_text(text_msg)
                 await callback.message.reply_text(
-                    _["admin_6"].format(user_mention, callback.message.chat.title),
+                    _["admin_6"].format(
+                        user_mention, callback.message.chat.title),
                     reply_markup=close_markup(_)
                 )
-                return await JARVIS.stop_stream(chat_id)
+                return await StreamController.stop_stream(chat_id)
             except Exception:
                 return
     else:
@@ -277,14 +279,15 @@ async def handle_skip_replay(callback: CallbackQuery, _, chat_id: int, command: 
         except Exception:
             image = None
         try:
-            await JARVIS.skip_stream(chat_id, new_link, video=status, image=image)
+            await StreamController.skip_stream(chat_id, new_link, video=status, image=image)
         except Exception:
             return await callback.message.reply_text(_["call_6"])
         buttons = stream_markup(_, chat_id)
         img = await get_thumb(videoid)
         run = await callback.message.reply_photo(
             photo=img,
-            caption=_["stream_1"].format(f"https://t.me/{app.username}?start=info_{videoid}", title[:23], duration, user),
+            caption=_["stream_1"].format(
+                f"https://t.me/{app.username}?start=info_{videoid}", title[:23], duration, user),
             reply_markup=InlineKeyboardMarkup(buttons)
         )
         db[chat_id][0]["mystic"] = run
@@ -302,14 +305,15 @@ async def handle_skip_replay(callback: CallbackQuery, _, chat_id: int, command: 
         except Exception:
             image = None
         try:
-            await JARVIS.skip_stream(chat_id, file_path, video=status, image=image)
+            await StreamController.skip_stream(chat_id, file_path, video=status, image=image)
         except Exception:
             return await mystic.edit_text(_["call_6"])
         buttons = stream_markup(_, chat_id)
         img = await get_thumb(videoid)
         run = await callback.message.reply_photo(
             photo=img,
-            caption=_["stream_1"].format(f"https://t.me/{app.username}?start=info_{videoid}", title[:23], duration, user),
+            caption=_["stream_1"].format(
+                f"https://t.me/{app.username}?start=info_{videoid}", title[:23], duration, user),
             reply_markup=InlineKeyboardMarkup(buttons)
         )
         db[chat_id][0]["mystic"] = run
@@ -319,7 +323,7 @@ async def handle_skip_replay(callback: CallbackQuery, _, chat_id: int, command: 
 
     elif "index_" in queued:
         try:
-            await JARVIS.skip_stream(chat_id, videoid, video=status)
+            await StreamController.skip_stream(chat_id, videoid, video=status)
         except Exception:
             return await callback.message.reply_text(_["call_6"])
         buttons = stream_markup(_, chat_id)
@@ -341,14 +345,16 @@ async def handle_skip_replay(callback: CallbackQuery, _, chat_id: int, command: 
             except Exception:
                 image = None
         try:
-            await JARVIS.skip_stream(chat_id, queued, video=status, image=image)
+            await StreamController.skip_stream(chat_id, queued, video=status, image=image)
         except Exception:
             return await callback.message.reply_text(_["call_6"])
         if videoid == "telegram":
             buttons = stream_markup(_, chat_id)
             run = await callback.message.reply_photo(
-                photo=(TELEGRAM_AUDIO_URL if str(streamtype) == "audio" else TELEGRAM_VIDEO_URL),
-                caption=_["stream_1"].format(SUPPORT_CHAT, title[:23], duration, user),
+                photo=(TELEGRAM_AUDIO_URL if str(streamtype)
+                       == "audio" else TELEGRAM_VIDEO_URL),
+                caption=_["stream_1"].format(
+                    SUPPORT_CHAT, title[:23], duration, user),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
             db[chat_id][0]["mystic"] = run
@@ -356,8 +362,10 @@ async def handle_skip_replay(callback: CallbackQuery, _, chat_id: int, command: 
         elif videoid == "soundcloud":
             buttons = stream_markup(_, chat_id)
             run = await callback.message.reply_photo(
-                photo=(SOUNCLOUD_IMG_URL if str(streamtype) == "audio" else TELEGRAM_VIDEO_URL),
-                caption=_["stream_1"].format(SUPPORT_CHAT, title[:23], duration, user),
+                photo=(SOUNCLOUD_IMG_URL if str(streamtype)
+                       == "audio" else TELEGRAM_VIDEO_URL),
+                caption=_["stream_1"].format(
+                    SUPPORT_CHAT, title[:23], duration, user),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
             db[chat_id][0]["mystic"] = run
@@ -367,7 +375,8 @@ async def handle_skip_replay(callback: CallbackQuery, _, chat_id: int, command: 
             img = await get_thumb(videoid)
             run = await callback.message.reply_photo(
                 photo=img,
-                caption=_["stream_1"].format(f"https://t.me/{app.username}?start=info_{videoid}", title[:23], duration, user),
+                caption=_["stream_1"].format(
+                    f"https://t.me/{app.username}?start=info_{videoid}", title[:23], duration, user),
                 reply_markup=InlineKeyboardMarkup(buttons)
             )
             db[chat_id][0]["mystic"] = run
@@ -414,7 +423,7 @@ async def handle_seek(callback: CallbackQuery, _, chat_id: int, command: str, us
         if n == 0:
             return await mystic.edit_text(_["admin_22"])
     try:
-        await JARVIS.seek_stream(
+        await StreamController.seek_stream(
             chat_id,
             file_path,
             seconds_to_min(to_seek),
@@ -483,7 +492,7 @@ async def close_menu(_, query: CallbackQuery):
         await msg.delete()
     except:
         pass
-    
+
 
 # ── Stop Download Callback ──
 @app.on_callback_query(filters.regex("stop_downloading") & ~BANNED_USERS)

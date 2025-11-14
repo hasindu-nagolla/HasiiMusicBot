@@ -6,7 +6,7 @@ from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from HasiiMusic import LOGGER, app, userbot
-from HasiiMusic.core.call import JARVIS
+from HasiiMusic.core.call import StreamController
 from HasiiMusic.misc import sudo
 from HasiiMusic.plugins import ALL_MODULES
 from HasiiMusic.utils.database import get_banned_users, get_gbanned
@@ -46,14 +46,14 @@ async def init():
     await app.start()
 
     for all_module in ALL_MODULES:
-        importlib.import_module("HasiiMusic.plugins" + all_module)
+        importlib.import_module("Tune.plugins" + all_module)
 
-    LOGGER("HasiiMusic.plugins").info("ᴛᴜɴᴇ's ᴍᴏᴅᴜʟᴇs ʟᴏᴀᴅᴇᴅ...")
+    LOGGER("Tune.plugins").info("ᴛᴜɴᴇ's ᴍᴏᴅᴜʟᴇs ʟᴏᴀᴅᴇᴅ...")
     await userbot.start()
-    await JARVIS.start()
+    await StreamController.start()
 
     try:
-        await JARVIS.stream_call("https://te.legra.ph/file/29f784eb49d230ab62e9e.mp4")
+        await StreamController.stream_call("https://te.legra.ph/file/29f784eb49d230ab62e9e.mp4")
     except NoActiveGroupCall:
         LOGGER("Tune").error(
             "ᴘʟᴇᴀsᴇ ᴛᴜʀɴ ᴏɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴏғ ʏᴏᴜʀ ʟᴏɢ ɢʀᴏᴜᴘ/ᴄʜᴀɴɴᴇʟ.\n\nᴀɴɴɪᴇ ʙᴏᴛ sᴛᴏᴘᴘᴇᴅ..."
@@ -62,7 +62,7 @@ async def init():
     except:
         pass
 
-    await JARVIS.decorators()
+    await StreamController.decorators()
     LOGGER("Tune").info(
         "\x54\x75\x6e\x65\x20\x56\x69\x61\x20\x4d\x75\x73\x69\x63\x20\x42\x6f\x74\x20\x53\x74\x61\x72\x74\x65\x64\x20\x53\x75\x63\x63\x65\x73\x73\x66\x75\x6c\x6c\x79\x2e"
     )

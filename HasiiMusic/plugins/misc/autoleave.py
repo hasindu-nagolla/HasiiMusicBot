@@ -5,7 +5,7 @@ from pyrogram.enums import ChatType
 
 import config
 from HasiiMusic import app
-from HasiiMusic.core.call import JARVIS, autoend
+from HasiiMusic.core.call import StreamController, autoend
 from HasiiMusic.utils.database import get_client, is_active_chat, is_autoend
 
 
@@ -59,7 +59,7 @@ async def auto_end():
                     continue
                 autoend[chat_id] = {}
                 try:
-                    await JARVIS.stop_stream(chat_id)
+                    await StreamController.stop_stream(chat_id)
                 except:
                     continue
                 try:
