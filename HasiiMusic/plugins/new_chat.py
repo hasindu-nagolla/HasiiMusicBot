@@ -40,9 +40,10 @@ async def new_chat_member(_, message: types.Message):
             
             try:
                 # Send the notification to the logger group
-                await app.send_message(
+                await app.send_photo(
                     chat_id=config.LOGGER_ID,
-                    text=text
+                    photo=config.START_IMG,
+                    caption=text
                 )
             except Exception as e:
                 print(f"Failed to send new chat notification: {e}")
@@ -82,9 +83,10 @@ async def left_chat_member(_, message: types.Message):
         
         try:
             # Send the notification to the logger group
-            await app.send_message(
+            await app.send_photo(
                 chat_id=config.LOGGER_ID,
-                text=text
+                photo=config.START_IMG,
+                caption=text
             )
         except Exception as e:
             print(f"Failed to send left chat notification: {e}")
