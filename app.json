@@ -20,7 +20,7 @@
             "value": "",
             "required": true
         },
-        "MONGO_URL": {
+        "MONGO_DB_URI": {
             "description": "Get a mongodb url from https://cloud.mongodb.com.",
             "value": "",
             "required": true
@@ -35,7 +35,7 @@
             "value": "",
             "required": true
         },
-        "SESSION": {
+        "STRING_SESSION": {
             "description": "A Pyrogram v2 String Session from @StringFatherBot on Telegram.",
             "value": "",
             "required": true
