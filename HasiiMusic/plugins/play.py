@@ -1,4 +1,5 @@
 from pyrogram import filters
+from pyrogram import types
 
 from HasiiMusic import anon, app, config, db, lang, queue, tg, yt
 from HasiiMusic.helpers import buttons, utils
