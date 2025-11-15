@@ -1,25 +1,36 @@
+# Asynchronous Core & Database
+asyncio
 aiofiles
 aiohttp
-apscheduler
-asyncio
-bs4
-ffmpeg-python
-future==1.0.0
-gitpython
-heroku3
-httpx==0.28.1
 motor
-pillow==12.0.0
-psutil
+
+# Telegram & Communication
 kurigram==2.2.14
-python-dotenv
 ntgcalls==2.0.6
 py-tgcalls==2.2.8
-pyyaml==6.0.3
-requests
-speedtest-cli
-spotipy
 tgcrypto
-unidecode
+
+# Media Handling & Processing
+ffmpeg-python
+pillow==12.0.0
 yt-dlp[default]==2025.11.12
 git+https://github.com/CertifiedCoders/youtube-search-python
+
+# General Web & API Interaction
+bs4
+httpx==0.28.1
+requests
+spotipy
+
+# Deployment & Development Tools
+gitpython
+heroku3
+python-dotenv
+pyyaml==6.0.3
+
+# System & Utilities
+apscheduler
+future==1.0.0
+psutil
+speedtest-cli
+unidecode
