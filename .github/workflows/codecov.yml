@@ -27,7 +27,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          python -m pytest --cov --cov-branch --cov-report=xml
+          python -m pytest --cov=HasiiMusic --cov=strings --cov=config --cov-branch --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
