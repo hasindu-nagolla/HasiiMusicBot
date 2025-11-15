@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 from pyrogram import enums, types
-from pyyt import Playlist, VideosSearch
+from py_yt import Playlist, VideosSearch
 
 from HasiiMusic import logger
 from HasiiMusic.helpers import Track, utils
