@@ -29,6 +29,12 @@
 
 ## 🚀 Deployment
 
+### ✔️ Prerequisites
+
+- Python 3.10+ installed
+- Deno & FFmpeg installed on your system
+- Required variables mentioned in sample.env
+
 ### Requirements
 
 - Python 3.12+
