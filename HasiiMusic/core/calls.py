@@ -143,7 +143,8 @@ class TgCall(PyTgCalls):
         _lang = await lang.get_lang(chat_id)
         msg = await app.send_message(chat_id=chat_id, text=_lang["play_next"])
         if not media.file_path:
-            media.file_path = await yt.download(media.id, video=media.video)
+            is_live = getattr(media, 'is_live', False)
+            media.file_path = await yt.download(media.id, video=media.video, is_live=is_live)
             if not media.file_path:
                 await self.stop(chat_id)
                 return await msg.edit_text(

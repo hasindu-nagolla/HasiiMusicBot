@@ -82,17 +82,21 @@ class YouTube:
         results = await _search.next()
         if results and results["result"]:
             data = results["result"][0]
+            duration = data.get("duration")
+            is_live = duration is None or duration == "LIVE"
+            
             return Track(
                 id=data.get("id"),
                 channel_name=data.get("channel", {}).get("name"),
-                duration=data.get("duration"),
-                duration_sec=utils.to_seconds(data.get("duration")),
+                duration=duration if not is_live else "LIVE",
+                duration_sec=0 if is_live else utils.to_seconds(duration),
                 message_id=m_id,
                 title=data.get("title")[:25],
                 thumbnail=data.get("thumbnails", [{}])[-1].get("url").split("?")[0],
                 url=data.get("link"),
                 view_count=data.get("viewCount", {}).get("short"),
                 video=video,
+                is_live=is_live,
             )
         return None
 
@@ -115,8 +119,13 @@ class YouTube:
             tracks.append(track)
         return tracks
 
-    async def download(self, video_id: str, video: bool = False) -> Optional[str]:
+    async def download(self, video_id: str, video: bool = False, is_live: bool = False) -> Optional[str]:
         url = self.base + video_id
+        
+        # For live streams, return the URL directly
+        if is_live:
+            return url
+        
         ext = "mp4" if video else "webm"
         filename = f"downloads/{video_id}.{ext}"
 

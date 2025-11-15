@@ -92,7 +92,8 @@ async def play_hndlr(
     if not file:
         return
 
-    if file.duration_sec > config.DURATION_LIMIT:
+    # Skip duration check for live streams
+    if not file.is_live and file.duration_sec > config.DURATION_LIMIT:
         return await sent.edit_text(
             m.lang["play_duration_limit"].format(config.DURATION_LIMIT // 60)
         )
@@ -128,7 +129,7 @@ async def play_hndlr(
             return
 
     if not file.file_path:
-        file.file_path = await yt.download(file.id, video=video)
+        file.file_path = await yt.download(file.id, video=video, is_live=file.is_live)
 
     await anon.play_media(chat_id=chat_id, message=sent, media=file)
     if not tracks:
