@@ -54,6 +54,13 @@ class TgCall(PyTgCalls):
         if not media.file_path:
             return await message.edit_text(_lang["error_no_file"].format(config.SUPPORT_CHAT))
 
+        # Enhanced FFmpeg parameters for better audio quality
+        ffmpeg_params = f"-ss {seek_time}" if seek_time > 1 else ""
+        if ffmpeg_params:
+            ffmpeg_params += " -b:a 320k -ar 48000 -ac 2"
+        else:
+            ffmpeg_params = "-b:a 320k -ar 48000 -ac 2"
+
         stream = types.MediaStream(
             media_path=media.file_path,
             audio_parameters=types.AudioQuality.STUDIO,
@@ -64,7 +71,7 @@ class TgCall(PyTgCalls):
                 if media.video
                 else types.MediaStream.Flags.IGNORE
             ),
-            ffmpeg_parameters=f"-ss {seek_time}" if seek_time > 1 else None,
+            ffmpeg_parameters=ffmpeg_params,
         )
         try:
             await client.play(
