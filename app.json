@@ -1,92 +1,44 @@
 {
-  "name": "˹ᴛᴜɴᴇ ᴠɪᴀ ʙᴏᴛ˼",
-  "description": "A Telegram Music Player Bot, written in Python with Pyrogram, Py-TgCalls, and yt-dlp.",
-  "logo": "https://files.catbox.moe/7udxph.jpg",
-  "keywords": [
-    "python3",
-    "telegram",
-    "MusicBot",
-    "py-tgcalls",
-    "pyrogram",
-    "yt-dlp"
-  ],
-  "env": {
-    "API_ID": {
-      "description": "Telegram API ID from https://my.telegram.org.",
-      "required": true,
-      "value": ""
-    },
-    "API_HASH": {
-      "description": "Telegram API Hash from https://my.telegram.org.",
-      "required": true,
-      "value": ""
-    },
-    "BOT_TOKEN": {
-      "description": "Bot token from BotFather.",
-      "required": true,
-      "value": ""
-    },
-    "MONGO_DB_URI": {
-      "description": "MongoDB URI for storing bot data (get from https://cloud.mongodb.com).",
-      "required": true,
-      "value": ""
-    },
-    "OWNER_ID": {
-      "description": "Your Telegram numeric user ID (use @userinfobot).",
-      "required": true,
-      "value": ""
-    },
-    "STRING_SESSION": {
-      "description": "Pyrogram v2 session string (generate from https://telegram.tools/session-string-generator#pyrogram).",
-      "required": true,
-      "value": ""
-    },
-    "LOGGER_ID": {
-      "description": "Chat ID of the log group where the bot sends logs (bot must be admin).",
-      "required": true,
-      "value": ""
-    },
-    "COOKIE_URL": {
-      "description": "Raw link (e.g., Pastebin or Batbin) to your YouTube cookies.txt file for better yt-dlp performance.",
-      "required": true,
-      "value": ""
-    },
-    "API_URL": {
-      "description": "(Optional) URL of a custom API server used for music downloads or other services.",
-      "required": false,
-      "value": ""
-    },
-    "VIDEO_API_URL": {
-      "description": "(Optional) URL of a custom API server used for video downloads or other services.",
-      "required": false,
-      "value": ""
-    },
-    "API_KEY": {
-      "description": "(Optional) API Key associated with your custom music download server (used with API_URL).",
-      "required": false,
-      "value": ""
-    },
-    "HEROKU_API_KEY": {
-      "description": "(Optional) Heroku API key for auto-deployments or restarts.",
-      "required": false,
-      "value": ""
-    },
-    "HEROKU_APP_NAME": {
-      "description": "(Optional) Your Heroku app name (used with HEROKU_API_KEY).",
-      "required": false,
-      "value": ""
+    "name": "AnonX Music",
+    "description": "A Telegram Music Player Bot, written in Python with Pyrogram and Py-Tgcalls.",
+    "logo": "https://te.legra.ph/file/b8a0c1a00db3e57522b53.jpg",
+    "keywords": ["python3", "telegram", "bot", "music-bot"],
+    "stack": "container",
+    "env": {
+        "API_ID": {
+            "description": "Get this value from https://my.telegram.org",
+            "value": "",
+            "required": true
+        },
+        "API_HASH": {
+            "description": "Get this value from https://my.telegram.org",
+            "value": "",
+            "required": true
+        },
+        "BOT_TOKEN": {
+            "description": "A Bot's token from Botfather",
+            "value": "",
+            "required": true
+        },
+        "MONGO_URL": {
+            "description": "Get a mongodb url from https://cloud.mongodb.com.",
+            "value": "",
+            "required": true
+        },
+        "LOGGER_ID": {
+            "description": "Your log group ID, add your bot there and promote as an admin.",
+            "value": "",
+            "required": true
+        },
+        "OWNER_ID": {
+            "description": "The user id of user whom you would like to add as OWNER.",
+            "value": "",
+            "required": true
+        },
+        "SESSION": {
+            "description": "A Pyrogram v2 String Session from @StringFatherBot on Telegram.",
+            "value": "",
+            "required": true
+        }
     }
-  },
-  "buildpacks": [
-    {
-      "url": "heroku/python"
-    },
-    {
-      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
-    },
-    {
-      "url": "https://github.com/mixersoft/heroku-buildpack-deno.git"
-    }
-  ],
-  "stack": "container"
 }
