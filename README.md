@@ -152,6 +152,12 @@ The bot streams audio at **STUDIO** quality (highest available) with:
 
 ---
 
+## 🙏 Credits
+
+Special thanks to [AnonymousX1025](https://github.com/AnonymousX1025) for the original inspiration.
+
+---
+
 <div align="center">
   
   ### Made with ❤️ by Hasindu Nagolla
