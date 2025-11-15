@@ -65,7 +65,7 @@
     "ping_pong": "<blockquote><u><b>Pong!</b></u>\n\n<b>Latency:</b> <code>{0}ms</code>\n\n<b>Uptime:</b> {1}\n<b>CPU:</b> <code>{2}%</code>\n<b>RAM:</b> <code>{3}%</code>\n<b>Disk:</b> <code>{4}%</code>\n<b>PyTgCalls Latency:</b> <code>{5}ms</code></blockquote>",
     "play_admin": "<blockquote><u><b>Admin only play</b></u>\n\nOnly admins are allowed to play in this chat.</blockquote>",
     "play_banned": "<blockquote><u><b>{0} assistant is banned your chat</b></u>\n\n<b>ID:</b> <code>{1}</code>\n<b>Name:</b> {2}\n<b>Username:</b> {3}</blockquote>",
-    "play_media": "🔴 <b>The Requested Stream Started</b> 🎵\n\n➜ <b>Title :</b> <a href={0}>{1}</a>\n➜ <b>Duration :</b> {2} minutes\n➜ <b>Requested by :</b> {3}",
+    "play_media": "● <b>The Requested Stream Started</b>\n\n➜ <b>Title :</b> <a href={0}>{1}</a>\n➜ <b>Duration :</b> {2} minutes\n➜ <b>Requested by :</b> {3}",
     "play_log": "<blockquote><u>{0} Play Log</u>\n\n<b>Chat:</b> <code>{1}</code> | {2}\n<b>User:</b> <code>{3}</code> | {4}\n<b>Message link:</b> {5}\n\n<b>Title:</b> {6}\n<b>Duration:</b> {7} min</blockquote>",
     "play_queued": "<blockquote><u><b>Added to queue: {0}\n\n<b>Title:</b> <a href={1}>{2}</a>\n\n<b>Duration:</b> {3} min\n<b>Requested by:</b> {4}</blockquote>",
     "play_usage": "<blockquote><b>Usage:</b>\n\n<code>/play attention</code></blockquote>",
