@@ -1,3 +1,11 @@
+# 🎵 HasiiMusicBot
+
+[![codecov](https://codecov.io/gh/hasindu-nagolla/HasiiMusicBot/branch/main/graph/badge.svg)](https://codecov.io/gh/hasindu-networks/HasiiMusicBot)
+![CI](https://github.com/hasindu-nagolla/HasiiMusicBot/actions/workflows/codecov.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.12-blue?style=flat&logo=python)
+![License](https://img.shields.io/github/license/hasindu-nagolla/HasiiMusicBot?style=flat)
+
+
 <!-- ✨ Animated Header (Top) -->
 
 <p align="center">
