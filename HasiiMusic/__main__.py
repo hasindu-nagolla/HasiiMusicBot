@@ -15,8 +15,6 @@ async def main():
     await anon.boot()
 
     for module in all_modules:
-        if module == "eval":
-            continue
         importlib.import_module(f"HasiiMusic.plugins.{module}")
     logger.info(f"🔌 Loaded {len(all_modules)} modules.")
 
