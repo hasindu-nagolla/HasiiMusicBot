@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def _list_modules():
     """
     List all Python module filenames (without extension) in the current directory,
@@ -14,5 +15,6 @@ def _list_modules():
         for file in mod_dir.glob("*.py")
         if file.is_file() and file.name != "__init__.py"
     ]
+
 
 all_modules = frozenset(sorted(_list_modules()))

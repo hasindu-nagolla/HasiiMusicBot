@@ -64,7 +64,8 @@ class YouTube:
             if message.entities:
                 for entity in message.entities:
                     if entity.type == enums.MessageEntityType.URL:
-                        link = text[entity.offset : entity.offset + entity.length]
+                        link = text[entity.offset: entity.offset +
+                                    entity.length]
                         break
 
             if message.caption_entities:
@@ -84,7 +85,7 @@ class YouTube:
             data = results["result"][0]
             duration = data.get("duration")
             is_live = duration is None or duration == "LIVE"
-            
+
             return Track(
                 id=data.get("id"),
                 channel_name=data.get("channel", {}).get("name"),
@@ -92,7 +93,8 @@ class YouTube:
                 duration_sec=0 if is_live else utils.to_seconds(duration),
                 message_id=m_id,
                 title=data.get("title")[:25],
-                thumbnail=data.get("thumbnails", [{}])[-1].get("url").split("?")[0],
+                thumbnail=data.get(
+                    "thumbnails", [{}])[-1].get("url").split("?")[0],
                 url=data.get("link"),
                 view_count=data.get("viewCount", {}).get("short"),
                 video=video,
@@ -121,7 +123,7 @@ class YouTube:
 
     async def download(self, video_id: str, video: bool = False, is_live: bool = False) -> Optional[str]:
         url = self.base + video_id
-        
+
         # For live streams, extract the direct stream URL using yt-dlp with cookies
         if is_live:
             cookie = self.get_cookies()
@@ -131,19 +133,20 @@ class YouTube:
                 "cookiefile": cookie,
                 "format": "best" if video else "bestaudio",
             }
-            
+
             def _extract_url():
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     try:
                         info = ydl.extract_info(url, download=False)
                         return info.get("url") or info.get("manifest_url")
                     except Exception as ex:
-                        logger.error("Live stream URL extraction failed: %s", ex)
+                        logger.error(
+                            "Live stream URL extraction failed: %s", ex)
                         return None
-            
+
             stream_url = await asyncio.to_thread(_extract_url)
             return stream_url if stream_url else url
-        
+
         ext = "mp4" if video else "webm"
         filename = f"downloads/{video_id}.{ext}"
 

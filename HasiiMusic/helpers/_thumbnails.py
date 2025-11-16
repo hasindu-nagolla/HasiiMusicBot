@@ -45,8 +45,10 @@ def trim_to_width(text: str, font: ImageFont.FreeTypeFont, max_w: int) -> str:
 class Thumbnail:
     def __init__(self):
         try:
-            self.title_font = ImageFont.truetype("HasiiMusic/helpers/Raleway-Bold.ttf", 32)
-            self.regular_font = ImageFont.truetype("HasiiMusic/helpers/Inter-Light.ttf", 18)
+            self.title_font = ImageFont.truetype(
+                "HasiiMusic/helpers/Raleway-Bold.ttf", 32)
+            self.regular_font = ImageFont.truetype(
+                "HasiiMusic/helpers/Inter-Light.ttf", 18)
         except OSError:
             self.title_font = self.regular_font = ImageFont.load_default()
 
@@ -66,24 +68,29 @@ class Thumbnail:
             # Download and prepare base image
             await self.save_thumb(temp, song.thumbnail)
             base = Image.open(temp).resize(size).convert("RGBA")
-            
+
             # Create blurred background
-            bg = ImageEnhance.Brightness(base.filter(ImageFilter.BoxBlur(10))).enhance(0.6)
+            bg = ImageEnhance.Brightness(base.filter(
+                ImageFilter.BoxBlur(10))).enhance(0.6)
 
             # Create frosted glass panel
-            panel_area = bg.crop((PANEL_X, PANEL_Y, PANEL_X + PANEL_W, PANEL_Y + PANEL_H))
-            overlay = Image.new("RGBA", (PANEL_W, PANEL_H), (255, 255, 255, TRANSPARENCY))
+            panel_area = bg.crop(
+                (PANEL_X, PANEL_Y, PANEL_X + PANEL_W, PANEL_Y + PANEL_H))
+            overlay = Image.new("RGBA", (PANEL_W, PANEL_H),
+                                (255, 255, 255, TRANSPARENCY))
             frosted = Image.alpha_composite(panel_area, overlay)
-            
+
             # Apply rounded corners to panel
             mask = Image.new("L", (PANEL_W, PANEL_H), 0)
-            ImageDraw.Draw(mask).rounded_rectangle((0, 0, PANEL_W, PANEL_H), 50, fill=255)
+            ImageDraw.Draw(mask).rounded_rectangle(
+                (0, 0, PANEL_W, PANEL_H), 50, fill=255)
             bg.paste(frosted, (PANEL_X, PANEL_Y), mask)
 
             # Add thumbnail with rounded corners
             thumb = base.resize((THUMB_W, THUMB_H))
             tmask = Image.new("L", thumb.size, 0)
-            ImageDraw.Draw(tmask).rounded_rectangle((0, 0, THUMB_W, THUMB_H), 20, fill=255)
+            ImageDraw.Draw(tmask).rounded_rectangle(
+                (0, 0, THUMB_W, THUMB_H), 20, fill=255)
             bg.paste(thumb, (THUMB_X, THUMB_Y), tmask)
 
             # Draw text elements
@@ -107,13 +114,17 @@ class Thumbnail:
             )
 
             # Progress bar
-            draw.line([(BAR_X, BAR_Y), (BAR_X + BAR_RED_LEN, BAR_Y)], fill="red", width=6)
-            draw.line([(BAR_X + BAR_RED_LEN, BAR_Y), (BAR_X + BAR_TOTAL_LEN, BAR_Y)], fill="gray", width=5)
-            draw.ellipse([(BAR_X + BAR_RED_LEN - 7, BAR_Y - 7), (BAR_X + BAR_RED_LEN + 7, BAR_Y + 7)], fill="red")
+            draw.line([(BAR_X, BAR_Y), (BAR_X + BAR_RED_LEN, BAR_Y)],
+                      fill="red", width=6)
+            draw.line([(BAR_X + BAR_RED_LEN, BAR_Y),
+                      (BAR_X + BAR_TOTAL_LEN, BAR_Y)], fill="gray", width=5)
+            draw.ellipse([(BAR_X + BAR_RED_LEN - 7, BAR_Y - 7),
+                         (BAR_X + BAR_RED_LEN + 7, BAR_Y + 7)], fill="red")
 
             # Time labels
-            draw.text((BAR_X, BAR_Y + 15), "00:00", fill="black", font=self.regular_font)
-            
+            draw.text((BAR_X, BAR_Y + 15), "00:00",
+                      fill="black", font=self.regular_font)
+
             is_live = getattr(song, 'is_live', False)
             end_text = "Live" if is_live else song.duration
             draw.text(
@@ -126,9 +137,11 @@ class Thumbnail:
             # Control icons (if available)
             icons_path = "HasiiMusic/helpers/play_icons.png"
             if os.path.isfile(icons_path):
-                ic = Image.open(icons_path).resize((ICONS_W, ICONS_H)).convert("RGBA")
+                ic = Image.open(icons_path).resize(
+                    (ICONS_W, ICONS_H)).convert("RGBA")
                 r, g, b, a = ic.split()
-                black_ic = Image.merge("RGBA", (r.point(lambda _: 0), g.point(lambda _: 0), b.point(lambda _: 0), a))
+                black_ic = Image.merge(
+                    "RGBA", (r.point(lambda _: 0), g.point(lambda _: 0), b.point(lambda _: 0), a))
                 bg.paste(black_ic, (ICONS_X, ICONS_Y), black_ic)
 
             # Save and cleanup

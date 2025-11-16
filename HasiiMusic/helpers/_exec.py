@@ -3,6 +3,7 @@ import ast
 import traceback
 from typing import Optional
 
+
 async def meval(code: str, globs: dict, **kwargs):
     """
     Asynchronously evaluate a code string in a controlled environment.
@@ -16,7 +17,8 @@ async def meval(code: str, globs: dict, **kwargs):
     while _global_arg in globs:
         _global_arg = "_" + _global_arg
 
-    kwargs[_global_arg] = {k: globs[k] for k in ("__name__", "__package__") if k in globs}
+    kwargs[_global_arg] = {k: globs[k]
+                           for k in ("__name__", "__package__") if k in globs}
 
     root = ast.parse(code, mode="exec")
     if not root.body:
@@ -29,10 +31,12 @@ async def meval(code: str, globs: dict, **kwargs):
     body = []
     body.append(ast.Expr(ast.Call(
         func=ast.Attribute(
-            value=ast.Call(func=ast.Name(id="globals", ctx=ast.Load()), args=[], keywords=[]),
+            value=ast.Call(func=ast.Name(
+                id="globals", ctx=ast.Load()), args=[], keywords=[]),
             attr="update", ctx=ast.Load()
         ),
-        args=[], keywords=[ast.keyword(arg=None, value=ast.Name(id=_global_arg, ctx=ast.Load()))]
+        args=[], keywords=[ast.keyword(
+            arg=None, value=ast.Name(id=_global_arg, ctx=ast.Load()))]
     )))
     body.append(ast.Assign(
         targets=[ast.Name(id=ret_name, ctx=ast.Store())],
@@ -43,7 +47,8 @@ async def meval(code: str, globs: dict, **kwargs):
         if isinstance(node, ast.Expr):
             new_node = ast.Expr(
                 value=ast.Call(
-                    func=ast.Attribute(value=ast.Name(id=ret_name, ctx=ast.Load()), attr="append", ctx=ast.Load()),
+                    func=ast.Attribute(value=ast.Name(
+                        id=ret_name, ctx=ast.Load()), attr="append", ctx=ast.Load()),
                     args=[node.value], keywords=[]
                 )
             )
@@ -67,7 +72,8 @@ async def meval(code: str, globs: dict, **kwargs):
 
     # Compile & execute
     locs = {}
-    exec(compile(ast.Module([func_def], type_ignores=[]), "<meval>", "exec"), {}, locs)
+    exec(compile(ast.Module([func_def], type_ignores=[]),
+         "<meval>", "exec"), {}, locs)
 
     result = await locs["tmp"](**kwargs)
     if not result:

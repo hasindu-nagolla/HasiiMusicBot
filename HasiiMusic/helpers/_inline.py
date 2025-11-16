@@ -22,21 +22,28 @@ class Inline:
         keyboard = []
         if status:
             keyboard.append(
-                [self.ikb(text=status, callback_data=f"controls status {chat_id}")]
+                [self.ikb(
+                    text=status, callback_data=f"controls status {chat_id}")]
             )
         elif timer:
             keyboard.append(
-                [self.ikb(text=timer, callback_data=f"controls status {chat_id}")]
+                [self.ikb(
+                    text=timer, callback_data=f"controls status {chat_id}")]
             )
 
         if not remove:
             keyboard.append(
                 [
-                    self.ikb(text="►", callback_data=f"controls resume {chat_id}"),
-                    self.ikb(text="❚❚", callback_data=f"controls pause {chat_id}"),
-                    self.ikb(text="⟳", callback_data=f"controls replay {chat_id}"),
-                    self.ikb(text="►►", callback_data=f"controls skip {chat_id}"),
-                    self.ikb(text="■", callback_data=f"controls stop {chat_id}"),
+                    self.ikb(
+                        text="►", callback_data=f"controls resume {chat_id}"),
+                    self.ikb(
+                        text="❚❚", callback_data=f"controls pause {chat_id}"),
+                    self.ikb(
+                        text="⟳", callback_data=f"controls replay {chat_id}"),
+                    self.ikb(
+                        text="►►", callback_data=f"controls skip {chat_id}"),
+                    self.ikb(
+                        text="■", callback_data=f"controls stop {chat_id}"),
                 ]
             )
         return self.ikm(keyboard)
@@ -52,12 +59,13 @@ class Inline:
                 ]
             ]
         else:
-            cbs = ["admins", "auth", "blist", "lang", "ping", "play", "queue", "stats", "sudo"]
+            cbs = ["admins", "auth", "blist", "lang",
+                   "ping", "play", "queue", "stats", "sudo"]
             buttons = [
                 self.ikb(text=_lang[f"help_{i}"], callback_data=f"help {cb}")
                 for i, cb in enumerate(cbs)
             ]
-            rows = [buttons[i : i + 3] for i in range(0, len(buttons), 3)]
+            rows = [buttons[i: i + 3] for i in range(0, len(buttons), 3)]
 
         return self.ikm(rows)
 
@@ -71,7 +79,7 @@ class Inline:
             )
             for code, name in langs.items()
         ]
-        rows = [buttons[i : i + 2] for i in range(0, len(buttons), 2)]
+        rows = [buttons[i: i + 2] for i in range(0, len(buttons), 2)]
         return self.ikm(rows)
 
     def ping_markup(self, text: str) -> types.InlineKeyboardMarkup:
@@ -95,7 +103,8 @@ class Inline:
     ) -> types.InlineKeyboardMarkup:
         _action = "pause" if playing else "resume"
         return self.ikm(
-            [[self.ikb(text=_text, callback_data=f"controls {_action} {chat_id} q")]]
+            [[self.ikb(
+                text=_text, callback_data=f"controls {_action} {chat_id} q")]]
         )
 
     def settings_markup(
@@ -115,7 +124,8 @@ class Inline:
                         text=lang["language"] + " ➜",
                         callback_data=f"controls status {chat_id}",
                     ),
-                    self.ikb(text=lang_codes[language], callback_data="language"),
+                    self.ikb(text=lang_codes[language],
+                             callback_data="language"),
                 ],
             ]
         )
@@ -146,7 +156,8 @@ class Inline:
                 ]
             ]
         else:
-            rows += [[self.ikb(text=lang["language"], callback_data="language")]]
+            rows += [[self.ikb(text=lang["language"],
+                               callback_data="language")]]
         return self.ikm(rows)
 
     def yt_key(self, link: str) -> types.InlineKeyboardMarkup:

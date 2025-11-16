@@ -15,7 +15,8 @@ def checkUB(play):
             return await app.leave_chat(m.chat.id)
 
         if not m.reply_to_message and (
-            len(m.command) < 2 or (len(m.command) == 2 and m.command[1] == "-f")
+            len(m.command) < 2 or (len(m.command)
+                                   == 2 and m.command[1] == "-f")
         ):
             return await m.reply_text(m.lang["play_usage"])
 
@@ -25,7 +26,8 @@ def checkUB(play):
         force = m.command[0].endswith("force") or (
             len(m.command) > 1 and "-f" in m.command[1]
         )
-        is_video_cmd = m.command[0][0] == "v" or (m.command[0][0] == "c" and m.command[0][1] == "v")
+        is_video_cmd = m.command[0][0] == "v" or (
+            m.command[0][0] == "c" and m.command[0][1] == "v")
         video = is_video_cmd and config.VIDEO_PLAY
         cplay = m.command[0][0] == "c"
         url = yt.url(m)
@@ -81,7 +83,8 @@ def checkUB(play):
                         return await m.reply_text(m.lang["admin_required"])
                     except Exception as ex:
                         return await m.reply_text(
-                            m.lang["play_invite_error"].format(type(ex).__name__)
+                            m.lang["play_invite_error"].format(
+                                type(ex).__name__)
                         )
 
                 umm = await m.reply_text(m.lang["play_invite"].format(app.name))
@@ -95,7 +98,8 @@ def checkUB(play):
                         await client.approve_chat_join_request(m.chat.id, client.id)
                     except Exception as ex:
                         return await umm.edit_text(
-                            m.lang["play_invite_error"].format(type(ex).__name__)
+                            m.lang["play_invite_error"].format(
+                                type(ex).__name__)
                         )
                 except Exception as ex:
                     return await umm.edit_text(

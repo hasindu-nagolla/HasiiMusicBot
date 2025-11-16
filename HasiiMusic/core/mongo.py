@@ -11,7 +11,8 @@ class MongoDB:
         """
         Initialize the MongoDB connection.
         """
-        self.mongo = AsyncMongoClient(config.MONGO_URL, serverSelectionTimeoutMS=12500)
+        self.mongo = AsyncMongoClient(
+            config.MONGO_URL, serverSelectionTimeoutMS=12500)
         self.db = self.mongo.Anon
 
         self.admin_list = {}
@@ -48,10 +49,12 @@ class MongoDB:
         try:
             start = time()
             await self.mongo.admin.command("ping")
-            logger.info(f"✅ Database connection successful. ({time() - start:.2f}s)")
+            logger.info(
+                f"✅ Database connection successful. ({time() - start:.2f}s)")
             await self.load_cache()
         except Exception as e:
-            raise SystemExit(f"Database connection failed: {type(e).__name__}") from e
+            raise SystemExit(
+                f"Database connection failed: {type(e).__name__}") from e
 
     async def close(self) -> None:
         """Close the connection to the database."""
@@ -284,7 +287,6 @@ class MongoDB:
         if not self.users:
             self.users.extend([user["_id"] async for user in self.usersdb.find()])
         return self.users
-
 
     async def migrate_coll(self) -> None:
         from bson import ObjectId

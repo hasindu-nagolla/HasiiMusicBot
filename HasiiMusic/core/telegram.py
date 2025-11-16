@@ -30,7 +30,8 @@ class Telegram:
         file_id = getattr(media, "file_unique_id", None)
         file_ext = getattr(media, "file_name", "").split(".")[-1]
         file_size = getattr(media, "file_size", 0)
-        file_title = getattr(media, "title", "Telegram File") or "Telegram File"
+        file_title = getattr(
+            media, "title", "Telegram File") or "Telegram File"
         duration = getattr(media, "duration", 0)
         video = bool(getattr(media, "mime_type", "").startswith("video/"))
 
@@ -82,7 +83,8 @@ class Telegram:
                 self.active.remove(file_id)
                 self.active_tasks.pop(msg_id, None)
                 await sent.edit_text(
-                    sent.lang["dl_complete"].format(round(time.time() - start_time, 2))
+                    sent.lang["dl_complete"].format(
+                        round(time.time() - start_time, 2))
                 )
 
             return Media(
