@@ -91,9 +91,9 @@ class Inline:
         return self.ikm(
             [
                 [
-                    self.ikb(
-                        text=_text, callback_data=f"controls force {chat_id} {item_id}"
-                    )
+                    self.ikb(text="►", callback_data=f"controls resume {chat_id}"),
+                    self.ikb(text="❚❚", callback_data=f"controls pause {chat_id}"),
+                    self.ikb(text="►►", callback_data=f"controls skip {chat_id}"),
                 ]
             ]
         )
