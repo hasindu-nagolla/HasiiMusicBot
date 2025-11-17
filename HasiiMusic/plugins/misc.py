@@ -66,7 +66,7 @@ async def update_timer(length=10):
                 played = media.time
                 remaining = duration - played
                 pos = min(int((played / duration) * length), length - 1)
-                timer = "—" * pos + "◉" + "—" * (length - pos - 1)
+                timer_bar = "—" * pos + "◉" + "—" * (length - pos - 1)
 
                 if remaining <= 30:
                     next = queue.get_next(chat_id, check=True)
@@ -75,16 +75,27 @@ async def update_timer(length=10):
 
                 if remaining < 10:
                     remove = True
+                    timer_text = timer_bar
                 else:
                     remove = False
-                    timer = f"{time.strftime('%M:%S', time.gmtime(played))} | {timer} | -{time.strftime('%M:%S', time.gmtime(remaining))}"
+                    played_time = time.strftime('%M:%S', time.gmtime(played))
+                    remaining_time = time.strftime('%M:%S', time.gmtime(remaining))
+                    timer_text = f"{played_time} | {timer_bar} | -{remaining_time}"
 
-                await app.edit_message_reply_markup(
+                # Update caption with timer
+                _lang = await lang.get_lang(chat_id)
+                text = _lang["play_media"].format(
+                    media.url,
+                    media.title,
+                    media.duration,
+                    media.user,
+                ) + f"\n\n<code>{timer_text}</code>"
+
+                await app.edit_message_caption(
                     chat_id=chat_id,
                     message_id=message_id,
-                    reply_markup=buttons.controls(
-                        chat_id=chat_id, timer=timer, remove=remove
-                    ),
+                    caption=text,
+                    reply_markup=buttons.controls(chat_id=chat_id, remove=remove),
                 )
             except:
                 pass
