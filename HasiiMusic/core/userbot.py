@@ -1,3 +1,11 @@
+# ==============================================================================
+# userbot.py - Assistant/Userbot Client Manager
+# ==============================================================================
+# This file manages assistant accounts (userbots) that join voice chats to play music.
+# Assistants are user accounts (not bots) that can join and stream audio/video.
+# You can configure up to 3 assistants using SESSION1, SESSION2, SESSION3 variables.
+# ==============================================================================
+
 from pyrogram import Client
 
 from HasiiMusic import config, logger
@@ -6,16 +14,23 @@ from HasiiMusic import config, logger
 class Userbot(Client):
     def __init__(self):
         """
-        Initializes the userbot with multiple clients.
-
-        This method sets up clients for the userbot using predefined session strings.
-        Each client is assigned a unique name based on the key in the `clients` dictionary.
+        Initialize userbot with multiple assistant clients.
+        
+        Creates up to 3 assistant clients based on available session strings.
+        Each assistant can independently join voice chats and stream music.
+        More assistants = ability to serve more groups simultaneously.
         """
-        self.clients = []
+        self.clients = []  # List to store all active assistant clients
+        
+        # Map of client names to their session string config keys
         clients = {"one": "SESSION1", "two": "SESSION2", "three": "SESSION3"}
+        
+        # Create a Pyrogram client for each configured session
         for key, string_key in clients.items():
-            name = f"HasiiMusicUB{key[-1]}"
-            session = getattr(config, string_key)
+            name = f"HasiiMusicUB{key[-1]}"  # Unique name: HasiiMusicUB1, HasiiMusicUB2, etc.
+            session = getattr(config, string_key)  # Get session string from config
+            
+            # Create and attach the client as an attribute (self.one, self.two, self.three)
             setattr(
                 self,
                 key,
@@ -23,7 +38,7 @@ class Userbot(Client):
                     name=name,
                     api_id=config.API_ID,
                     api_hash=config.API_HASH,
-                    session_string=session,
+                    session_string=session,  # Pyrogram session string
                 ),
             )
 

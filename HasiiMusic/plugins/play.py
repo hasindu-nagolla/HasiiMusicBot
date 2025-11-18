@@ -1,3 +1,20 @@
+# ==============================================================================
+# play.py - Main Play Command Handler
+# ==============================================================================
+# This is the core plugin that handles all play-related commands:
+# - /play <query> - Play audio from YouTube search or URL
+# - /vplay <query> - Play video from YouTube
+# - /playforce - Force play (skip queue and play immediately)
+# - /cplay - Play in connected channel
+# 
+# Supports:
+# - YouTube search queries
+# - YouTube URLs (videos and playlists)
+# - Telegram audio/video files (via reply)
+# - Queue management
+# - Channel play mode
+# ==============================================================================
+
 from pyrogram import filters
 from pyrogram import types
 
@@ -7,11 +24,21 @@ from HasiiMusic.helpers._play import checkUB
 
 
 def playlist_to_queue(chat_id: int, tracks: list) -> str:
+    """
+    Add multiple tracks to queue and format them as a message.
+    
+    Args:
+        chat_id: The chat ID where queue is managed
+        tracks: List of Track objects to add
+        
+    Returns:
+        Formatted string listing all added tracks
+    """
     text = "<blockquote expandable>"
     for track in tracks:
-        pos = queue.add(chat_id, track)
+        pos = queue.add(chat_id, track)  # Add track to queue
         text += f"<b>{pos}.</b> {track.title}\n"
-    text = text[:1948] + "</blockquote>"
+    text = text[:1948] + "</blockquote>"  # Limit message length
     return text
 
 @app.on_message(

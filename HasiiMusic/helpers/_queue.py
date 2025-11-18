@@ -1,19 +1,33 @@
+# ==============================================================================
+# _queue.py - Music Queue Manager
+# ==============================================================================
+# This file manages the music queue for each chat.
+# - Each chat has its own separate queue
+# - Queues are stored in memory (lost on restart)
+# - Supports adding, removing, and retrieving songs from the queue
+# - Uses deque (double-ended queue) for efficient operations
+# ==============================================================================
+
 from collections import defaultdict, deque
 from typing import Union
 
 from ._dataclass import Media, Track
 
+# MediaItem can be either a Media or Track object
 MediaItem = Union[Media, Track]
 
 
 class Queue:
     def __init__(self):
+        """Initialize the queue manager with empty queues for all chats."""
+        # Dictionary mapping chat_id to its queue (deque of Media/Track items)
+        # defaultdict automatically creates a new deque for new chat_ids
         self.queues: dict[int, deque[MediaItem]] = defaultdict(deque)
 
     def add(self, chat_id: int, item: MediaItem) -> int:
-        """Add an item to the queue and return its position (1-based)."""
-        self.queues[chat_id].append(item)
-        return len(self.queues[chat_id]) - 1
+        """Add a song to the end of the queue and return its position."""
+        self.queues[chat_id].append(item)  # Add to end of queue
+        return len(self.queues[chat_id]) - 1  # Return position (0-based index)
 
     def check_item(self, chat_id: int, item_id: str) -> tuple[int, MediaItem | None]:
         """Check if an item with the given ID exists in the queue."""
