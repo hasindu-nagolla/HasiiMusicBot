@@ -69,6 +69,15 @@ async def _broadcast(_, message: types.Message):
             await asyncio.sleep(0.1)
         except errors.FloodWait as fw:
             await asyncio.sleep(fw.value + 30)
+            # Retry after flood wait
+            try:
+                await app.send_message(chat, broadcast_text)
+                if chat in groups:
+                    count += 1
+                else:
+                    ucount += 1
+            except Exception as retry_ex:
+                failed += f"{chat} - {retry_ex}\n"
         except Exception as ex:
             failed += f"{chat} - {ex}\n"
             continue
