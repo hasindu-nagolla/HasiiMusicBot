@@ -1,3 +1,14 @@
+# ==============================================================================
+# youtube.py - YouTube Download & Search Handler
+# ==============================================================================
+# This file handles all YouTube-related operations:
+# - Searching for videos/audio
+# - Downloading YouTube content using yt-dlp
+# - Managing YouTube cookies for age-restricted content
+# - Caching search results for better performance
+# - Validating YouTube URLs
+# ==============================================================================
+
 import os
 import re
 import yt_dlp
@@ -15,18 +26,22 @@ from HasiiMusic.helpers import Track, utils
 
 class YouTube:
     def __init__(self):
-        self.base = "https://www.youtube.com/watch?v="
-        self.cookies = []
-        self.checked = False
-        self.warned = False
+        """Initialize YouTube handler with configuration and caching."""
+        self.base = "https://www.youtube.com/watch?v="  # Base YouTube URL
+        self.cookies = []  # List of available cookie files
+        self.checked = False  # Whether cookies directory has been checked
+        self.warned = False  # Whether missing cookies warning has been shown
+        
+        # Regular expression to match YouTube URLs (videos, shorts, playlists)
         self.regex = re.compile(
             r"(https?://)?(www\.|m\.|music\.)?"
             r"(youtube\.com/(watch\?v=|shorts/|playlist\?list=)|youtu\.be/)"
             r"([A-Za-z0-9_-]{11}|PL[A-Za-z0-9_-]+)([&?][^\s]*)?"
         )
-        # Cache search results for 10 minutes
-        self.search_cache = {}
-        self.cache_time = {}
+        
+        # Cache search results to reduce API calls (10 minute TTL)
+        self.search_cache = {}  # {"query_video": (result, timestamp)}
+        self.cache_time = {}  # Deprecated, using tuple in search_cache instead
 
     def get_cookies(self):
         if not self.checked:
