@@ -24,6 +24,10 @@ class Config:
 
         self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/TheInfinityAI")
         self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/Hasindu_Lakshan")
+        
+        # Parse excluded chats from comma-separated string
+        excluded = getenv("EXCLUDED_CHATS", "")
+        self.EXCLUDED_CHATS = [int(x.strip()) for x in excluded.split(",") if x.strip().lstrip('-').isdigit()]
 
         self.AUTO_END: bool = getenv("AUTO_END", False)
         self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", False)
