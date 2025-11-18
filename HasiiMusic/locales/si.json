@@ -29,13 +29,7 @@
   "eval_error": "⚠️ Code එක run කරද්දී error එකක් ආවා\n\n",
   "eval_inp": "Input?",
   "eval_out": "<b>Output:</b>\n<code>{0}</code>",
-  "gcast_usage": "භාවිතය: /broadcast <පණිවිඩය>
-
-උදාහරණය: /broadcast හෙලෝ හැමෝටම!
-
-විකල්ප:
--user : Users වලටත් යවන්න
--nochat : Groups වලට යවන්න එපා",
+  "gcast_usage": "භාවිතය: /broadcast <පණිවිඩය>\n\nඋදාහරණය: /broadcast හෙලෝ හැමෝටම!\n\nවිකල්ප:\n-user : Users වලටත් යවන්න\n-nochat : Groups වලට යවන්න එපා",
   "gcast_active": "දැනට යන broadcast එක ඉවර වෙනකම් පොඩ්ඩක් ඉන්න.",
   "gcast_inactive": "Broadcast දැනට active නෑ.",
   "gcast_start": "Broadcast එක පටන් ගත්තා.",
