@@ -12,13 +12,17 @@ broadcasting = False
 @lang.language()
 async def _broadcast(_, message: types.Message):
     global broadcasting
-    if not message.reply_to_message:
+    
+    # Extract the broadcast message from command
+    if len(message.command) < 2:
         return await message.reply_text(message.lang["gcast_usage"])
 
     if broadcasting:
         return await message.reply_text(message.lang["gcast_active"])
 
-    msg = message.reply_to_message
+    # Get the message text after /broadcast command
+    broadcast_text = message.text.split(None, 1)[1]
+    
     count, ucount = 0, 0
     chats, groups, users = [], [], []
     sent = await message.reply_text(message.lang["gcast_start"])
@@ -31,7 +35,7 @@ async def _broadcast(_, message: types.Message):
     chats.extend(groups + users)
     broadcasting = True
 
-    await msg.forward(app.logger)
+    # Log to logger group
     await (await app.send_message(
         chat_id=app.logger, 
         text=message.lang["gcast_log"].format(
@@ -49,11 +53,8 @@ async def _broadcast(_, message: types.Message):
             break
 
         try:
-            (
-                await msg.copy(chat, reply_markup=msg.reply_markup)
-                if "-copy" in message.text
-                else await msg.forward(chat)
-            )
+            # Send as direct message from bot
+            await app.send_message(chat, broadcast_text)
             if chat in groups:
                 count += 1
             else:
