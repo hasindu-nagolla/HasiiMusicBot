@@ -80,7 +80,15 @@ class TgCall(PyTgCalls):
                     media.duration,
                     media.user,
                 )
-                keyboard = buttons.controls(chat_id)
+                # Create initial timer display
+                if not media.is_live and media.duration_sec:
+                    import time as time_module
+                    played_time = time_module.strftime('%M:%S', time_module.gmtime(0))
+                    total_time = time_module.strftime('%M:%S', time_module.gmtime(media.duration_sec))
+                    timer_text = f"{played_time} ——————————● {total_time}"
+                    keyboard = buttons.controls(chat_id, timer=timer_text)
+                else:
+                    keyboard = buttons.controls(chat_id)
                 try:
                     await message.edit_media(
                         media=InputMediaPhoto(
