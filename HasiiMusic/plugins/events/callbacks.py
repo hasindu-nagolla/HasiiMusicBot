@@ -2,7 +2,7 @@ import re
 
 from pyrogram import filters, types
 
-from HasiiMusic import anon, app, db, lang, queue, tg, yt
+from HasiiMusic import tune, app, db, lang, queue, tg, yt
 from HasiiMusic.helpers import admin_check, buttons, can_manage_vc
 
 
@@ -34,7 +34,7 @@ async def _controls(_, query: types.CallbackQuery):
             return await query.answer(
                 query.lang["play_already_paused"], show_alert=True
             )
-        await anon.pause(chat_id)
+        await tune.pause(chat_id)
         if qaction:
             return await query.edit_message_reply_markup(
                 reply_markup=buttons.queue_markup(chat_id, query.lang["paused"], False)
@@ -46,7 +46,7 @@ async def _controls(_, query: types.CallbackQuery):
         status = query.lang["playing"]
         if await db.playing(chat_id):
             return await query.answer(query.lang["play_not_paused"], show_alert=True)
-        await anon.resume(chat_id)
+        await tune.resume(chat_id)
         if qaction:
             return await query.edit_message_reply_markup(
                 reply_markup=buttons.queue_markup(chat_id, query.lang["playing"], True)
@@ -54,7 +54,7 @@ async def _controls(_, query: types.CallbackQuery):
         reply = query.lang["play_resumed"].format(user)
 
     elif action == "skip":
-        await anon.play_next(chat_id)
+        await tune.play_next(chat_id)
         status = query.lang["skipped"]
         reply = query.lang["play_skipped"].format(user)
 
@@ -78,17 +78,17 @@ async def _controls(_, query: types.CallbackQuery):
         if not media.file_path:
             media.file_path = await yt.download(media.id, video=media.video)
         media.message_id = msg.id
-        return await anon.play_media(chat_id, msg, media)
+        return await tune.play_media(chat_id, msg, media)
 
     elif action == "replay":
         media = queue.get_current(chat_id)
         media.user = user
-        await anon.replay(chat_id)
+        await tune.replay(chat_id)
         status = query.lang["replayed"]
         reply = query.lang["play_replayed"].format(user)
 
     elif action == "stop":
-        await anon.stop(chat_id)
+        await tune.stop(chat_id)
         status = query.lang["stopped"]
         reply = query.lang["play_stopped"].format(user)
 

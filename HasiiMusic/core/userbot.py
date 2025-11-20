@@ -27,7 +27,7 @@ class Userbot(Client):
         
         # Create a Pyrogram client for each configured session
         for key, string_key in clients.items():
-            name = f"HasiiMusicUB{key[-1]}"  # Unique name: HasiiMusicUB1, HasiiMusicUB2, etc.
+            name = f"HasiiTuneUB{key[-1]}"  # Unique name: HasiiTuneUB1, HasiiTuneUB2, etc.
             session = getattr(config, string_key)  # Get session string from config
             
             # Create and attach the client as an attribute (self.one, self.two, self.three)
@@ -69,10 +69,6 @@ class Userbot(Client):
         client.username = ub.me.username
         client.mention = ub.me.mention
         self.clients.append(client)
-        try:
-            await ub.join_chat("FallenAssociation")
-        except:
-            pass
         logger.info(f"👤 Assistant {num} started as @{client.username}")
 
     async def boot(self):

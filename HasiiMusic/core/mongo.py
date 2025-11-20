@@ -18,7 +18,7 @@ class MongoDB:
             minPoolSize=10,
             maxIdleTimeMS=30000
         )
-        self.db = self.mongo.Anon
+        self.db = self.mongo.HasiiTune
 
         self.admin_list = {}  # Cache admin lists
         self.admin_cache_time = {}  # Track cache freshness
@@ -138,14 +138,14 @@ class MongoDB:
         return num
 
     async def get_assistant(self, chat_id: int):
-        from HasiiMusic import anon
+        from HasiiMusic import tune
 
         if chat_id not in self.assistant:
             doc = await self.assistantdb.find_one({"_id": chat_id})
             num = doc["num"] if doc else await self.set_assistant(chat_id)
             self.assistant[chat_id] = num
 
-        return anon.clients[self.assistant[chat_id] - 1]
+        return tune.clients[self.assistant[chat_id] - 1]
 
     async def get_client(self, chat_id: int):
         if chat_id not in self.assistant:

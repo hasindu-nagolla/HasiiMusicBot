@@ -76,7 +76,7 @@ queue = Queue()
 
 # Initialize call handler
 from HasiiMusic.core.calls import TgCall
-anon = TgCall()
+tune = TgCall()
 
 
 async def stop() -> None:

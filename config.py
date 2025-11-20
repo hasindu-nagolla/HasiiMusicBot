@@ -86,9 +86,9 @@ class Config:
         # URLs for various bot images
         self.DEFAULT_THUMB: str = getenv(
             "DEFAULT_THUMB",
-            "https://te.legra.ph/file/3e40a408286d4eda24191.jpg"  # Default thumbnail
+            "https://files.catbox.moe/kgrs8f.png"  # Default thumbnail
         )
-        self.PING_IMG: str = getenv("PING_IMG", "https://files.catbox.moe/haagg2.png")    # Ping command image
+        self.PING_IMG: str = getenv("PING_IMG", "https://files.catbox.moe/2ronp6.jpeg")    # Ping command image
         self.START_IMG: str = getenv("START_IMG", "https://files.catbox.moe/und0yt.jpg")  # Start command image
     
     def _parse_excluded_chats(self) -> List[int]:

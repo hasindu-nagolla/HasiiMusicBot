@@ -3,14 +3,14 @@ import time
 
 from pyrogram import enums, filters, types
 
-from HasiiMusic import anon, app, config, db, lang, queue, tasks, userbot, yt
+from HasiiMusic import tune, app, config, db, lang, queue, tasks, userbot, yt
 from HasiiMusic.helpers import buttons
 
 
 @app.on_message(filters.video_chat_started, group=19)
 @app.on_message(filters.video_chat_ended, group=20)
 async def _watcher_vc(_, m: types.Message):
-    await anon.stop(m.chat.id)
+    await tune.stop(m.chat.id)
 
 
 async def auto_leave():
@@ -109,7 +109,7 @@ async def vc_watcher(sleep=15):
                         chat_id=chat_id, status=_lang["stopped"], remove=True
                     ),
                 )
-                await anon.stop(chat_id)
+                await tune.stop(chat_id)
                 await sent.reply_text(_lang["auto_left"])
 
 

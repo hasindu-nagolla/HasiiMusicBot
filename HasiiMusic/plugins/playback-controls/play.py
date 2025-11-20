@@ -18,7 +18,7 @@
 from pyrogram import filters
 from pyrogram import types
 
-from HasiiMusic import anon, app, config, db, lang, queue, tg, yt
+from HasiiMusic import tune, app, config, db, lang, queue, tg, yt
 from HasiiMusic.helpers import buttons, utils
 from HasiiMusic.helpers._play import checkUB
 
@@ -158,7 +158,7 @@ async def play_hndlr(
     if not file.file_path:
         file.file_path = await yt.download(file.id, video=video, is_live=file.is_live)
 
-    await anon.play_media(chat_id=chat_id, message=sent, media=file)
+    await tune.play_media(chat_id=chat_id, message=sent, media=file)
     if not tracks:
         return
     added = playlist_to_queue(chat_id, tracks)

@@ -9,7 +9,7 @@ from typing import Any, Optional, Tuple
 
 from pyrogram import filters, types
 
-from HasiiMusic import anon, app, config, db, lang, userbot
+from HasiiMusic import tune, app, config, db, lang, userbot
 from HasiiMusic.helpers import format_exception, meval
 
 
@@ -37,7 +37,7 @@ async def eval_handler(_, message: types.Message):
             "chat": message.chat,
             "user": message.from_user,
             "app": app,
-            "anon": anon,
+            "tune": tune,
             "db": db,
             "client": app,
             "ub": userbot,

@@ -71,7 +71,7 @@ class Inline:
 
     def lang_markup(self, _lang: str) -> types.InlineKeyboardMarkup:
         langs = lang.get_languages()
-        
+
         # Map language codes to flags
         flags = {
             "en": "🇬🇧",

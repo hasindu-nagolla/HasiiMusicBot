@@ -1,6 +1,6 @@
 from pyrogram import filters, types
 
-from HasiiMusic import anon, app, db, lang, queue
+from HasiiMusic import tune, app, db, lang, queue
 from HasiiMusic.helpers import can_manage_vc
 
 
@@ -40,7 +40,7 @@ async def _seek(_, m: types.Message):
         if start_from + 10 > media.duration_sec:
             start_from = media.duration_sec - 5
 
-    await anon.play_media(m.chat.id, sent, media, start_from)
+    await tune.play_media(m.chat.id, sent, media, start_from)
     media.time = start_from
     await sent.edit_text(
         m.lang["play_seeked"].format(stype, start_from, m.from_user.mention)

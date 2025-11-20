@@ -15,7 +15,7 @@ import importlib
 
 from pyrogram import idle
 
-from HasiiMusic import (anon, app, config, db,
+from HasiiMusic import (tune, app, config, db,
                    logger, stop, userbot, yt)
 from HasiiMusic.plugins import all_modules
 
@@ -31,7 +31,7 @@ async def main():
     await userbot.boot()
     
     # Step 4: Initialize voice call handler
-    await anon.boot()
+    await tune.boot()
 
     # Step 5: Load all plugin modules (commands like /play, /pause, etc.)
     for module in all_modules:
