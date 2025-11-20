@@ -36,7 +36,7 @@ async def main():
     # Step 5: Load all plugin modules (commands like /play, /pause, etc.)
     for module in all_modules:
         importlib.import_module(f"HasiiMusic.plugins.{module}")
-    logger.info(f"🔌 Loaded {len(all_modules)} modules.")
+    logger.info(f"🔌 Loaded {len(all_modules)} plugin modules.")
 
     # Step 6: Download YouTube cookies if URLs are provided (for age-restricted videos)
     if config.COOKIES_URL:
