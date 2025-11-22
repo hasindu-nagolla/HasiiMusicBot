@@ -57,17 +57,22 @@ class Userbot(Client):
             3: self.three,
         }
         client = clients[num]
-        await client.start()
         try:
-            await client.send_message(config.LOGGER_ID, "Assistant Started")
-        except:
-            raise SystemExit(
-                f"Assistant {num} failed to send message in log group.")
+            await client.start()
+        except Exception as e:
+            logger.error(f"❌ Assistant {num} failed to start: {e}")
+            return  # Don't raise SystemExit, just skip this assistant
+        
+        try:
+            await client.send_message(config.LOGGER_ID, f"Assistant {num} Started")
+        except Exception as e:
+            logger.warning(f"⚠️ Assistant {num} couldn't send message to logger: {e}")
+            # Continue anyway - this is not critical
 
-        client.id = ub.me.id
-        client.name = ub.me.first_name
-        client.username = ub.me.username
-        client.mention = ub.me.mention
+        client.id = client.me.id if hasattr(client, 'me') and client.me else None
+        client.name = client.me.first_name if hasattr(client, 'me') and client.me else f"Assistant{num}"
+        client.username = client.me.username if hasattr(client, 'me') and client.me else None
+        client.mention = client.me.mention if hasattr(client, 'me') and client.me else client.name
         self.clients.append(client)
         logger.info(f"👤 Assistant {num} started as @{client.username}")
 

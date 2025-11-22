@@ -76,7 +76,7 @@ async def _controls(_, query: types.CallbackQuery):
 
         msg = await app.send_message(chat_id=chat_id, text=query.lang["play_next"])
         if not media.file_path:
-            media.file_path = await yt.download(media.id, video=media.video)
+            media.file_path = await yt.download(media.id, video=False)
         media.message_id = msg.id
         return await tune.play_media(chat_id, msg, media)
 
@@ -113,7 +113,7 @@ async def _controls(_, query: types.CallbackQuery):
         pass
 
 
-@app.on_callback_query(filters.regex("help") & ~app.bl_users)
+@app.on_callback_query(filters.regex(r"^help($| )") & ~app.bl_users)
 @lang.language()
 async def _help(_, query: types.CallbackQuery):
     data = query.data.split()

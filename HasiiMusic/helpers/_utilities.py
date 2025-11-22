@@ -70,19 +70,8 @@ class Utilities:
         )
         await app.send_message(chat_id=app.logger, text=_text)
 
-    async def send_log(self, m: types.Message, chat: bool = False) -> None:
-        if chat:
-            user = m.from_user
-            return await app.send_message(
-                chat_id=app.logger,
-                text=m.lang["log_chat"].format(
-                    m.chat.id,
-                    m.chat.title,
-                    user.id if user else 0,
-                    user.mention if user else "Anonymous",
-                ),
-            )
-
+    async def send_log(self, m: types.Message) -> None:
+        """Log new user to logger group when they start the bot in private chat."""
         await app.send_message(
             chat_id=app.logger,
             text=m.lang["log_user"].format(

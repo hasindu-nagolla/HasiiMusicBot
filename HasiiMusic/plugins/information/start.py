@@ -102,7 +102,6 @@ async def _new_member(_, message: types.Message):
     
     - Leaves non-supergroup chats
     - Adds new groups to database
-    - Sends log to logger group
     """
     # Only work in supergroups (not basic groups)
     if message.chat.type != enums.ChatType.SUPERGROUP:
@@ -113,7 +112,5 @@ async def _new_member(_, message: types.Message):
         if member.id == app.id:  # Bot itself was added
             if await db.is_chat(message.chat.id):
                 return  # Chat already in database
-            # Log new chat addition to logger group
-            await utils.send_log(message, True)
-            # Add chat to database
+            # Add chat to database (log is sent from new_chat.py with photo)
             await db.add_chat(message.chat.id)

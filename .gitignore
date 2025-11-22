@@ -9,3 +9,4 @@ __pycache__/
 anony/cookies/*.txt
 *.session
 *.session-journal
+.vscode

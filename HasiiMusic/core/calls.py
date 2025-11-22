@@ -58,11 +58,7 @@ class TgCall(PyTgCalls):
             audio_parameters=types.AudioQuality.STUDIO,
             video_parameters=types.VideoQuality.HD_720p,
             audio_flags=types.MediaStream.Flags.REQUIRED,
-            video_flags=(
-                types.MediaStream.Flags.AUTO_DETECT
-                if media.video
-                else types.MediaStream.Flags.IGNORE
-            ),
+            video_flags=types.MediaStream.Flags.IGNORE,  # Audio only, no video
             ffmpeg_parameters=f"-ss {seek_time}" if seek_time > 1 else None,
         )
         try:
@@ -80,7 +76,15 @@ class TgCall(PyTgCalls):
                     media.duration,
                     media.user,
                 )
-                keyboard = buttons.controls(chat_id)
+                # Create initial timer display
+                if not media.is_live and media.duration_sec:
+                    import time as time_module
+                    played_time = time_module.strftime('%M:%S', time_module.gmtime(0))
+                    total_time = time_module.strftime('%M:%S', time_module.gmtime(media.duration_sec))
+                    timer_text = f"{played_time} ——————————● {total_time}"
+                    keyboard = buttons.controls(chat_id, timer=timer_text)
+                else:
+                    keyboard = buttons.controls(chat_id)
                 try:
                     await message.edit_media(
                         media=InputMediaPhoto(
@@ -141,7 +145,7 @@ class TgCall(PyTgCalls):
         msg = await app.send_message(chat_id=chat_id, text=_lang["play_next"])
         if not media.file_path:
             is_live = getattr(media, 'is_live', False)
-            media.file_path = await yt.download(media.id, video=media.video, is_live=is_live)
+            media.file_path = await yt.download(media.id, video=False, is_live=is_live)
             if not media.file_path:
                 await self.stop(chat_id)
                 return await msg.edit_text(
@@ -156,25 +160,23 @@ class TgCall(PyTgCalls):
         return round(sum(pings) / len(pings), 2)
 
     async def decorators(self, client: PyTgCalls) -> None:
-        for client in self.clients:
-
-            @client.on_update()
-            async def update_handler(_, update: types.Update) -> None:
-                if isinstance(update, types.StreamEnded):
-                    if update.stream_type == types.StreamEnded.Type.AUDIO:
-                        await self.play_next(update.chat_id)
-                elif isinstance(update, types.ChatUpdate):
-                    if update.status in [
-                        types.ChatUpdate.Status.KICKED,
-                        types.ChatUpdate.Status.LEFT_GROUP,
-                        types.ChatUpdate.Status.CLOSED_VOICE_CHAT,
-                    ]:
-                        await self.stop(update.chat_id)
+        @client.on_update()
+        async def update_handler(_, update: types.Update) -> None:
+            if isinstance(update, types.StreamEnded):
+                if update.stream_type == types.StreamEnded.Type.AUDIO:
+                    await self.play_next(update.chat_id)
+            elif isinstance(update, types.ChatUpdate):
+                if update.status in [
+                    types.ChatUpdate.Status.KICKED,
+                    types.ChatUpdate.Status.LEFT_GROUP,
+                    types.ChatUpdate.Status.CLOSED_VOICE_CHAT,
+                ]:
+                    await self.stop(update.chat_id)
 
     async def boot(self) -> None:
         PyTgCallsSession.notice_displayed = True
         for ub in userbot.clients:
-            client = PyTgCalls(ub, cache_duration=100)
+            client = PyTgCalls(ub, cache_duration=300)  # Increased cache for better performance
             await client.start()
             self.clients.append(client)
             await self.decorators(client)

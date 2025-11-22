@@ -62,8 +62,8 @@ class Config:
         # Pyrogram session strings - get from @StringFatherBot
         # You can have up to 3 assistants for handling multiple groups
         self.SESSION1: str = getenv("STRING_SESSION", "")  # Primary assistant (required)
-        self.SESSION2: str = getenv("SESSION2", "")        # Secondary assistant (optional)
-        self.SESSION3: str = getenv("SESSION3", "")        # Tertiary assistant (optional)
+        self.SESSION2: str = getenv("STRING_SESSION2", "")  # Secondary assistant (optional)
+        self.SESSION3: str = getenv("STRING_SESSION3", "")  # Tertiary assistant (optional)
         
         # ============ SUPPORT LINKS ============
         self.SUPPORT_CHANNEL: str = getenv("SUPPORT_CHANNEL", "https://t.me/TheInfinityAI")
@@ -76,7 +76,6 @@ class Config:
         # ============ FEATURE FLAGS ============
         self.AUTO_END: bool = self._str_to_bool(getenv("AUTO_END", "False"))      # Auto-end stream when queue is empty
         self.AUTO_LEAVE: bool = self._str_to_bool(getenv("AUTO_LEAVE", "False"))  # Auto-leave inactive chats
-        self.VIDEO_PLAY: bool = self._str_to_bool(getenv("VIDEO_PLAY", "True"))   # Enable video playback
         
         # ============ YOUTUBE COOKIES ============
         # Parse space-separated cookie URLs for age-restricted content

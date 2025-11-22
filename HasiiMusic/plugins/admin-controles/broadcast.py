@@ -18,7 +18,7 @@ import os
 import asyncio
 from typing import List, Tuple
 
-from pyrogram import errors, filters, types
+from pyrogram import enums, errors, filters, types
 
 from HasiiMusic import app, db, lang
 
@@ -214,8 +214,9 @@ async def _send_broadcast(
     success_users = 0
     failed_log = ""
     all_chats = groups + users
+    total_chats = len(all_chats)
     
-    for chat_id in all_chats:
+    for index, chat_id in enumerate(all_chats, start=1):
         # Check if broadcast was stopped
         if not broadcasting:
             await status_message.edit_text(
@@ -223,8 +224,31 @@ async def _send_broadcast(
             )
             break
         
+        # Update progress every 50 chats
+        if index % 50 == 0:
+            try:
+                await status_message.edit_text(
+                    f"📤 Broadcasting...\n\n"
+                    f"Progress: {index}/{total_chats}\n"
+                    f"✅ Groups: {success_groups}\n"
+                    f"✅ Users: {success_users}"
+                )
+            except:
+                pass
+        
         # Attempt to send message
         try:
+            # Check if it's a channel (not a group) - skip channels
+            if chat_id in groups:
+                try:
+                    chat = await app.get_chat(chat_id)
+                    # Skip channels - only send to supergroups (groups)
+                    if chat.type == enums.ChatType.CHANNEL:
+                        failed_log += f"{chat_id} - Skipped (channel, not a group)\n"
+                        continue
+                except:
+                    pass  # If can't get chat info, try to send anyway
+            
             await app.send_message(chat_id, text)
             
             # Track success
@@ -233,12 +257,23 @@ async def _send_broadcast(
             else:
                 success_users += 1
             
-            # Rate limiting delay
-            await asyncio.sleep(0.1)
+            # Anti-flood delay: 300ms between messages (safer than 100ms)
+            await asyncio.sleep(0.3)
             
         except errors.FloodWait as fw:
-            # Handle flood wait by waiting and retrying
-            await asyncio.sleep(fw.value + 30)
+            # Handle flood wait by waiting and continuing (don't stop broadcast)
+            try:
+                await status_message.edit_text(
+                    f"⏳ Flood wait triggered. Waiting {fw.value} seconds...\n\n"
+                    f"Progress: {index}/{total_chats}\n"
+                    f"Don't worry, broadcast will continue!"
+                )
+            except:
+                pass
+            
+            await asyncio.sleep(fw.value + 5)
+            
+            # Retry sending after waiting
             try:
                 await app.send_message(chat_id, text)
                 if chat_id in groups:
@@ -246,11 +281,45 @@ async def _send_broadcast(
                 else:
                     success_users += 1
             except Exception as retry_ex:
-                failed_log += f"{chat_id} - {retry_ex}\n"
-                
+                failed_log += f"{chat_id} - FloodWait retry failed: {retry_ex}\n"
+        
+        except errors.UserIsBlocked:
+            # User blocked the bot - skip silently
+            failed_log += f"{chat_id} - User blocked bot\n"
+            continue
+            
+        except errors.ChatWriteForbidden:
+            # Bot can't write in this chat - skip
+            failed_log += f"{chat_id} - No write permission\n"
+            continue
+        
+        except errors.ChannelPrivate:
+            # Bot was removed from channel/group - remove from database
+            if chat_id in groups:
+                try:
+                    await db.rm_chat(chat_id)
+                    failed_log += f"{chat_id} - Removed from group (cleaned from database)\n"
+                except:
+                    failed_log += f"{chat_id} - Channel private (bot not member)\n"
+            else:
+                failed_log += f"{chat_id} - Channel private\n"
+            continue
+            
+        except errors.PeerIdInvalid:
+            # Invalid chat ID - remove from database
+            if chat_id in groups:
+                try:
+                    await db.rm_chat(chat_id)
+                    failed_log += f"{chat_id} - Invalid ID (cleaned from database)\n"
+                except:
+                    failed_log += f"{chat_id} - Invalid chat ID\n"
+            else:
+                failed_log += f"{chat_id} - Invalid user ID\n"
+            continue
+            
         except Exception as ex:
-            # Log failed send
-            failed_log += f"{chat_id} - {ex}\n"
+            # Log failed send but CONTINUE to next chat
+            failed_log += f"{chat_id} - {type(ex).__name__}: {str(ex)}\n"
             continue
     
     return success_groups, success_users, failed_log

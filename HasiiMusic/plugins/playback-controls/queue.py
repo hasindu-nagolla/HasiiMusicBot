@@ -32,7 +32,7 @@ async def _queue_func(_, m: types.Message):
             if i == 15:
                 break
             _text += m.lang["queue_item"].format(
-                i + 1, media.title, media.duration
+                i, media.title, media.duration  # Show 1, 2, 3... for queued songs
             )
         _text += "</blockquote>"
 

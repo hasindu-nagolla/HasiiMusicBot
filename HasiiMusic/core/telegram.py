@@ -30,7 +30,7 @@ class Telegram:
 
     def get_media(self, msg: types.Message) -> bool:
         """Check if message contains downloadable media."""
-        return any([msg.video, msg.audio, msg.document, msg.voice])
+        return any([msg.audio, msg.document, msg.voice])
 
     async def download(self, msg: types.Message, sent: types.Message) -> Media | None:
         """
@@ -50,13 +50,12 @@ class Telegram:
         start_time = time.time()  # Track download start time
 
         # Extract media information from message
-        media = msg.audio or msg.voice or msg.video or msg.document
+        media = msg.audio or msg.voice or msg.document
         file_id = getattr(media, "file_unique_id", None)  # Unique file identifier
         file_ext = getattr(media, "file_name", "").split(".")[-1]  # File extension
         file_size = getattr(media, "file_size", 0)  # File size in bytes
         file_title = getattr(media, "title", "Telegram File") or "Telegram File"  # Media title
         duration = getattr(media, "duration", 0)  # Duration in seconds
-        video = bool(getattr(media, "mime_type", "").startswith("video/"))  # Check if video
 
         # Validate duration limit (configured in config.py)
         if duration > config.DURATION_LIMIT:
@@ -120,7 +119,7 @@ class Telegram:
                 message_id=sent.id,
                 url=msg.link,
                 title=file_title[:25],
-                video=video,
+                video=False,  # Audio only
             )
         except asyncio.CancelledError:
             return await sent.stop_propagation()

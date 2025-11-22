@@ -26,9 +26,6 @@ def checkUB(play):
         force = m.command[0].endswith("force") or (
             len(m.command) > 1 and "-f" in m.command[1]
         )
-        is_video_cmd = m.command[0][0] == "v" or (
-            m.command[0][0] == "c" and m.command[0][1] == "v")
-        video = is_video_cmd and config.VIDEO_PLAY
         cplay = m.command[0][0] == "c"
         url = yt.url(m)
         if url and not yt.valid(url):
@@ -114,6 +111,6 @@ def checkUB(play):
         except:
             pass
 
-        return await play(_, m, force, video, url, cplay)
+        return await play(_, m, force, url, cplay)
 
     return wrapper

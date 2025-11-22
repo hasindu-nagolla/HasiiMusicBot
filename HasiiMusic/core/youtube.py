@@ -177,9 +177,17 @@ class YouTube:
                     try:
                         info = ydl.extract_info(url, download=False)
                         return info.get("url") or info.get("manifest_url")
+                    except yt_dlp.utils.ExtractorError as ex:
+                        error_msg = str(ex)
+                        if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
+                            logger.error("YouTube bot detection triggered. Please update cookies.")
+                        elif "not available" in error_msg.lower():
+                            logger.error("Video format not available or region-blocked.")
+                        else:
+                            logger.error("Live stream URL extraction failed: %s", ex)
+                        return None
                     except Exception as ex:
-                        logger.error(
-                            "Live stream URL extraction failed: %s", ex)
+                        logger.error("Unexpected error during live stream extraction: %s", ex)
                         return None
 
             stream_url = await asyncio.to_thread(_extract_url)
@@ -219,12 +227,26 @@ class YouTube:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 try:
                     ydl.download([url])
-                except (yt_dlp.utils.DownloadError, yt_dlp.utils.ExtractorError):
-                    if cookie in self.cookies:
+                except yt_dlp.utils.ExtractorError as ex:
+                    error_msg = str(ex)
+                    if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
+                        logger.error("❌ YouTube bot detection: Please update cookies or wait before retrying.")
+                    elif "not available" in error_msg.lower():
+                        logger.error("❌ Video not available: May be region-blocked or private.")
+                    elif "age" in error_msg.lower():
+                        logger.error("❌ Age-restricted video: Cookies required.")
+                    else:
+                        logger.error("❌ YouTube extraction failed: %s", ex)
+                    if cookie and cookie in self.cookies:
+                        self.cookies.remove(cookie)
+                    return None
+                except yt_dlp.utils.DownloadError as ex:
+                    logger.error("❌ Download error: %s", ex)
+                    if cookie and cookie in self.cookies:
                         self.cookies.remove(cookie)
                     return None
                 except Exception as ex:
-                    logger.error("Download failed: %s", ex)
+                    logger.error("❌ Unexpected download error: %s", ex)
                     return None
             return filename
 

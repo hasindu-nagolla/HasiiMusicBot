@@ -19,42 +19,51 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from HasiiMusic import tune, app, config, db, lang, queue
 from HasiiMusic.helpers import buttons, utils
-from HasiiMusic.helpers._admins import is_admin
 
 # Set up logging
 LOGGER = logging.getLogger(__name__)
 
 # Dictionary of radio stations with their stream URLs
 RADIO_STATION = {
-    "SirasaFM": "http://live.trusl.com:1170/;",
-    "HelaNadaFM": "https://stream-176.zeno.fm/9ndoyrsujwpvv",
-    "Radio Plus Hitz": "https://altair.streamerr.co/stream/8054",
-    "English": "https://hls-01-regions.emgsound.ru/11_msk/playlist.m3u8",
-    "HiruFM": "https://radio.lotustechnologieslk.net:2020/stream/hirufmgarden?1707015384",
-    "RedFM": "https://shaincast.caster.fm:47830/listen.mp3",
-    "RanFM": "https://207.148.74.192:7874/ran.mp3",
-    "YFM": "http://live.trusl.com:1180/;",
-    "+212": "http://stream.radio.co/sf55ced545/listen",
-    "Deep House Music": "http://live.dancemusic.ro:7000/",
-    "Radio Italia": "https://energyitalia.radioca.st",
-    "The Best Music": "http://s1.slotex.pl:7040/",
-    "HITZ FM": "https://stream-173.zeno.fm/uyx7eqengijtv",
-    "Prime Radio HD": "https://stream-153.zeno.fm/oksfm5djcfxvv",
-    "1Mix Radio": "https://stream-154.zeno.fm/xdf9ba0vyz8uv",
-    "RFI Tieng Viet": "https://rfivietnamien96k.ice.infomaniak.ch/rfivietnamien-96k.mp3",
-    "Phat": "https://phat.stream.laut.fm/phat",
-    "Dai Phat Thanh VN": "http://c13.radioboss.fm:8127/stream",
-    "Pulse EDM": "https://naxos.cdnstream.com/1373_128",
-    "Base Music": "https://base-music.stream.laut.fm/base-music",
-    "Ultra Music": "http://prem4.di.fm/umfradio_hi?20a1d1bf879e76&_ic2=1733161375677",
-    "Na Dahasa FM": "https://stream-155.zeno.fm/z7q96fbw7rquv",
-    "Parani Gee": "http://cast2.citrus3.com:8288/;",
-    "SunFM": "https://radio.lotustechnologieslk.net:2020/stream/sunfmgarden",
-    "EDM MEGASHUFFLE": "https://maggie.torontocast.com:9030/stream",
+    # --- Sri Lankan Radio Stations ---
+    "SLBC Radio": "http://220.247.227.20:8000/RSLstream",
+    "Siyatha FM": "https://srv01.onlineradio.voaplus.com/siyathafm",
+    "ITN FM": "https://cp12.serverse.com/proxy/itnfm/stream",
+    "Rhythm FM": "https://srv01.onlineradio.voaplus.com/rhythmfm",
+    "Kothmale FM": "https://s46.myradiostream.com:11156/listen.mp3",
+    "Colour Radio": "https://stream.zeno.fm/uo3gmts0ilivv",
+    "Free FM": "https://stream.zeno.fm/1tcs4fbw7rquv",
+    "Seth FM": "https://listen.radioking.com/radio/384487/stream/435781",
+    "V FM": "https://dc1.serverse.com/proxy/fmlanka/stream",
+    "Sirasa FM": "http://live.trusl.com:1170/",                                          # ✅
+    "Hiru FM": "https://radio.lotustechnologieslk.net:2020/stream/hirufmgarden",         # ✅
+    "Y FM": "http://live.trusl.com:1180/",                                               # ✅
+    "Shaa FM": "https://radio.lotustechnologieslk.net:2020/stream/shaafmgarden",         # ✅
+    "Gold FM": "https://radio.lotustechnologieslk.net:2020/stream/goldfmgarden",         # ✅
+    "Sooriyan FM": "https://radio.lotustechnologieslk.net:2020/stream/sooriyanfmgarden", # ✅
+    "bestcoast.fm": "https://streams.radio.co/sea5dddd6b/listen",                        # ✅
+    "Yes FM": "http://live.trusl.com:1160/",                                             # ✅
+    "Sitha FM": "https://stream.streamgenial.stream/cdzzrkrv0p8uv",                      # ✅
+    "Hiru FM Garden": "https://radio.lotustechnologieslk.net:2020/stream/hirufmgarden",  # ✅
+    "Sun FM": "https://radio.lotustechnologieslk.net:2020/stream/sunfmgarden",           # ✅
+    "Shree FM": "https://streamingv2.shoutcast.com/shreefm945",                          # ✅
+    "Red FM": "https://shaincast.caster.fm:47830/listen.mp3",                            # ✅
+    "Ran FM": "https://207.148.74.192:7874/ran.mp3",                                     # ✅
+    "Neth FM": "https://cp11.serverse.com/proxy/nethfm/stream",                          # ✅
+    "Kiss FM": "https://srv01.onlineradio.voaplus.com/kissfm",                           # ✅
+    "Rangiri FM": "https://stream.streamgenial.stream/hwafmr3f4p8uv",                    # ✅
+    "Lakhanada Radio": "https://cp12.serverse.com/proxy/itnfm?mp=/stream",               # ✅
+    "HITZ FM": "https://stream-173.zeno.fm/uyx7eqengijtv",                               # ✅
+    "Na Dahasa FM": "https://stream-155.zeno.fm/z7q96fbw7rquv",                          # ✅
+    "Parani Gee": "http://cast2.citrus3.com:8288/",                                      # ✅
+    "Deep House Music": "http://live.dancemusic.ro:7000/",                               # ✅
+    "Base Music": "https://base-music.stream.laut.fm/base-music",                        # ✅
+    "Pulse EDM": "https://naxos.cdnstream.com/1373_128",                                 # ✅
+
 }
 
 
-def radio_buttons(page=0, per_page=5):
+def radio_buttons(page=0, per_page=10):
     """Generate pagination buttons for radio stations."""
     stations = sorted(RADIO_STATION.keys())
     total_pages = (len(stations) - 1) // per_page + 1
@@ -62,10 +71,18 @@ def radio_buttons(page=0, per_page=5):
     end = start + per_page
     current_stations = stations[start:end]
 
-    buttons_list = [
-        [InlineKeyboardButton(name, callback_data=f"station_{name}")]
-        for name in current_stations
-    ]
+    # Create buttons in rows of 2
+    buttons_list = []
+    for i in range(0, len(current_stations), 2):
+        row = []
+        # Add first button in the row
+        row.append(InlineKeyboardButton(
+            current_stations[i], callback_data=f"station_{current_stations[i]}"))
+        # Add second button if it exists
+        if i + 1 < len(current_stations):
+            row.append(InlineKeyboardButton(
+                current_stations[i + 1], callback_data=f"station_{current_stations[i + 1]}"))
+        buttons_list.append(row)
 
     nav_buttons = []
     if page > 0:
@@ -84,12 +101,38 @@ def radio_buttons(page=0, per_page=5):
     return InlineKeyboardMarkup(buttons_list)
 
 
-async def is_admin_or_anonymous(chat_id, user_id):
-    """Check if user is admin or anonymous admin."""
-    if user_id == 1087968824:  # Anonymous admin ID
+async def has_radio_control_permission(chat_id, user_id):
+    """
+    Check if user has permission to control radio.
+    Allowed users:
+    - Bot owner
+    - Sudo users
+    - Authorized users in the chat
+    - Chat admins
+    - Anonymous admins
+    """
+    # Check if anonymous admin
+    if user_id == 1087968824:
         return True
-    member = await app.get_chat_member(chat_id, user_id)
-    return member.status in ["administrator", "creator"]
+    
+    # Check if bot owner
+    if user_id == config.OWNER_ID:
+        return True
+    
+    # Check if sudo user
+    if user_id in app.sudoers:
+        return True
+    
+    # Check if authorized user in this chat
+    if await db.is_auth(chat_id, user_id):
+        return True
+    
+    # Check if chat admin
+    try:
+        member = await app.get_chat_member(chat_id, user_id)
+        return member.status in ["administrator", "creator"]
+    except:
+        return False
 
 
 async def update_timer(chat_id, message_id, station_name, start_time):
@@ -106,7 +149,7 @@ async def update_timer(chat_id, message_id, station_name, start_time):
                 await app.edit_message_caption(
                     chat_id=chat_id,
                     message_id=message_id,
-                    caption=f"📻 Now playing: {station_name}\n⏱️ Time: {timer}",
+                    caption=f"📻 𝗡𝗼𝘄 𝗽𝗹𝗮𝘆𝗶𝗻𝗴: {station_name}\n⏱️ 𝗧𝗶𝗺𝗲: {timer}",
                     reply_markup=InlineKeyboardMarkup([
                         [InlineKeyboardButton(
                             f"🎵 {station_name}", callback_data="noop")],
@@ -142,10 +185,10 @@ async def radio_handler(_, m: Message) -> None:
         channel_id = await db.get_cmode(m.chat.id)
         if channel_id is None:
             return await m.reply_text(
-                "❌ Channel play is not enabled.\n\n"
-                "To enable for linked channel:\n"
+                "❌ 𝗖𝗵𝗮𝗻𝗻𝗲𝗹 𝗽𝗹𝗮𝘆 𝗶𝘀 𝗻𝗼𝘁 𝗲𝗻𝗮𝗯𝗹𝗲𝗱.\n\n"
+                "𝗧𝗼 𝗲𝗻𝗮𝗯𝗹𝗲 𝗳𝗼𝗿 𝗹𝗶𝗻𝗸𝗲𝗱 𝗰𝗵𝗮𝗻𝗻𝗲𝗹:\n"
                 "`/channelplay linked`\n\n"
-                "To enable for any channel:\n"
+                "𝗧𝗼 𝗲𝗻𝗮𝗯𝗹𝗲 𝗳𝗼𝗿 𝗮𝗻𝘆 𝗰𝗵𝗮𝗻𝗻𝗲𝗹:\n"
                 "`/channelplay [channel_id]`"
             )
         try:
@@ -153,12 +196,12 @@ async def radio_handler(_, m: Message) -> None:
             chat_id = chat.id
         except:
             return await m.reply_text(
-                "❌ Channel not found or bot is not in the channel.\n"
-                "Please make sure the channel ID is correct and the bot is added correctly."
+                "❌ 𝗖𝗵𝗮𝗻𝗻𝗲𝗹 𝗻𝗼𝘁 𝗳𝗼𝘂𝗻𝗱 𝗼𝗿 𝗯𝗼𝘁 𝗶𝘀 𝗻𝗼𝘁 𝗶𝗻 𝘁𝗵𝗲 𝗰𝗵𝗮𝗻𝗻𝗲𝗹.\n"
+                "𝗣𝗹𝗲𝗮𝘀𝗲 𝗺𝗮𝗸𝗲 𝘀𝘂𝗿𝗲 𝘁𝗵𝗲 𝗰𝗵𝗮𝗻𝗻𝗲𝗹 𝗜𝗗 𝗶𝘀 𝗰𝗼𝗿𝗿𝗲𝗰𝘁 𝗮𝗻𝗱 𝘁𝗵𝗲 𝗯𝗼𝘁 𝗶𝘀 𝗮𝗱𝗱𝗲𝗱 𝗰𝗼𝗿𝗿𝗲𝗰𝘁𝗹𝘆."
             )
 
     await m.reply_text(
-        "📻 Select a radio station to play:",
+        "📻 𝗦𝗲𝗹𝗲𝗰𝘁 𝗮 𝗿𝗮𝗱𝗶𝗼 𝘀𝘁𝗮𝘁𝗶𝗼𝗻 𝘁𝗼 𝗽𝗹𝗮𝘆:",
         reply_markup=radio_buttons(page=0),
     )
 
@@ -177,34 +220,31 @@ async def on_station_select(_, callback_query):
     RADIO_URL = RADIO_STATION.get(station_name)
 
     if not RADIO_URL:
-        return await callback_query.answer("❌ Invalid station name.", show_alert=True)
+        return await callback_query.answer("❌ 𝗜𝗻𝘃𝗮𝗹𝗶𝗱 𝘀𝘁𝗮𝘁𝗶𝗼𝗻 𝗻𝗮𝗺𝗲.", show_alert=True)
 
     chat_id = callback_query.message.chat.id
 
-    # Check if radio is already playing - only admins can switch
+    # Check if radio is already playing - only authorized users can switch
     if await db.get_call(chat_id):
-        # Check if user is admin
-        if not await is_admin(chat_id, callback_query.from_user.id):
+        # Check if user has permission
+        if not await has_radio_control_permission(chat_id, callback_query.from_user.id):
             return await callback_query.answer(
-                "❌ Only admins can change the station while radio is playing.\n"
-                "Please wait for the current session to end.",
+                "❌ 𝗢𝗻𝗹𝘆 𝗮𝗱𝗺𝗶𝗻𝘀, 𝗯𝗼𝘁 𝗼𝘄𝗻𝗲𝗿, 𝘀𝘂𝗱𝗼 𝘂𝘀𝗲𝗿𝘀, 𝗼𝗿 𝗮𝘂𝘁𝗵𝗼𝗿𝗶𝘇𝗲𝗱 𝘂𝘀𝗲𝗿𝘀 𝗰𝗮𝗻 𝗰𝗵𝗮𝗻𝗴𝗲 𝘁𝗵𝗲 𝘀𝘁𝗮𝘁𝗶𝗼𝗻 𝘄𝗵𝗶𝗹𝗲 𝗿𝗮𝗱𝗶𝗼 𝗶𝘀 𝗽𝗹𝗮𝘆𝗶𝗻𝗴.\n"
+                "𝗣𝗹𝗲𝗮𝘀𝗲 𝘄𝗮𝗶𝘁 𝗳𝗼𝗿 𝘁𝗵𝗲 𝗰𝘂𝗿𝗿𝗲𝗻𝘁 𝘀𝗲𝘀𝘀𝗶𝗼𝗻 𝘁𝗼 𝗲𝗻𝗱.",
                 show_alert=True
             )
 
-    await callback_query.answer("🔄 Switching station...")
+    await callback_query.answer("🔄 𝗦𝘄𝗶𝘁𝗰𝗵𝗶𝗻𝗴 𝘀𝘁𝗮𝘁𝗶𝗼𝗻...")
 
-    mention = callback_query.from_user.mention if callback_query.from_user.id != 1087968824 else "Anonymous Admin"
+    mention = callback_query.from_user.mention if callback_query.from_user.id != 1087968824 else "𝗔𝗻𝗼𝗻𝘆𝗺𝗼𝘂𝘀 𝗔𝗱𝗺𝗶𝗻"
 
-    # Delete the station selection message if it exists
-    try:
-        await callback_query.message.delete()
-    except:
-        pass
+    # Keep the station selection message visible - don't delete it
+    # Users can continue selecting stations from the same button list
 
     mystic = await app.send_photo(
         chat_id=chat_id,
         photo=config.START_IMG,
-        caption=f"📻 Now playing: {station_name}\n⏱️ Time: 00:00",
+        caption=f"📻 𝗡𝗼𝘄 𝗽𝗹𝗮𝘆𝗶𝗻𝗴: {station_name}\n⏱️ 𝗧𝗶𝗺𝗲: 00:00",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton(f"🎵 {station_name}", callback_data="noop")],
             [
@@ -224,7 +264,7 @@ async def on_station_select(_, callback_query):
             self.url = url
             self.title = title
             self.is_live = True
-            self.duration = "Live Stream"
+            self.duration = "𝗟𝗶𝘃𝗲 𝗦𝘁𝗿𝗲𝗮𝗺"
             self.duration_sec = 0
             self.file_path = url  # Use URL as file path for streaming
             self.id = url
@@ -251,7 +291,7 @@ async def on_station_select(_, callback_query):
     try:
         await tune.play_media(chat_id=chat_id, message=mystic, media=file)
     except Exception as e:
-        await mystic.edit_caption(f"❌ Error playing radio:\n{str(e)}")
+        await mystic.edit_caption(f"❌ 𝗘𝗿𝗿𝗼𝗿 𝗽𝗹𝗮𝘆𝗶𝗻𝗴 𝗿𝗮𝗱𝗶𝗼:\n{str(e)}")
         LOGGER.error(f"Radio play error: {e}")
 
 
@@ -261,7 +301,7 @@ async def skip_radio_callback(_, callback_query):
     # Anyone can browse stations, not just admins
     await callback_query.answer()
     await callback_query.message.reply_text(
-        "📻 Select another radio station:",
+        "📻 𝗦𝗲𝗹𝗲𝗰𝘁 𝗮𝗻𝗼𝘁𝗵𝗲𝗿 𝗿𝗮𝗱𝗶𝗼 𝘀𝘁𝗮𝘁𝗶𝗼𝗻:",
         reply_markup=radio_buttons(page=0)
     )
 
@@ -271,14 +311,16 @@ async def close_message_callback(_, callback_query):
     """Handle close button."""
     try:
         # Check if user has permission to delete
-        member = await app.get_chat_member(callback_query.message.chat.id, callback_query.from_user.id)
-        if member.status in ["administrator", "creator"] or callback_query.from_user.id == 1087968824:
+        if await has_radio_control_permission(callback_query.message.chat.id, callback_query.from_user.id):
             await callback_query.message.delete()
             await callback_query.answer()
         else:
-            await callback_query.answer("❌ Only group admins can close this message.", show_alert=True)
+            await callback_query.answer(
+                "❌ 𝗢𝗻𝗹𝘆 𝗮𝗱𝗺𝗶𝗻𝘀, 𝗯𝗼𝘁 𝗼𝘄𝗻𝗲𝗿, 𝘀𝘂𝗱𝗼 𝘂𝘀𝗲𝗿𝘀, 𝗼𝗿 𝗮𝘂𝘁𝗵𝗼𝗿𝗶𝘇𝗲𝗱 𝘂𝘀𝗲𝗿𝘀 𝗰𝗮𝗻 𝗰𝗹𝗼𝘀𝗲 𝘁𝗵𝗶𝘀 𝗺𝗲𝘀𝘀𝗮𝗴𝗲.",
+                show_alert=True
+            )
     except Exception as e:
-        await callback_query.answer(f"❌ Error: {str(e)}", show_alert=True)
+        await callback_query.answer(f"❌ 𝗘𝗿𝗿𝗼𝗿: {str(e)}", show_alert=True)
 
 
 @app.on_callback_query(filters.regex(r"^radio_help_"))
@@ -287,20 +329,18 @@ async def on_radio_help(_, callback_query):
     await callback_query.answer()
     page = int(callback_query.data.split("_")[2])
     help_text = (
-        "📻 Radio Plugin Help\n\n"
-        "English:\n"
-        "• Type `/radio`: Open station list\n"
-        "• Select a station using buttons\n"
-        "• Use `/stop`: Stop playback\n"
-        "සිංහල:\n"
-        "• සිංදු අහන්න පටන් ගන්න `/radio` ටයිප් කරලා ස්ටේෂන් එකක් තෝරගන්න.\n"
-        "• වෙන චැනල් එකක් ඕනෙනම් Stations බටන් එක ඔබන්න.\n"
-        "• අහලා ඉවරනම් `/stop` කරන්න.\n"
+        "<blockquote>📻 𝗥𝗮𝗱𝗶𝗼 𝗣𝗹𝘂𝗴𝗶𝗻 𝗛𝗲𝗹𝗽</blockquote>\n\n"
+        "<blockquote><b>𝗘𝗻𝗴𝗹𝗶𝘀𝗵:</b>\n"
+        "• 𝗧𝘆𝗽𝗲 `/radio`𝘁𝗼 𝗢𝗽𝗲𝗻 𝘀𝘁𝗮𝘁𝗶𝗼𝗻 𝗹𝗶𝘀𝘁\n"
+        "• 𝗨𝘀𝗲 `/stop`𝘁𝗼 𝗦𝘁𝗼𝗽 𝗽𝗹𝗮𝘆𝗯𝗮𝗰𝗸 </blockquote>"
+        "<blockquote><b>සිංහල:</b>\n"
+        "<b>• `/radio` ටයිප් කරලා ස්ටේෂන් එකක් තෝරගන්න.</b>\n"
+        "<b>• අහලා ඉවරනම් `/stop` කරන්න.</b> </blockquote>"
     )
     await callback_query.message.edit_text(
         help_text,
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔙 Back to Stations",
+            [InlineKeyboardButton("🔙 𝗕𝗮𝗰𝗸 𝘁𝗼 𝗦𝘁𝗮𝘁𝗶𝗼𝗻𝘀",
                                   callback_data=f"back_to_stations_{page}")]
         ])
     )
@@ -312,7 +352,7 @@ async def on_back_to_stations(_, callback_query):
     await callback_query.answer()
     page = int(callback_query.data.split("_")[-1])
     await callback_query.message.edit_text(
-        "📻 Select a radio station to play:",
+        "📻 𝗦𝗲𝗹𝗲𝗰𝘁 𝗮 𝗿𝗮𝗱𝗶𝗼 𝘀𝘁𝗮𝘁𝗶𝗼𝗻 𝘁𝗼 𝗽𝗹𝗮𝘆:",
         reply_markup=radio_buttons(page=page)
     )
 
@@ -320,4 +360,4 @@ async def on_back_to_stations(_, callback_query):
 @app.on_callback_query(filters.regex(r"^noop"))
 async def on_noop(_, callback_query):
     """Handle no-operation button."""
-    await callback_query.answer("🎵 Enjoying the music!", show_alert=False)
+    await callback_query.answer("🎵 𝗘𝗻𝗷𝗼𝘆𝗶𝗻𝗴 𝘁𝗵𝗲 𝗺𝘂𝘀𝗶𝗰!", show_alert=False)
