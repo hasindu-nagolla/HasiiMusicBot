@@ -1,3 +1,17 @@
+# ==============================================================================
+# blacklist.py - User/Chat Blacklist Commands (Sudo Only)
+# ==============================================================================
+# This plugin manages the bot blacklist to block abusive users/chats.
+# Blacklisted entities cannot use the bot.
+# 
+# Commands:
+# - /blacklist <user_id|chat_id|@username> - Add to blacklist
+# - /unblacklist <user_id|chat_id|@username> - Remove from blacklist
+# - /whitelist <user_id|chat_id|@username> - Same as /unblacklist
+# 
+# Only sudo users can manage the blacklist.
+# ==============================================================================
+
 from pyrogram import filters, types
 
 from HasiiMusic import app, db, lang

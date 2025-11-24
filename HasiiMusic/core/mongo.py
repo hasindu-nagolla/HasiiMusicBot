@@ -1,3 +1,21 @@
+# ==============================================================================
+# mongo.py - MongoDB Database Manager
+# ==============================================================================
+# This file handles all database operations using MongoDB.
+# Collections:
+# - users: User data (sudo users)
+# - chats: Group/chat data (language, channel play mode, authorized users)
+# - blacklist: Blacklisted users/chats
+# - calls: Active voice call sessions
+# - cache: Admin list cache
+# 
+# Features:
+# - Async MongoDB operations for better performance
+# - Connection pooling for efficiency
+# - Admin list caching to reduce database queries
+# - Random assistant selection for load balancing
+# ==============================================================================
+
 from random import randint
 from time import time
 

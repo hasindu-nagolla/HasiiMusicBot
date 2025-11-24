@@ -1,3 +1,19 @@
+# ==============================================================================
+# misc.py - Miscellaneous Event Handlers
+# ==============================================================================
+# This plugin handles various bot events and background tasks.
+# 
+# Events:
+# - Voice chat started/ended - Auto-stop playback
+# - Bot mentioned - Send info message
+# - Auto-leave - Remove inactive assistants from groups every 30 minutes
+# 
+# Features:
+# - Automatic cleanup of inactive voice chat sessions
+# - Bot promotion reminders
+# - Keep assistants from cluttering unused groups
+# ==============================================================================
+
 import asyncio
 import time
 

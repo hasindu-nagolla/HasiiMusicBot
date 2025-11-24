@@ -1,3 +1,17 @@
+# ==============================================================================
+# stop.py - Stop Playback Command
+# ==============================================================================
+# This plugin handles stopping voice chat playback and clearing the queue.
+# 
+# Commands:
+# - /stop - Stop playback and clear queue
+# - /end - Same as /stop
+# 
+# Requirements:
+# - User must be admin or authorized user
+# - Music must be playing
+# ==============================================================================
+
 from pyrogram import filters, types
 
 from HasiiMusic import tune, app, db, lang

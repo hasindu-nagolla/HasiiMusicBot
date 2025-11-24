@@ -1,3 +1,17 @@
+# ==============================================================================
+# _play.py - Play Command Helper & Validator
+# ==============================================================================
+# This file contains the @checkUB decorator used by play commands.
+# Validates:
+# - User permissions (only real users, not anonymous admins)
+# - Chat type (only supergroups)
+# - Command syntax (query or reply required)
+# - Queue limits
+# - YouTube URL validity
+# 
+# This decorator ensures all play commands have proper validation before execution.
+# ==============================================================================
+
 import asyncio
 
 from pyrogram import enums, errors, types

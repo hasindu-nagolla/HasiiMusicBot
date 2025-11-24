@@ -1,3 +1,20 @@
+# ==============================================================================
+# channelplay.py - Channel Play Mode Configuration
+# ==============================================================================
+# This plugin enables playing music in linked channels instead of the group voice chat.
+# Useful for groups with linked channels.
+# 
+# Commands:
+# - /channelplay linked - Enable for linked channel
+# - /channelplay <channel_id> - Enable for specific channel
+# - /channelplay disable - Disable channel play mode
+# 
+# Requirements:
+# - User must be admin
+# - Bot must be admin in the channel
+# - For "linked" mode, channel must be linked to the group
+# ==============================================================================
+
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter, ChatMemberStatus, ChatType
 from pyrogram.types import Message

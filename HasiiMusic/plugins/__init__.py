@@ -1,3 +1,15 @@
+# ==============================================================================
+# __init__.py - Plugin Auto-Discovery Module
+# ==============================================================================
+# This file automatically discovers all plugin files in subdirectories.
+# It scans the plugins/ folder recursively and builds a list of module paths.
+# 
+# Example output: ['admin-controles.broadcast', 'events.callbacks', 'playback-controls.play']
+# 
+# This list is used by __main__.py to dynamically load all plugins at startup,
+# making it easy to add new commands without manual registration.
+# ==============================================================================
+
 from pathlib import Path
 
 

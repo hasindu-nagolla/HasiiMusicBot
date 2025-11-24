@@ -1,3 +1,16 @@
+# ==============================================================================
+# _utilities.py - General Utility Functions
+# ==============================================================================
+# This file contains various helper functions used throughout the bot:
+# - Time formatting (ETA, duration)
+# - File size formatting (bytes to KB/MB/GB)
+# - User extraction from messages (mentions, replies, user IDs)
+# - Duration conversion (mm:ss to seconds)
+# - Message text extraction
+# 
+# These utilities keep code DRY (Don't Repeat Yourself) across plugins.
+# ==============================================================================
+
 import re
 from pyrogram import enums, types
 from HasiiMusic import app

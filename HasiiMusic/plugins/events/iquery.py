@@ -1,3 +1,17 @@
+# ==============================================================================
+# iquery.py - Inline Query Handler
+# ==============================================================================
+# This plugin handles inline mode queries (@botname <query>).
+# 
+# Features:
+# - Search YouTube videos in inline mode
+# - Display up to 15 results
+# - Show thumbnails, duration, views, channel info
+# - Users can select a video to share in any chat
+# 
+# Usage: @HasiiMusicBot search query
+# ==============================================================================
+
 from py_yt import VideosSearch
 from pyrogram import types
 

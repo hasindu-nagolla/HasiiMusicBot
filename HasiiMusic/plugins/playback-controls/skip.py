@@ -1,3 +1,17 @@
+# ==============================================================================
+# skip.py - Skip Track Command
+# ==============================================================================
+# This plugin handles skipping to the next track in the queue.
+# 
+# Commands:
+# - /skip - Skip current track and play next
+# - /next - Same as /skip
+# 
+# Requirements:
+# - User must be admin or authorized user
+# - Music must be playing
+# ==============================================================================
+
 from pyrogram import filters, types
 
 from HasiiMusic import tune, app, db, lang

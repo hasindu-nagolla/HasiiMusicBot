@@ -1,3 +1,15 @@
+# ==============================================================================
+# _inline.py - Inline Keyboard Button Builder
+# ==============================================================================
+# This file provides helper functions to create inline keyboard buttons.
+# Used to build:
+# - Playback control buttons (play, pause, skip, stop, etc.)
+# - Language selection menus
+# - Help menus and navigation
+# - Download cancel buttons
+# - Settings buttons
+# ==============================================================================
+
 from pyrogram import types
 
 from HasiiMusic import app, config, lang

@@ -1,3 +1,17 @@
+# ==============================================================================
+# callbacks.py - Callback Query Handler
+# ==============================================================================
+# This plugin handles inline button callbacks (when users press inline buttons).
+# 
+# Callback Types:
+# - cancel_dl - Cancel ongoing download
+# - controls - Playback controls (pause, resume, skip, replay, etc.)
+# - close - Close/delete message
+# - help_menu - Navigate help pages
+# 
+# Most callbacks require admin/authorized user permissions.
+# ==============================================================================
+
 import re
 
 from pyrogram import filters, types

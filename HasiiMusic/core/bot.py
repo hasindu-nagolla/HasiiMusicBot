@@ -1,5 +1,17 @@
 """
-Bot core module for HasiiMusicBot.
+# ==============================================================================
+# bot.py - Main Bot Client Manager
+# ==============================================================================
+# This file defines the main Bot class that handles the Telegram bot client.
+# Features:
+# - Extends Pyrogram Client with custom bot functionality
+# - Manages bot authentication and connection
+# - Handles bot startup and shutdown procedures
+# - Provides owner, logger, and sudo user filters
+# - Stores bot information (ID, name, username, mention)
+# ==============================================================================
+
+"""Bot core module for HasiiMusicBot.
 
 This module defines the main Bot class that extends Pyrogram's Client
 with custom functionality for music bot operations.

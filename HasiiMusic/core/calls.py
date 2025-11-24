@@ -1,3 +1,16 @@
+# ==============================================================================
+# calls.py - Voice Call Handler (PyTgCalls Integration)
+# ==============================================================================
+# This file manages voice/video chat functionality using PyTgCalls.
+# Features:
+# - Stream audio/video to Telegram voice chats
+# - Playback controls (play, pause, resume, stop, seek)
+# - Queue management (play next track automatically)
+# - Multi-assistant support (load balancing)
+# - Live stream support
+# - Thumbnail updates during playback
+# ==============================================================================
+
 from ntgcalls import ConnectionNotFound, TelegramServerError
 from pyrogram.errors import MessageIdInvalid
 from pyrogram.types import InputMediaPhoto, Message

@@ -1,3 +1,19 @@
+# ==============================================================================
+# language.py - Language Selection Command
+# ==============================================================================
+# This plugin allows users to change the bot's language for their chat.
+# 
+# Commands:
+# - /lang - Show language selection menu
+# - /language - Same as /lang
+# 
+# Supported Languages:
+# - English (en)
+# - Sinhala (si)
+# 
+# Only admins can change the chat language.
+# ==============================================================================
+
 from pyrogram import filters, types
 
 from HasiiMusic import app, db, lang

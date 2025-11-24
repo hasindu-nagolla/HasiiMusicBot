@@ -1,3 +1,15 @@
+# ==============================================================================
+# new_chat.py - New Group Handler
+# ==============================================================================
+# This plugin handles when the bot is added to a new group.
+# 
+# Features:
+# - Send notification to logger channel with group info
+# - Welcome message in the group
+# - Check if group meets requirements (supergroup, admin permissions)
+# - Log group details (name, ID, member count, who added the bot)
+# ==============================================================================
+
 from pyrogram import filters, types
 from pyrogram.errors import ChatAdminRequired
 

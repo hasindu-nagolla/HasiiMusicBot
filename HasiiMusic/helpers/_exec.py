@@ -1,3 +1,16 @@
+# ==============================================================================
+# _exec.py - Code Execution Helper for Eval Command
+# ==============================================================================
+# This file provides safe code execution functionality for the /eval command.
+# Features:
+# - Async code evaluation (supports await)
+# - Expression and statement execution
+# - Exception handling and formatting
+# - Sandbox environment for code execution
+# 
+# Used by: admin-controles/eval.py
+# ==============================================================================
+
 import os
 import ast
 import traceback

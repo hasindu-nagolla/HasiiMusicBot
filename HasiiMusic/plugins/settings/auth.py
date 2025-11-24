@@ -1,3 +1,18 @@
+# ==============================================================================
+# auth.py - Authorization Management Commands
+# ==============================================================================
+# This plugin manages authorized users who can control music playback.
+# Authorized users can use playback commands even if they're not admins.
+# 
+# Commands:
+# - /auth <user> - Grant playback control permissions to user
+# - /unauth <user> - Revoke playback control permissions from user
+# - /admincache - Reload admin list cache for current chat
+# - /reload - Same as /admincache
+# 
+# Only group admins can add/remove authorized users.
+# ==============================================================================
+
 import time
 
 from pyrogram import filters, types

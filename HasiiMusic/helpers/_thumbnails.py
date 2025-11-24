@@ -1,3 +1,17 @@
+# ==============================================================================
+# _thumbnails.py - Dynamic Thumbnail Generator
+# ==============================================================================
+# This file generates beautiful custom thumbnails for now playing messages.
+# Features:
+# - Modern frosted glass design
+# - Background blur effect with album art
+# - Track title and metadata display
+# - Progress bar visualization
+# - Social media icons
+# - Responsive text sizing
+# - Image caching for performance
+# ==============================================================================
+
 import os
 import re
 import aiohttp

@@ -1,3 +1,17 @@
+# ==============================================================================
+# restart.py - Bot Restart & Logging Commands (Sudo Only)
+# ==============================================================================
+# This plugin provides administrative commands for bot maintenance.
+# 
+# Commands:
+# - /logs - Get log file
+# - /logger on/off - Enable/disable database logging
+# - /restart - Restart the bot
+# - /update - Update bot from git and restart
+# 
+# All commands require sudo user permissions.
+# ==============================================================================
+
 import os
 import sys
 import shutil

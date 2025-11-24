@@ -1,3 +1,21 @@
+# ==============================================================================
+# eval.py - Code Execution Command (Owner Only)
+# ==============================================================================
+# This plugin allows the bot owner to execute Python code and shell commands remotely.
+# 
+# Commands:
+# - /eval <code> - Execute Python code in the bot's context
+# - /exec <code> - Same as /eval (alias)
+# 
+# Security: Only the bot owner (defined in config) can use this command.
+# 
+# Features:
+# - Async code support (can use await)
+# - Access to all bot variables (app, db, userbot, etc.)
+# - Output returned as message or file if too long
+# - Syntax highlighting in responses
+# ==============================================================================
+
 import io
 import os
 import re
