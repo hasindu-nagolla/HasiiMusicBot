@@ -1,170 +1,121 @@
-<div align="center">
-  <img src="https://files.catbox.moe/und0yt.jpg" alt="Hasii Music Bot" width="400"/>
-  
-  # 🎵 Hasii Music Bot
-  
-  <p><b>A Powerful Telegram Music Player Bot</b></p>
-  
-  [![Telegram](https://img.shields.io/badge/Telegram-Channel-blue?style=for-the-badge&logo=telegram)](https://t.me/TheInfinityAI)
-  [![Telegram](https://img.shields.io/badge/Telegram-Support-blue?style=for-the-badge&logo=telegram)](https://t.me/Hasindu_Lakshan)
-  
-</div>
+# HasiiMusicBot Website
 
----
+Modern, responsive single-page application built with React + Tailwind CSS to showcase HasiiMusicBot features and functionality.
 
-## ✨ Features
+## 🚀 Tech Stack
 
-- 🎵 **High Quality Music Streaming** - Crystal clear audio with STUDIO quality
-- 📻 **Live Radio Streaming** - 50+ international and local radio stations
-- 🎧 **YouTube Support** - Play music from YouTube links or search
-- 📝 **Queue System** - Manage multiple songs in queue
-- ⚡ **Fast & Reliable** - Built with Pyrogram and PyTgCalls
-- 🎛 **Admin Controls** - Pause, resume, skip, and stop controls
-- 🌐 **Multi-Language** - Supports English and Sinhala
-- 👥 **User Authorization** - Authorized users can control playback
-- 📊 **Statistics** - Track bot usage and performance
-- 🔄 **Auto-Leave** - Automatically leaves inactive voice chats
+- **React 18** - Modern UI library
+- **Tailwind CSS** - Utility-first CSS framework
+- **Vite** - Next-generation frontend tooling
+- **Framer Motion** - Production-ready animation library
+- **Lucide React** - Beautiful icon library
+- **React Router** - Client-side routing
 
----
+## 📦 Project Structure
 
-## 🚀 Deployment
-
-### ✔️ Prerequisites
-
-- Python 3.10+ installed
-- Deno & FFmpeg installed on your system
-- Required variables mentioned in sample.env
-
-### Requirements
-
-- Python 3.12+
-- MongoDB Database
-- Telegram Bot Token
-- Telegram API ID & Hash
-- Pyrogram String Session
-
-### Environment Variables
-
-Create a `.env` file with the following variables:
-
-```env
-API_ID=your_api_id
-API_HASH=your_api_hash
-BOT_TOKEN=your_bot_token
-MONGO_DB_URI=your_mongodb_uri
-LOGGER_ID=your_logger_group_id
-OWNER_ID=your_user_id
-STRING_SESSION=your_pyrogram_session
-COOKIE_URL=youtube_cookies_url (optional)
 ```
+docs/
+├── public/              # Static assets
+│   └── favicon.svg     # Site favicon
+├── src/
+│   ├── components/     # React components
+│   │   ├── Navbar.jsx
+│   │   ├── Hero.jsx
+│   │   ├── Features.jsx
+│   │   ├── Stats.jsx
+│   │   ├── Commands.jsx
+│   │   ├── Installation.jsx
+│   │   ├── Footer.jsx
+│   │   └── ParticlesBackground.jsx
+│   ├── App.jsx        # Main app component
+│   ├── main.jsx       # Entry point
+│   └── index.css      # Global styles
+├── index.html         # HTML template
+├── package.json       # Dependencies
+├── vite.config.js     # Vite configuration
+├── tailwind.config.js # Tailwind configuration
+└── postcss.config.js  # PostCSS configuration
+```
+
+## 🛠️ Development
+
+### Prerequisites
+
+- Node.js 18+ and npm
 
 ### Installation
 
-1. **Clone the repository**
 ```bash
-git clone https://github.com/hasindu-nagolla/HasiiMusicBot
-cd HasiiMusicBot
+cd docs
+npm install
 ```
 
-2. **Install dependencies**
-```bash
-pip install -r requirements.txt
-```
-
-3. **Set up environment variables**
-```bash
-cp sample.env .env
-# Edit .env with your values
-```
-
-4. **Run the bot**
-```bash
-bash start
-```
-
-### Docker Deployment
+### Development Server
 
 ```bash
-docker build -t hasii-music-bot .
-docker run -d --env-file .env hasii-music-bot
+npm run dev
 ```
 
----
+Visit `http://localhost:5173` to view the site.
 
-## 📖 Commands
+### Build for Production
 
-### User Commands
-- `/play` - Play a song (YouTube URL or search query)
-- `/radio` - Browse and play live radio stations
-- `/queue` - View current queue
-- `/ping` - Check bot status
-- `/help` - Show help menu
-- `/lang` - Change language
+```bash
+npm run build
+```
 
-### Admin Commands
-- `/pause` - Pause current stream
-- `/resume` - Resume paused stream
-- `/skip` - Skip current track
-- `/stop` - Stop playing and clear queue
-- `/seek` - Seek to specific timestamp
-- `/reload` - Reload admin cache
+The built files will be in the `dist/` directory.
 
-### Sudo Commands
-- `/stats` - View bot statistics
-- `/broadcast` - Broadcast message to all chats
-- `/addsudo` - Add sudo user
-- `/rmsudo` - Remove sudo user
-- `/restart` - Restart the bot
-- `/logs` - Get bot logs
+## 🚢 Deployment
 
----
+This site is automatically deployed to GitHub Pages using GitHub Actions whenever changes are pushed to the `docs/` directory.
 
-## 🛠 Configuration
+### Manual Deployment
 
-### Audio Quality Settings
-The bot streams audio at **STUDIO** quality (highest available) with:
-- **Codec**: Opus (best quality for music)
-- **Format**: WebM container for audio downloads
-- **Sample Rate**: 48kHz
-- **Channels**: Stereo
-- **Optimization**: 16 concurrent downloads, 1MB chunks
+1. Build the project:
+   ```bash
+   npm run build
+   ```
 
-### Customization
-- Modify language files in `HasiiMusic/locales/`
-- Customize thumbnails and images in `config.py`
-- Adjust queue limits and duration in `config.py`
+2. The GitHub Actions workflow will automatically deploy to GitHub Pages
 
----
+3. Access your site at: `https://hasindu-nagolla.github.io/HasiiMusicBot/`
 
-## 📞 Support & Contact
+## 🎨 Customization
 
-- **Developer**: Hasindu Nagolla
-- **Telegram Channel**: [@TheInfinityAI](https://t.me/TheInfinityAI)
-- **Support Group**: [@Hasindu_Lakshan](https://t.me/Hasindu_Lakshan)
-- **GitHub**: [hasindu-nagolla](https://github.com/hasindu-nagolla)
+### Colors
 
----
+Edit `tailwind.config.js` to customize the color palette:
 
-## 📝 Notes
+```javascript
+theme: {
+  extend: {
+    colors: {
+      primary: { ... },
+      accent: { ... },
+    },
+  },
+}
+```
 
-- Make sure your bot is admin in both the group and logger group
-- The assistant account will auto-join groups when needed for playback
-- Keep your `.env` file secure and never share it publicly
-- For YouTube downloads, cookies may be required for some videos
-- Radio streams are live - no duration limits or downloads needed
+### Content
 
----
+All content is in the component files under `src/components/`. Edit these files to update:
 
-## 🙏 Credits
+- Hero section content
+- Features list
+- Commands reference
+- Installation steps
+- Footer links
 
-Special thanks to [AnonymousX1025](https://github.com/AnonymousX1025) for the original inspiration.
+### Animations
 
----
+Custom animations are defined in `tailwind.config.js` under the `animation` and `keyframes` sections.
 
-<div align="center">
-  
-  ### Made with ❤️ by Hasindu Nagolla
-  
-  **© 2025 Hasii Music Bot. All rights reserved.**
-  
-</div>
+## 📄 License
+
+MIT License - See parent directory LICENSE file
+
+## 👨‍💻 Developer
+
+Built by [Hasindu Nagolla](https://github.com/hasindu-nagolla)

@@ -1,23 +1,34 @@
-# ==============================================================================
-# .gitignore - Git Ignore Rules
-# ==============================================================================
-# Prevents sensitive and generated files from being committed to git.
-# 
-# Security: .env, *.session files contain sensitive credentials
-# Generated: cache/, downloads/, __pycache__/ are auto-generated
-# Logs: log.txt contains runtime logs
-# ==============================================================================
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-.env
-.cache
-log.txt
+# Dependencies
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-venv/
-cache/
-downloads/
-__pycache__/
-anony/cookies/*.txt
-*.session
-*.session-journal
-.vscode
-HasiiMusic/plugins/playback-controls/radio.py
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Build output
+build
+.cache
+
+# Environment variables
+.env
+.env.local
+.env.production
