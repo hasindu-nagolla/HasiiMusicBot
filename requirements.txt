@@ -1,26 +1,31 @@
-aiofiles
-aiohttp
-apscheduler
-asyncio
-bs4
-ffmpeg-python
-future==1.0.0
-gitpython
-heroku3
-httpx==0.28.1
-motor 
-pillow==11.3.0
-psutil
-py-yt-search
-kurigram==2.2.13
-python-dotenv
-ntgcalls==2.0.6
-py-tgcalls==2.2.8
-pyyaml==6.0.3
-requests
-speedtest-cli
-spotipy
-tgcrypto
-unidecode
-#yt-dlp==2025.10.14
-yt-dlp==2025.10.22
+# ==============================================================================
+# requirements.txt - Python Dependencies
+# ==============================================================================
+# This file lists all Python packages required for HasiiMusicBot.
+# 
+# Installation:
+#   pip install -r requirements.txt
+# 
+# Key Dependencies:
+# - aiohttp: Async HTTP client for API requests
+# - kurigram (Pyrogram): Telegram MTProto API framework
+# - pillow: Image processing for thumbnails
+# - psutil: System monitoring (CPU, RAM, disk usage)
+# - pymongo: MongoDB database driver
+# - pytgcrypto: Telegram encryption layer
+# - py-tgcalls: Voice chat streaming library
+# - py-yt-search: YouTube search without API
+# - python-dotenv: Load environment variables from .env
+# - yt-dlp: YouTube video/audio downloader
+# ==============================================================================
+
+aiohttp~=3.13.1
+kurigram>=2.2.13
+pillow~=12.0.0
+psutil~=7.1.2
+pymongo>=4.15.3
+pytgcrypto>=1.2.11
+py-tgcalls~=2.2.8
+py-yt-search~=0.5.1
+python-dotenv~=1.1.1
+yt-dlp>=2025.11.12

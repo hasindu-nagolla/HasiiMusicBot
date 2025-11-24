@@ -1,116 +1,100 @@
+# ==============================================================================
+# userbot.py - Assistant/Userbot Client Manager
+# ==============================================================================
+# This file manages assistant accounts (userbots) that join voice chats to play music.
+# Assistants are user accounts (not bots) that can join and stream audio/video.
+# You can configure up to 3 assistants using SESSION1, SESSION2, SESSION3 variables.
+# ==============================================================================
+
 from pyrogram import Client
 
-import config
-
-from HasiiMusic.logging import LOGGER
-
-assistants = []
-assistantids = []
-
-GROUPS_TO_JOIN = [
-    "TheInfinityAI",
-]
+from HasiiMusic import config, logger
 
 
-# Initialize userbots
-class Userbot:
+class Userbot(Client):
     def __init__(self):
-        self.one = Client(
-            "HasiiAssis1",
-            config.API_ID,
-            config.API_HASH,
-            session_string=str(config.STRING1),
-            no_updates=True,
-        )
-        self.two = Client(
-            "HasiiAssis2",
-            config.API_ID,
-            config.API_HASH,
-            session_string=str(config.STRING2),
-            no_updates=True,
-        )
-        self.three = Client(
-            "HasiiAssis3",
-            config.API_ID,
-            config.API_HASH,
-            session_string=str(config.STRING3),
-            no_updates=True,
-        )
-        self.four = Client(
-            "HasiiAssis4",
-            config.API_ID,
-            config.API_HASH,
-            session_string=str(config.STRING4),
-            no_updates=True,
-        )
-        self.five = Client(
-            "HasiiAssis5",
-            config.API_ID,
-            config.API_HASH,
-            session_string=str(config.STRING5),
-            no_updates=True,
-        )
+        """
+        Initialize userbot with multiple assistant clients.
+        
+        Creates up to 3 assistant clients based on available session strings.
+        Each assistant can independently join voice chats and stream music.
+        More assistants = ability to serve more groups simultaneously.
+        """
+        self.clients = []  # List to store all active assistant clients
+        
+        # Map of client names to their session string config keys
+        clients = {"one": "SESSION1", "two": "SESSION2", "three": "SESSION3"}
+        
+        # Create a Pyrogram client for each configured session
+        for key, string_key in clients.items():
+            name = f"HasiiTuneUB{key[-1]}"  # Unique name: HasiiTuneUB1, HasiiTuneUB2, etc.
+            session = getattr(config, string_key)  # Get session string from config
+            
+            # Create and attach the client as an attribute (self.one, self.two, self.three)
+            setattr(
+                self,
+                key,
+                Client(
+                    name=name,
+                    api_id=config.API_ID,
+                    api_hash=config.API_HASH,
+                    session_string=session,  # Pyrogram session string
+                ),
+            )
 
-    async def start_assistant(self, client: Client, index: int):
-        string_attr = [
-            config.STRING1,
-            config.STRING2,
-            config.STRING3,
-            config.STRING4,
-            config.STRING5,
-        ][index - 1]
-        if not string_attr:
-            return
-
+    async def boot_client(self, num: int, ub: Client):
+        """
+        Boot a client and perform initial setup.
+        Args:
+            num (int): The client number to boot (1, 2, or 3).
+            ub (Client): The userbot client instance.
+        Raises:
+            SystemExit: If the client fails to send a message in the log group.
+        """
+        clients = {
+            1: self.one,
+            2: self.two,
+            3: self.three,
+        }
+        client = clients[num]
         try:
             await client.start()
-            for group in GROUPS_TO_JOIN:
-                try:
-                    await client.join_chat(group)
-                except Exception:
-                    pass
-
-            assistants.append(index)
-
-            try:
-                await client.send_message(
-                    config.LOGGER_ID, f"Hasii's Assistant {index} Started"
-                )
-            except Exception:
-                LOGGER(__name__).error(
-                    f"Assistant {index} can't access the log group. Check permissions!"
-                )
-                exit()
-
-            me = await client.get_me()
-            client.id, client.name, client.username = me.id, me.first_name, me.username
-            assistantids.append(me.id)
-
-            LOGGER(__name__).info(f"Assistant {index} Started as {client.name}")
-
         except Exception as e:
-            LOGGER(__name__).error(f"Failed to start Assistant {index}: {e}")
-
-    async def start(self):
-        LOGGER(__name__).info("Starting Hasii's Assistants...")
-        await self.start_assistant(self.one, 1)
-        await self.start_assistant(self.two, 2)
-        await self.start_assistant(self.three, 3)
-        await self.start_assistant(self.four, 4)
-        await self.start_assistant(self.five, 5)
-
-    async def stop(self):
-        LOGGER(__name__).info("Stopping Assistants...")
+            logger.error(f"❌ Assistant {num} failed to start: {e}")
+            return  # Don't raise SystemExit, just skip this assistant
+        
         try:
-            if config.STRING1:
-                await self.one.stop()
-            if config.STRING2:
-                await self.two.stop()
-            if config.STRING3:
-                await self.three.stop()
-            if config.STRING4:
-                await self.four.stop()
-            if config.STRING5:
-                await self.five.stop()
+            await client.send_message(config.LOGGER_ID, f"Assistant {num} Started")
         except Exception as e:
-            LOGGER(__name__).error(f"Error while stopping assistants: {e}")
+            logger.warning(f"⚠️ Assistant {num} couldn't send message to logger: {e}")
+            # Continue anyway - this is not critical
+
+        client.id = client.me.id if hasattr(client, 'me') and client.me else None
+        client.name = client.me.first_name if hasattr(client, 'me') and client.me else f"Assistant{num}"
+        client.username = client.me.username if hasattr(client, 'me') and client.me else None
+        client.mention = client.me.mention if hasattr(client, 'me') and client.me else client.name
+        self.clients.append(client)
+        logger.info(f"👤 Assistant {num} started as @{client.username}")
+
+    async def boot(self):
+        """
+        Asynchronously starts the assistants.
+        """
+        if config.SESSION1:
+            await self.boot_client(1, self.one)
+        if config.SESSION2:
+            await self.boot_client(2, self.two)
+        if config.SESSION3:
+            await self.boot_client(3, self.three)
+
+    async def exit(self):
+        """
+        Asynchronously stops the assistants.
+        """
+        if config.SESSION1:
+            await self.one.stop()
+        if config.SESSION2:
+            await self.two.stop()
+        if config.SESSION3:
+            await self.three.stop()
+        logger.info("Assistants stopped.")

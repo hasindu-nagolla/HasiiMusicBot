@@ -1,76 +1,63 @@
+# ==============================================================================
+# __main__.py - Main Entry Point for HasiiMusicBot
+# ==============================================================================
+# This is the main file that starts the bot. It performs the following:
+# 1. Connects to the database
+# 2. Starts the bot client
+# 3. Starts assistant (userbot) clients
+# 4. Loads all plugin modules
+# 5. Initializes YouTube cookies if configured
+# 6. Keeps the bot running until manually stopped
+# ==============================================================================
+
 import asyncio
 import importlib
 
 from pyrogram import idle
-from pytgcalls.exceptions import NoActiveGroupCall
 
-import config
-from HasiiMusic import LOGGER, app, userbot
-from HasiiMusic.core.call import JARVIS
-from HasiiMusic.misc import sudo
-from HasiiMusic.plugins import ALL_MODULES
-from HasiiMusic.utils.database import get_banned_users, get_gbanned
-from HasiiMusic.utils.cookie_handler import fetch_and_store_cookies 
-from config import BANNED_USERS
+from HasiiMusic import (tune, app, config, db,
+                   logger, stop, userbot, yt)
+from HasiiMusic.plugins import all_modules
 
 
-async def init():
-    if (
-        not config.STRING1
-        and not config.STRING2
-        and not config.STRING3
-        and not config.STRING4
-        and not config.STRING5
-    ):
-        LOGGER(__name__).error("ᴀssɪsᴛᴀɴᴛ sᴇssɪᴏɴ ɴᴏᴛ ғɪʟʟᴇᴅ, ᴘʟᴇᴀsᴇ ғɪʟʟ ᴀ ᴘʏʀᴏɢʀᴀᴍ sᴇssɪᴏɴ...")
-        exit()
+async def main():
+    # Step 1: Connect to MongoDB database
+    await db.connect()
+    
+    # Step 2: Start the main bot client
+    await app.boot()
+    
+    # Step 3: Start assistant/userbot clients (for joining voice chats)
+    await userbot.boot()
+    
+    # Step 4: Initialize voice call handler
+    await tune.boot()
 
-    try:
-        await fetch_and_store_cookies()
-        LOGGER("Tune").info("ʏᴏᴜᴛᴜʙᴇ ᴄᴏᴏᴋɪᴇs ʟᴏᴀᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ✅")
-    except Exception as e:
-        LOGGER("Tune").warning(f"⚠️ᴄᴏᴏᴋɪᴇ ᴇʀʀᴏʀ: {e}")
+    # Step 5: Load all plugin modules (commands like /play, /pause, etc.)
+    for module in all_modules:
+        importlib.import_module(f"HasiiMusic.plugins.{module}")
+    logger.info(f"🔌 Loaded {len(all_modules)} plugin modules.")
 
-    await sudo()
+    # Step 6: Download YouTube cookies if URLs are provided (for age-restricted videos)
+    if config.COOKIES_URL:
+        await yt.save_cookies(config.COOKIES_URL)
 
-    try:
-        users = await get_gbanned()
-        for user_id in users:
-            BANNED_USERS.add(user_id)
-        users = await get_banned_users()
-        for user_id in users:
-            BANNED_USERS.add(user_id)
-    except Exception as e:
-        LOGGER("Tune").warning(f"ғᴀɪʟᴇᴅ ᴛᴏ ʟᴏᴀᴅ ʙᴀɴɴᴇᴅ ᴜsᴇʀs: {e}")
+    # Step 7: Load sudo users and blacklisted users from database
+    sudoers = await db.get_sudoers()
+    app.sudoers.update(sudoers)  # Add sudo users to filter
+    app.bl_users.update(await db.get_blacklisted())  # Add blacklisted users to filter
+    logger.info(f"👑 Loaded {len(app.sudoers)} sudo users.")
+    logger.info("\n🎉 Bot started successfully! Ready to play music! 🎵\n")
 
-    await app.start()
-
-    for all_module in ALL_MODULES:
-        importlib.import_module("HasiiMusic.plugins" + all_module)
-
-    LOGGER("HasiiMusic.plugins").info("ᴛᴜɴᴇ's ᴍᴏᴅᴜʟᴇs ʟᴏᴀᴅᴇᴅ...")
-    await userbot.start()
-    await JARVIS.start()
-
-    try:
-        await JARVIS.stream_call("https://te.legra.ph/file/29f784eb49d230ab62e9e.mp4")
-    except NoActiveGroupCall:
-        LOGGER("Tune").error(
-            "ᴘʟᴇᴀsᴇ ᴛᴜʀɴ ᴏɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴏғ ʏᴏᴜʀ ʟᴏɢ ɢʀᴏᴜᴘ/ᴄʜᴀɴɴᴇʟ.\n\nᴀɴɴɪᴇ ʙᴏᴛ sᴛᴏᴘᴘᴇᴅ..."
-        )
-        exit()
-    except:
-        pass
-
-    await JARVIS.decorators()
-    LOGGER("Tune").info(
-        "\x54\x75\x6e\x65\x20\x56\x69\x61\x20\x4d\x75\x73\x69\x63\x20\x42\x6f\x74\x20\x53\x74\x61\x72\x74\x65\x64\x20\x53\x75\x63\x63\x65\x73\x73\x66\x75\x6c\x6c\x79\x2e"
-    )
+    # Step 8: Keep the bot running (press Ctrl+C to stop)
     await idle()
-    await app.stop()
-    await userbot.stop()
-    LOGGER("Tune").info("sᴛᴏᴘᴘɪɴɢ ᴛᴜɴᴇ ᴠɪᴀ ᴍᴜsɪᴄ ʙᴏᴛ ...")
+    
+    # Step 9: Cleanup and shutdown when bot is stopped
+    await stop()
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(init())
+    try:
+        asyncio.get_event_loop().run_until_complete(main())
+    except KeyboardInterrupt:
+        pass

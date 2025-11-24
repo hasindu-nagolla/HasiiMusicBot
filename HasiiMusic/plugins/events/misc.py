@@ -1,0 +1,137 @@
+# ==============================================================================
+# misc.py - Miscellaneous Event Handlers
+# ==============================================================================
+# This plugin handles various bot events and background tasks.
+# 
+# Events:
+# - Voice chat started/ended - Auto-stop playback
+# - Bot mentioned - Send info message
+# - Auto-leave - Remove inactive assistants from groups every 30 minutes
+# 
+# Features:
+# - Automatic cleanup of inactive voice chat sessions
+# - Bot promotion reminders
+# - Keep assistants from cluttering unused groups
+# ==============================================================================
+
+import asyncio
+import time
+
+from pyrogram import enums, filters, types
+
+from HasiiMusic import tune, app, config, db, lang, queue, tasks, userbot, yt
+from HasiiMusic.helpers import buttons
+
+
+@app.on_message(filters.video_chat_started, group=19)
+@app.on_message(filters.video_chat_ended, group=20)
+async def _watcher_vc(_, m: types.Message):
+    await tune.stop(m.chat.id)
+
+
+async def auto_leave():
+    while True:
+        await asyncio.sleep(1800)
+        for ub in userbot.clients:
+            left = 0
+            try:
+                for dialog in await ub.get_dialogs():
+                    chat_id = dialog.chat.id
+                    if left >= 20:
+                        break
+                    # Skip logger and any excluded chats
+                    excluded = [app.logger] + config.EXCLUDED_CHATS
+                    if chat_id in excluded:
+                        continue
+                    if dialog.chat.type in [
+                        enums.ChatType.GROUP,
+                        enums.ChatType.SUPERGROUP,
+                    ]:
+                        if chat_id in db.active_calls:
+                            continue
+                        await ub.leave_chat(chat_id)
+                        left += 1
+                    await asyncio.sleep(5)
+            except:
+                continue
+
+
+async def track_time():
+    while True:
+        await asyncio.sleep(1)
+        for chat_id in db.active_calls:
+            if not await db.playing(chat_id):
+                continue
+            media = queue.get_current(chat_id)
+            if not media:
+                continue
+            media.time += 1
+
+
+async def update_timer(length=10):
+    while True:
+        await asyncio.sleep(7)
+        for chat_id in db.active_calls:
+            if not await db.playing(chat_id):
+                continue
+            try:
+                media = queue.get_current(chat_id)
+                if not media:
+                    continue
+                duration, message_id = media.duration_sec, media.message_id
+                if not duration or not message_id or not media.time:
+                    continue
+                played = media.time
+                remaining = duration - played
+                pos = min(int((played / duration) * length), length - 1)
+                timer_bar = "—" * pos + "●" + "—" * (length - pos - 1)
+
+                if remaining <= 30:
+                    next = queue.get_next(chat_id, check=True)
+                    if next and not next.file_path:
+                        next.file_path = await yt.download(next.id, video=False)
+
+                if remaining < 10:
+                    remove = True
+                    timer_text = timer_bar
+                else:
+                    remove = False
+                    played_time = time.strftime('%M:%S', time.gmtime(played))
+                    remaining_time = time.strftime('%M:%S', time.gmtime(remaining))
+                    timer_text = f"{played_time} {timer_bar} {remaining_time}"
+
+                await app.edit_message_reply_markup(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    reply_markup=buttons.controls(chat_id=chat_id, timer=timer_text, remove=remove),
+                )
+            except:
+                pass
+
+
+async def vc_watcher(sleep=15):
+    while True:
+        await asyncio.sleep(sleep)
+        for chat_id in db.active_calls:
+            client = await db.get_assistant(chat_id)
+            played = await client.time(chat_id)
+            participants = await client.get_participants(chat_id)
+            if len(participants) < 2 and played > 30:
+                _lang = await lang.get_lang(chat_id)
+                sent = await app.edit_message_reply_markup(
+                    chat_id=chat_id,
+                    message_id=queue.get_current(chat_id).message_id,
+                    reply_markup=buttons.controls(
+                        chat_id=chat_id, status=_lang["stopped"], remove=True
+                    ),
+                )
+                await tune.stop(chat_id)
+                await sent.reply_text(_lang["auto_left"])
+
+
+if config.AUTO_END:
+    tasks.append(asyncio.create_task(vc_watcher()))
+if config.AUTO_LEAVE:
+    tasks.append(asyncio.create_task(auto_leave()))
+tasks.append(asyncio.create_task(track_time()))
+tasks.append(asyncio.create_task(update_timer()))

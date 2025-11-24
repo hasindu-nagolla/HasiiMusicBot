@@ -1,10 +1,23 @@
+# ==============================================================================
+# .gitignore - Git Ignore Rules
+# ==============================================================================
+# Prevents sensitive and generated files from being committed to git.
+# 
+# Security: .env, *.session files contain sensitive credentials
+# Generated: cache/, downloads/, __pycache__/ are auto-generated
+# Logs: log.txt contains runtime logs
+# ==============================================================================
+
 .env
 .cache
 log.txt
 .DS_Store
-*.session
-raw_files/
+venv/
 cache/
 downloads/
 __pycache__/
+anony/cookies/*.txt
+*.session
 *.session-journal
+.vscode
+HasiiMusic/plugins/playback-controls/radio.py

@@ -1,187 +1,168 @@
-import re
+# ==============================================================================
+# config.py - Bot Configuration Manager
+# ==============================================================================
+# This file loads all configuration settings from environment variables (.env file).
+# 
+# What it does:
+# - Reads settings from .env file (API keys, bot token, database URL, etc.)
+# - Validates that all required settings are present
+# - Provides default values for optional settings
+# - Converts string values to appropriate types (int, bool, list)
+# 
+# Important: Never commit your .env file to git! It contains sensitive data.
+# Use sample.env as a template to create your own .env file.
+# ==============================================================================
+
+"""
+Configuration module for HasiiMusicBot.
+
+This module loads and validates all environment variables required for the bot to function.
+It provides a centralized Config class that manages all configuration settings.
+"""
+
 from os import getenv
+from typing import List
 from dotenv import load_dotenv
-from typing import Iterable, Iterator, Set
 
-from pyrogram import filters
-
-# Load environment variables from .env file
+# Load environment variables from .env file (create one from sample.env)
 load_dotenv()
 
-# ── Core bot config ────────────────────────────────────────────────────────────
-API_ID = int(getenv("API_ID", 27798659))
-API_HASH = getenv("API_HASH", "26100c77cee02e5e34b2bbee58440f86")
-BOT_TOKEN = getenv("BOT_TOKEN")
 
-OWNER_ID = int(getenv("OWNER_ID", 7044783841))
-OWNER_USERNAME = getenv("OWNER_USERNAME", "@Hasindu_Lakshan")
-BOT_USERNAME = getenv("BOT_USERNAME", "HasiiXRobot")
-BOT_NAME = getenv("BOT_NAME", "˹𝐇ᴀsɪɪ ✘ 𝙼ᴜsɪᴄ˼")
-ASSUSERNAME = getenv("ASSUSERNAME", "musicxhasii")
-EVALOP = list(map(int, getenv("EVALOP", "6797202080").split()))
-
-# ───── Mongo & Logging ───── #
-MONGO_DB_URI = getenv("MONGO_DB_URI")
-LOGGER_ID = int(getenv("LOGGER_ID", -1002014167331))
-
-# ── Limits (durations in min/sec; sizes in bytes) ──────────────────────────────
-DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 300))
-SONG_DOWNLOAD_DURATION = int(getenv("SONG_DOWNLOAD_DURATION", "1200"))
-SONG_DOWNLOAD_DURATION_LIMIT = int(
-    getenv("SONG_DOWNLOAD_DURATION_LIMIT", "1800"))
-TG_AUDIO_FILESIZE_LIMIT = int(getenv("TG_AUDIO_FILESIZE_LIMIT", "157286400"))
-TG_VIDEO_FILESIZE_LIMIT = int(getenv("TG_VIDEO_FILESIZE_LIMIT", "1288490189"))
-PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", "30"))
-
-# ── External APIs ──────────────────────────────────────────────────────────────
-COOKIE_URL = getenv("COOKIE_URL")  # required (paste link)
-API_URL = getenv("API_URL")        # optional
-API_KEY = getenv("API_KEY")        # optional
-
-# ───── Heroku Configuration ───── #
-HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
-HEROKU_API_KEY = getenv("HEROKU_API_KEY")
-
-# ───── Git & Updates ───── #
-UPSTREAM_REPO = getenv(
-    "UPSTREAM_REPO", "https://github.com/hasindu-nagolla/HasiiMusicBot")
-UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "Master")
-GIT_TOKEN = getenv("GIT_TOKEN")
-
-# ───── Support & Community ───── #
-SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/musicxhasii")
-SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/musicxhasii")
-
-# ───── Assistant Auto Leave ───── #
-AUTO_LEAVING_ASSISTANT = False
-AUTO_LEAVE_ASSISTANT_TIME = int(getenv("ASSISTANT_LEAVE_TIME", "3600"))
-
-# ───── Error Handling ───── #
-DEBUG_IGNORE_LOG = True
-
-# ───── Spotify Credentials ───── #
-SPOTIFY_CLIENT_ID = getenv(
-    "SPOTIFY_CLIENT_ID", "22b6125bfe224587b722d6815002db2b")
-SPOTIFY_CLIENT_SECRET = getenv(
-    "SPOTIFY_CLIENT_SECRET", "c9c63c6fbf2f467c8bc68624851e9773")
-
-# ───── Session Strings ───── #
-STRING1 = getenv("STRING_SESSION")
-STRING2 = getenv("STRING_SESSION2")
-STRING3 = getenv("STRING_SESSION3")
-STRING4 = getenv("STRING_SESSION4")
-STRING5 = getenv("STRING_SESSION5")
-
-
-# ───── Bot Media Assets ───── #
-START_VIDS = [
-    "https://files.catbox.moe/c3nt3q.mp4",
-    "https://files.catbox.moe/0g8sfl.mp4",
-    "https://files.catbox.moe/v0izu5.mp4"
-]
-
-STICKERS = [
-    "CAACAgUAAx0Cd6nKUAACASBl_rnalOle6g7qS-ry-aZ1ZpVEnwACgg8AAizLEFfI5wfykoCR4h4E",
-    "CAACAgUAAx0Cd6nKUAACATJl_rsEJOsaaPSYGhU7bo7iEwL8AAPMDgACu2PYV8Vb8aT4_HUPHgQ"
-]
-HELP_IMG_URL = "https://files.catbox.moe/139oue.png"
-PING_VID_URL = "https://files.catbox.moe/xn7qae.png"
-PLAYLIST_IMG_URL = "https://files.catbox.moe/isq0xv.png"
-STATS_VID_URL = "https://files.catbox.moe/fcdh4j.png"
-TELEGRAM_AUDIO_URL = "https://files.catbox.moe/wal0ys.png"
-TELEGRAM_VIDEO_URL = "https://files.catbox.moe/q06uki.png"
-STREAM_IMG_URL = "https://files.catbox.moe/q8j61o.png"
-SOUNCLOUD_IMG_URL = "https://files.catbox.moe/000ozd.png"
-YOUTUBE_IMG_URL = "https://files.catbox.moe/rt7nxl.png"
-SPOTIFY_ARTIST_IMG_URL = "https://files.catbox.moe/5zitrm.png"
-SPOTIFY_ALBUM_IMG_URL = "https://files.catbox.moe/5zitrm.png"
-SPOTIFY_PLAYLIST_IMG_URL = "https://files.catbox.moe/5zitrm.png"
-FAILED = "https://files.catbox.moe/rt7nxl.png"
-
-
-# ───── Utility & Functional ───── #
-def time_to_seconds(time: str) -> int:
-    return sum(int(x) * 60**i for i, x in enumerate(reversed(time.split(":"))))
-
-
-DURATION_LIMIT = time_to_seconds(f"{DURATION_LIMIT_MIN}:00")
-
-
-# ───── Bot Introduction Messages ───── #
-AYU = ["💞", "🦋", "🔍", "🧪", "⚡️", "🎩", "🍷", "🥂", "🕊️", "🪄", "🧨"]
-
-# ───── Runtime Structures ───── #
-class BannedUsersManager:
-    """Manage banned user IDs while exposing a Pyrogram filter."""
-
-    def __init__(self) -> None:
-        self._ids: Set[int] = set()
-
-        def _checker(_, __, update) -> bool:
-            user = getattr(update, "from_user", None)
-            return bool(user and user.id in self._ids)
-
-        self._filter = filters.create(_checker)
-
-    def add(self, user_id: int) -> None:
-        self._ids.add(int(user_id))
-
-    def remove(self, user_id: int) -> None:
-        self._ids.remove(int(user_id))
-
-    def discard(self, user_id: int) -> None:
-        self._ids.discard(int(user_id))
-
-    def update(self, user_ids: Iterable[int]) -> None:
-        for user_id in user_ids:
-            self.add(user_id)
-
-    def clear(self) -> None:
-        self._ids.clear()
-
-    def __contains__(self, user_id: object) -> bool:  # type: ignore[override]
-        try:
-            return int(user_id) in self._ids
-        except (TypeError, ValueError):
-            return False
-
-    def __len__(self) -> int:
-        return len(self._ids)
-
-    def __iter__(self) -> Iterator[int]:
-        return iter(self._ids)
-
-    def __bool__(self) -> bool:
-        return bool(self._ids)
-
-    def __invert__(self):
-        return ~self._filter
-
-    def __repr__(self) -> str:
-        return f"BannedUsersManager(total={len(self)})"
-
-    @property
-    def filter(self):
-        return self._filter
-
-
-BANNED_USERS = BannedUsersManager()
-adminlist, lyrical, votemode, autoclean, confirmer = {}, {}, {}, [], {}
-
-# ── Minimal validation ─────────────────────────────────────────────────────────
-if SUPPORT_CHANNEL and not re.match(r"^https?://", SUPPORT_CHANNEL):
-    raise SystemExit(
-        "[ERROR] - Invalid SUPPORT_CHANNEL URL. Must start with https://")
-
-if SUPPORT_CHAT and not re.match(r"^https?://", SUPPORT_CHAT):
-    raise SystemExit(
-        "[ERROR] - Invalid SUPPORT_CHAT URL. Must start with https://")
-
-if not COOKIE_URL:
-    raise SystemExit("[ERROR] - COOKIE_URL is required.")
-
-# Only allow these cookie link formats
-if not re.match(r"^https://(batbin\.me|pastebin\.com)/[A-Za-z0-9]+$", COOKIE_URL):
-    raise SystemExit(
-        "[ERROR] - Invalid COOKIE_URL. Use https://batbin.me/<id> or https://pastebin.com/<id>")
-
+class Config:
+    """
+    Configuration class for managing bot settings.
+    
+    All settings are loaded from environment variables with sensible defaults where applicable.
+    Required variables are validated on initialization through the check() method.
+    """
+    
+    def __init__(self):
+        """Initialize configuration by loading all environment variables."""
+        
+        # ============ TELEGRAM API CREDENTIALS ============
+        # Get these from https://my.telegram.org
+        self.API_ID: int = int(getenv("API_ID", "0"))  # Telegram API ID (numeric)
+        self.API_HASH: str = getenv("API_HASH", "")    # Telegram API Hash (hexadecimal)
+        
+        # ============ BOT CONFIGURATION ============
+        self.BOT_TOKEN: str = getenv("BOT_TOKEN", "")        # Bot token from @BotFather
+        self.LOGGER_ID: int = int(getenv("LOGGER_ID", "0"))  # Group/channel ID for logs (must be negative)
+        self.OWNER_ID: int = int(getenv("OWNER_ID", "0"))    # Your user ID (get from @userinfobot)
+        
+        # ============ DATABASE CONFIGURATION ============
+        self.MONGO_URL: str = getenv("MONGO_DB_URI", "")  # MongoDB connection URL (mongodb+srv://...)
+        
+        # ============ MUSIC BOT LIMITS ============
+        # Convert minutes to seconds for duration limit
+        self.DURATION_LIMIT: int = int(getenv("DURATION_LIMIT", "150")) * 60  # Max song duration (default: 150 min)
+        self.QUEUE_LIMIT: int = int(getenv("QUEUE_LIMIT", "30"))             # Max songs in queue (default: 30)
+        self.PLAYLIST_LIMIT: int = int(getenv("PLAYLIST_LIMIT", "20"))       # Max songs from playlist (default: 20)
+        
+        # ============ ASSISTANT/USERBOT SESSIONS ============
+        # Pyrogram session strings - get from @StringFatherBot
+        # You can have up to 3 assistants for handling multiple groups
+        self.SESSION1: str = getenv("STRING_SESSION", "")  # Primary assistant (required)
+        self.SESSION2: str = getenv("STRING_SESSION2", "")  # Secondary assistant (optional)
+        self.SESSION3: str = getenv("STRING_SESSION3", "")  # Tertiary assistant (optional)
+        
+        # ============ SUPPORT LINKS ============
+        self.SUPPORT_CHANNEL: str = getenv("SUPPORT_CHANNEL", "https://t.me/TheInfinityAI")
+        self.SUPPORT_CHAT: str = getenv("SUPPORT_CHAT", "https://t.me/Hasindu_Lakshan")
+        
+        # ============ EXCLUDED CHATS ============
+        # Parse comma-separated chat IDs that assistants should never leave
+        self.EXCLUDED_CHATS: List[int] = self._parse_excluded_chats()
+        
+        # ============ FEATURE FLAGS ============
+        self.AUTO_END: bool = self._str_to_bool(getenv("AUTO_END", "False"))      # Auto-end stream when queue is empty
+        self.AUTO_LEAVE: bool = self._str_to_bool(getenv("AUTO_LEAVE", "False"))  # Auto-leave inactive chats
+        
+        # ============ YOUTUBE COOKIES ============
+        # Parse space-separated cookie URLs for age-restricted content
+        self.COOKIES_URL: List[str] = self._parse_cookies()
+        
+        # ============ IMAGE URLS ============
+        # URLs for various bot images
+        self.DEFAULT_THUMB: str = getenv(
+            "DEFAULT_THUMB",
+            "https://files.catbox.moe/kgrs8f.png"  # Default thumbnail
+        )
+        self.PING_IMG: str = getenv("PING_IMG", "https://files.catbox.moe/2ronp6.jpeg")    # Ping command image
+        self.START_IMG: str = getenv("START_IMG", "https://files.catbox.moe/und0yt.jpg")  # Start command image
+        self.RADIO_IMG: str = getenv("RADIO_IMG", "https://files.catbox.moe/t03fzk.png")    # Radio command image
+    
+    def _parse_excluded_chats(self) -> List[int]:
+        """
+        Parse excluded chat IDs from comma-separated string.
+        
+        Returns:
+            List[int]: List of chat IDs to exclude from auto-leave.
+        """
+        excluded = getenv("EXCLUDED_CHATS", "")
+        if not excluded:
+            return []
+        
+        chat_ids = []
+        for chat_id in excluded.split(","):
+            chat_id = chat_id.strip()
+            if chat_id.lstrip('-').isdigit():
+                chat_ids.append(int(chat_id))
+        return chat_ids
+    
+    def _parse_cookies(self) -> List[str]:
+        """
+        Parse YouTube cookie URLs from space-separated string.
+        
+        Returns:
+            List[str]: List of valid cookie URLs.
+        """
+        cookie_str = getenv("COOKIE_URL", "")
+        if not cookie_str:
+            return []
+        
+        return [
+            url.strip()
+            for url in cookie_str.split()
+            if url.strip() and "batbin.me" in url
+        ]
+    
+    @staticmethod
+    def _str_to_bool(value: str) -> bool:
+        """
+        Convert string to boolean value.
+        
+        Args:
+            value: String representation of boolean.
+            
+        Returns:
+            bool: Converted boolean value.
+        """
+        return value.lower() in ("true", "1", "yes", "y", "on")
+    
+    def check(self) -> None:
+        """
+        Validate that all required environment variables are set.
+        
+        Raises:
+            SystemExit: If any required variables are missing.
+        """
+        required_vars = {
+            "API_ID": self.API_ID,
+            "API_HASH": self.API_HASH,
+            "BOT_TOKEN": self.BOT_TOKEN,
+            "MONGO_DB_URI": self.MONGO_URL,
+            "LOGGER_ID": self.LOGGER_ID,
+            "OWNER_ID": self.OWNER_ID,
+            "STRING_SESSION": self.SESSION1,
+        }
+        
+        missing = [
+            name for name, value in required_vars.items()
+            if not value or (isinstance(value, int) and value == 0)
+        ]
+        
+        if missing:
+            raise SystemExit(
+                f"❌ Missing required environment variables: {', '.join(missing)}\n"
+                f"Please check your .env file and ensure all required variables are set."
+            )

@@ -1,144 +1,170 @@
+<div align="center">
+  <img src="https://files.catbox.moe/und0yt.jpg" alt="Hasii Music Bot" width="400"/>
+  
+  # 🎵 Hasii Music Bot
+  
+  <p><b>A Powerful Telegram Music Player Bot</b></p>
+  
+  [![Telegram](https://img.shields.io/badge/Telegram-Channel-blue?style=for-the-badge&logo=telegram)](https://t.me/TheInfinityAI)
+  [![Telegram](https://img.shields.io/badge/Telegram-Support-blue?style=for-the-badge&logo=telegram)](https://t.me/Hasindu_Lakshan)
+  
+</div>
 
-<p align="center">
-  <a href="https://t.me/musicxhasii">
-    <img src="https://files.catbox.moe/und0yt.jpg" width="600">
-  </a>
-</p>
+---
 
-## 🌟 Intro about application?
+## ✨ Features
 
-**HasiiMusicBot** is a modern Telegram music bot built using Pyrogram and PyTgCalls. It streams high quality music in group voice chats. it supports various platforms like YouTube, Spotify.
+- 🎵 **High Quality Music Streaming** - Crystal clear audio with STUDIO quality
+- 📻 **Live Radio Streaming** - 50+ international and local radio stations
+- 🎧 **YouTube Support** - Play music from YouTube links or search
+- 📝 **Queue System** - Manage multiple songs in queue
+- ⚡ **Fast & Reliable** - Built with Pyrogram and PyTgCalls
+- 🎛 **Admin Controls** - Pause, resume, skip, and stop controls
+- 🌐 **Multi-Language** - Supports English and Sinhala
+- 👥 **User Authorization** - Authorized users can control playback
+- 📊 **Statistics** - Track bot usage and performance
+- 🔄 **Auto-Leave** - Automatically leaves inactive voice chats
 
+---
 
-## 🔑 Environment Variables
+## 🚀 Deployment
 
-Below are the required and optional environment variables for deployment.
+### ✔️ Prerequisites
+
+- Python 3.10+ installed
+- Deno & FFmpeg installed on your system
+- Required variables mentioned in sample.env
+
+### Requirements
+
+- Python 3.12+
+- MongoDB Database
+- Telegram Bot Token
+- Telegram API ID & Hash
+- Pyrogram String Session
+
+### Environment Variables
+
+Create a `.env` file with the following variables:
 
 ```env
-API_ID=              # Required
-API_HASH=            # Required
-BOT_TOKEN=           # Required
-OWNER_ID=            # Required - Telegram user ID
-LOGGER_ID=           # Required - Log group/channel ID
-STRING_SESSION=      # Required 
-MONGO_DB_URI=        # Required 
-COOKIE_URL=          # Required 
-
-API_KEY=             # Optional
-API_URL=             # Optional
+API_ID=your_api_id
+API_HASH=your_api_hash
+BOT_TOKEN=your_bot_token
+MONGO_DB_URI=your_mongodb_uri
+LOGGER_ID=your_logger_group_id
+OWNER_ID=your_user_id
+STRING_SESSION=your_pyrogram_session
+COOKIE_URL=youtube_cookies_url (optional)
 ```
 
-⚠️ Use safe paste services like [Pastebin](https://pastebin.com) or [Batbin](https://batbin.me) for save cookies (YT Cookies).
+### Installation
 
+1. **Clone the repository**
+```bash
+git clone https://github.com/hasindu-nagolla/HasiiMusicBot
+cd HasiiMusicBot
+```
 
-### ☕ VPS Setup Guide
+2. **Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+3. **Set up environment variables**
+```bash
+cp sample.env .env
+# Edit .env with your values
+```
+
+4. **Run the bot**
+```bash
+bash start
+```
+
+### Docker Deployment
 
 ```bash
-🎵 Deploy  on VPS
-
-### Step 1: Update & Install Packages
-sudo apt update && sudo apt upgrade -y
-sudo apt install git curl python3-pip python3-venv ffmpeg -y
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt install -y nodejs
-npm install -g npm
-
-### Step 2: Clone Repo
-git clone repo_link
-cd file_name
-tmux new -s bot_name
-
-### Step 3: Setup & Run
-python3 -m venv venv
-source venv/bin/activate
-pip install -U pip && pip install -r requirements.txt
-bash setup   # Fill environment variables
-bash start   # Start bot
-
-### Useful Commands
-tmux detach         # Use Ctrl+B, then D
-tmux attach-session -t tune # Attach to Running Bot session
-tmux kill-session -t tune # to kill the running bot session
-rm -rf TuneViaBot  # Uninstall the repo
+docker build -t hasii-music-bot .
+docker run -d --env-file .env hasii-music-bot
 ```
 
-  </details>
+---
+
+## 📖 Commands
+
+### User Commands
+- `/play` - Play a song (YouTube URL or search query)
+- `/radio` - Browse and play live radio stations
+- `/queue` - View current queue
+- `/ping` - Check bot status
+- `/help` - Show help menu
+- `/lang` - Change language
+
+### Admin Commands
+- `/pause` - Pause current stream
+- `/resume` - Resume paused stream
+- `/skip` - Skip current track
+- `/stop` - Stop playing and clear queue
+- `/seek` - Seek to specific timestamp
+- `/reload` - Reload admin cache
+
+### Sudo Commands
+- `/stats` - View bot statistics
+- `/broadcast` - Broadcast message to all chats
+- `/addsudo` - Add sudo user
+- `/rmsudo` - Remove sudo user
+- `/restart` - Restart the bot
+- `/logs` - Get bot logs
+
+---
+
+## 🛠 Configuration
+
+### Audio Quality Settings
+The bot streams audio at **STUDIO** quality (highest available) with:
+- **Codec**: Opus (best quality for music)
+- **Format**: WebM container for audio downloads
+- **Sample Rate**: 48kHz
+- **Channels**: Stereo
+- **Optimization**: 16 concurrent downloads, 1MB chunks
+
+### Customization
+- Modify language files in `HasiiMusic/locales/`
+- Customize thumbnails and images in `config.py`
+- Adjust queue limits and duration in `config.py`
+
+---
+
+## 📞 Support & Contact
+
+- **Developer**: Hasindu Nagolla
+- **Telegram Channel**: [@TheInfinityAI](https://t.me/TheInfinityAI)
+- **Support Group**: [@Hasindu_Lakshan](https://t.me/Hasindu_Lakshan)
+- **GitHub**: [hasindu-nagolla](https://github.com/hasindu-nagolla)
+
+---
+
+## 📝 Notes
+
+- Make sure your bot is admin in both the group and logger group
+- The assistant account will auto-join groups when needed for playback
+- Keep your `.env` file secure and never share it publicly
+- For YouTube downloads, cookies may be required for some videos
+- Radio streams are live - no duration limits or downloads needed
+
+---
+
+## 🙏 Credits
+
+Special thanks to [AnonymousX1025](https://github.com/AnonymousX1025) for the original inspiration.
+
+---
+
+<div align="center">
+  
+  ### Made with ❤️ by Hasindu Nagolla
+  
+  **© 2025 Hasii Music Bot. All rights reserved.**
+  
 </div>
-
-##
-
-### 🐳 Docker Deployment
-
-<img src="https://img.shields.io/badge/Show%20/Hide-Docker%20Steps-10b981?style=for-the-badge" alt="Toggle Docker Steps"/>
-
-<div align="left">
-  <details>
-
-```bash
-### Step 1: Clone Repo
-git clone https://github.com/CertifiedCoders/TuneViaBot
-cd TuneViaBot
-
-### Step 2: Create .env File
-nano .env
-# Paste your environment variables here and save (Ctrl+O, Enter, Ctrl+X)
-
-### Step 3: Build Image
-docker build -t tuneviabot .
-
-### Step 4: Run Container
-docker run -d --name tune --env-file .env --restart unless-stopped tuneviabot
-
-### Step 5: Manage Container
-docker logs -f tune        # View logs (Ctrl+C to exit)
-docker stop tune           # Stop container
-docker start tune          # Start again
-docker rm -f tune          # Remove container
-docker rmi tuneviabot      # Remove image
-```
-
-  </details>
-</div>
-
-
-
-##
-### ☁️ Quick Deploy
-
-| Platform                | Deploy Link                                                                                                                                                                                               |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🔑 **Generate Session** | <a href="https://t.me/SessionBuilderbot"><img src="https://img.shields.io/badge/Session%20-Generator-blue?style=for-the-badge&logo=telegram"/></a>                                                    |
-| 🌍 **Heroku Deploy**    | <a href="http://dashboard.heroku.com/new?template=https://github.com/CertifiedCoders/TuneViaBot"><img src="https://img.shields.io/badge/Deploy%20to-Heroku-purple?style=for-the-badge&logo=heroku"/></a> |
-
-
-
-
-## 💬 Community & Support
-
-<p align="center">
-  <a href="https://t.me/CertifiedCoders">
-    <img src="https://img.shields.io/badge/Support_Group-Telegram-0088cc?style=for-the-badge&logo=telegram&logoColor=white" />
-  </a>
-  <a href="https://t.me/CertifiedCodes">
-    <img src="https://img.shields.io/badge/Updates_Channel-Telegram-6A5ACD?style=for-the-badge&logo=telegram&logoColor=white" />
-  </a>
-  <a href="https://t.me/CertifiedCoder">
-    <img src="https://img.shields.io/badge/Contact_Owner-Telegram-4CAF50?style=for-the-badge&logo=telegram&logoColor=white" />
-  </a>
-  <a href="https://youtube.com/@rajnisha3">
-    <img src="https://img.shields.io/badge/Subscribe-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" />
-  </a>
-  <a href="https://instagram.com/rajnishthegreat">
-    <img src="https://img.shields.io/badge/Follow-Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" />
-  </a>
-  <a href="mailto:rajnishmishraaa1@gmail.com">
-    <img src="https://img.shields.io/badge/Contact-Email-0078D4?style=for-the-badge&logo=gmail&logoColor=white" />
-  </a>
-</p>
-
-
-##
-### 🔖 Credits
-
-* <b> *sᴩᴇᴄɪᴀʟ ᴛʜᴀɴᴋs ᴛᴏ <a href="https://github.com/AnonymousX1025">ᴀɴᴏɴʏ</a> ғᴏʀ <a href="https://github.com/AnonymousX1025/AnonXMusic">ᴀɴᴏɴxᴍᴜsɪᴄ</a>* </b>
-* <b> *ᴄʀᴀғᴛᴇᴅ ᴡɪᴛʜ ᴘᴀssɪᴏɴ ʙʏ <a href="https://github.com/CertifiedCoders">ᴄᴇʀᴛɪғɪᴇᴅ ᴄᴏᴅᴇʀs</a>* </b>

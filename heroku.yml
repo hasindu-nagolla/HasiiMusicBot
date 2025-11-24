@@ -1,5 +1,17 @@
+# ==============================================================================
+# heroku.yml - Heroku Deployment Configuration
+# ==============================================================================
+# This file tells Heroku to use Docker for deployment.
+# 
+# The 'worker' dyno type is used because this is a bot (not a web server).
+# Heroku will build the Docker image defined in Dockerfile.
+# 
+# Usage:
+#   1. Create Heroku app: heroku create your-app-name
+#   2. Set stack to container: heroku stack:set container
+#   3. Push to deploy: git push heroku main
+# ==============================================================================
+
 build:
   docker:
     worker: Dockerfile
-run:
-  worker: bash start
