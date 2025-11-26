@@ -92,9 +92,9 @@ class TgCall(PyTgCalls):
                 # Create initial timer display
                 if not media.is_live and media.duration_sec:
                     import time as time_module
-                    played = 0
+                    played = media.time  # Use actual media.time value
                     duration = media.duration_sec
-                    # Build progress bar with length=10 to match UI
+                    # Build progress bar with same length as update_timer
                     length = 10
                     pos = min(int((played / duration) * length), length - 1) if duration else 0
                     timer_bar = "—" * pos + "●" + "—" * (length - pos - 1)
