@@ -77,9 +77,14 @@ async def broadcast_message(_, message: types.Message) -> None:
     await _log_broadcast_start(message)
     await asyncio.sleep(5)
     
-    # Perform the broadcast
+    # Determine if the command was a reply to a media message
+    media_message = None
+    if message.reply_to_message:
+        media_message = message.reply_to_message
+
+    # Perform the broadcast (supports text and media messages)
     success_groups, success_users, failed_chats = await _send_broadcast(
-        broadcast_text, groups, users, sent
+        broadcast_text, groups, users, sent, media_message
     )
     
     # Reset broadcasting flag
@@ -217,7 +222,8 @@ async def _send_broadcast(
     text: str,
     groups: List[int],
     users: List[int],
-    status_message: types.Message
+    status_message: types.Message,
+    media_message: types.Message | None = None,
 ) -> Tuple[int, int, str]:
     """
     Send broadcast message to all recipients.
@@ -271,15 +277,53 @@ async def _send_broadcast(
                         continue
                 except:
                     pass  # If can't get chat info, try to send anyway
-            
-            await app.send_message(chat_id, text)
-            
+
+            # If a media message was provided, send media directly (not forward)
+            if media_message:
+                caption = text.strip() if text else (media_message.caption or "")
+                try:
+                    if media_message.photo:
+                        file_id = media_message.photo[-1].file_id
+                        await app.send_photo(chat_id=chat_id, photo=file_id, caption=caption)
+                    elif getattr(media_message, 'video', None):
+                        file_id = media_message.video.file_id
+                        await app.send_video(chat_id=chat_id, video=file_id, caption=caption)
+                    elif getattr(media_message, 'audio', None):
+                        file_id = media_message.audio.file_id
+                        await app.send_audio(chat_id=chat_id, audio=file_id, caption=caption)
+                    elif getattr(media_message, 'voice', None):
+                        file_id = media_message.voice.file_id
+                        await app.send_voice(chat_id=chat_id, voice=file_id, caption=caption)
+                    elif getattr(media_message, 'document', None):
+                        file_id = media_message.document.file_id
+                        await app.send_document(chat_id=chat_id, document=file_id, caption=caption)
+                    elif getattr(media_message, 'animation', None):
+                        file_id = media_message.animation.file_id
+                        await app.send_animation(chat_id=chat_id, animation=file_id, caption=caption)
+                    elif getattr(media_message, 'sticker', None):
+                        file_id = media_message.sticker.file_id
+                        await app.send_sticker(chat_id=chat_id, sticker=file_id)
+                    else:
+                        # Fallback to text if media type not recognized
+                        if text:
+                            await app.send_message(chat_id, text)
+                        else:
+                            failed_log += f"{chat_id} - Unsupported media type or empty caption\n"
+                            await asyncio.sleep(0.3)
+                            continue
+                except Exception as send_ex:
+                    failed_log += f"{chat_id} - Media send failed: {type(send_ex).__name__}: {str(send_ex)}\n"
+                    continue
+            else:
+                # No media: send text message
+                await app.send_message(chat_id, text)
+
             # Track success
             if chat_id in groups:
                 success_groups += 1
             else:
                 success_users += 1
-            
+
             # Anti-flood delay: 300ms between messages (safer than 100ms)
             await asyncio.sleep(0.3)
             
