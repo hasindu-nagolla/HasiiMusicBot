@@ -32,14 +32,15 @@ async def mention_admins(_, message: types.Message):
     message_text = message.text or message.caption or ""
     cleaned_text = TRIGGER_PATTERN.sub("", message_text).strip()
     
-    # Get user info
+    # Get user info (handle anonymous admins)
     sender = message.from_user
-    if not sender:
-        return
-    
-    user_display = f"{sender.first_name}"
-    if sender.username:
-        user_display += f" (@{sender.username})"
+    if sender:
+        user_display = f"{sender.first_name}"
+        if sender.username:
+            user_display += f" (@{sender.username})"
+    else:
+        # Anonymous admin or channel
+        user_display = "Anonymous Admin"
     
     # Guard condition if user sends empty mentions
     if not cleaned_text:
