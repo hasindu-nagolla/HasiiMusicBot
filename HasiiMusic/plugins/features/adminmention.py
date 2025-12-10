@@ -70,6 +70,12 @@ async def mention_admins(_, message: types.Message):
             if user.is_bot or user.is_deleted:
                 continue
             
+            # Skip admins who have "Remain Anonymous" enabled
+            # Check privileges - if is_anonymous privilege is True, skip them
+            if hasattr(admin, 'privileges') and admin.privileges:
+                if getattr(admin.privileges, 'is_anonymous', False):
+                    continue
+            
             # Add mention
             if user.username:
                 mentions.append(f"@{user.username}")
