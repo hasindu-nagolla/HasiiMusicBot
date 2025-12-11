@@ -45,34 +45,6 @@ def checkUB(play):
         if url and not yt.valid(url):
             return await m.reply_text(m.lang["play_unsupported"])
 
-        # Check if bot is admin in the chat
-        try:
-            bot_member = await app.get_chat_member(m.chat.id, app.id)
-            if bot_member.status not in [
-                enums.ChatMemberStatus.ADMINISTRATOR,
-                enums.ChatMemberStatus.OWNER,
-            ]:
-                return await m.reply_text(
-                    f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
-                    f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
-                    f"<b>Required permissions:</b>\n"
-                    f"• Manage Voice Chats\n"
-                    f"• Invite Users via Link\n"
-                    f"• Delete Messages\n\n"
-                    f"Please promote me as admin with the required permissions.</blockquote>"
-                )
-        except Exception:
-            # If we can't check bot status, it likely means bot is not admin
-            return await m.reply_text(
-                f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
-                f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
-                f"<b>Required permissions:</b>\n"
-                f"• Manage Voice Chats\n"
-                f"• Invite Users via Link\n"
-                f"• Delete Messages\n\n"
-                f"Please promote me as admin with the required permissions.</blockquote>"
-            )
-
         play_mode = await db.get_play_mode(m.chat.id)
         if play_mode or force:
             adminlist = await db.get_admins(m.chat.id)
@@ -105,7 +77,15 @@ def checkUB(play):
                             )
                         )
             except errors.ChatAdminRequired:
-                return await m.reply_text(m.lang["admin_required"])
+                return await m.reply_text(
+                    f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
+                    f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
+                    f"<b>Required permissions:</b>\n"
+                    f"• Manage Voice Chats\n"
+                    f"• Invite Users via Link\n"
+                    f"• Delete Messages\n\n"
+                    f"Please promote me as admin with the required permissions.</blockquote>"
+                )
             except errors.UserNotParticipant:
                 if m.chat.username:
                     invite_link = m.chat.username
@@ -119,7 +99,15 @@ def checkUB(play):
                         if not invite_link:
                             invite_link = await app.export_chat_invite_link(m.chat.id)
                     except errors.ChatAdminRequired:
-                        return await m.reply_text(m.lang["admin_required"])
+                        return await m.reply_text(
+                            f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
+                            f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
+                            f"<b>Required permissions:</b>\n"
+                            f"• Manage Voice Chats\n"
+                            f"• Invite Users via Link\n"
+                            f"• Delete Messages\n\n"
+                            f"Please promote me as admin with the required permissions.</blockquote>"
+                        )
                     except Exception as ex:
                         return await m.reply_text(
                             m.lang["play_invite_error"].format(
