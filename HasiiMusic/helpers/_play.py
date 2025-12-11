@@ -55,6 +55,33 @@ def checkUB(play):
             ):
                 return await m.reply_text(m.lang["play_admin"])
 
+        # Check if bot is admin in the chat
+        try:
+            bot_member = await app.get_chat_member(m.chat.id, app.id)
+            if bot_member.status not in [
+                enums.ChatMemberStatus.ADMINISTRATOR,
+                enums.ChatMemberStatus.OWNER,
+            ]:
+                return await m.reply_text(
+                    f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
+                    f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
+                    f"<b>Required permissions:</b>\n"
+                    f"• Manage Voice Chats\n"
+                    f"• Invite Users via Link\n"
+                    f"• Delete Messages\n\n"
+                    f"Please promote me as admin with the required permissions.</blockquote>"
+                )
+        except errors.ChatAdminRequired:
+            return await m.reply_text(
+                f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
+                f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
+                f"<b>Required permissions:</b>\n"
+                f"• Manage Voice Chats\n"
+                f"• Invite Users via Link\n"
+                f"• Delete Messages\n\n"
+                f"Please promote me as admin with the required permissions.</blockquote>"
+            )
+
         if m.chat.id not in db.active_calls:
             client = await db.get_client(m.chat.id)
             try:
