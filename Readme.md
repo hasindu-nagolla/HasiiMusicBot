@@ -82,13 +82,6 @@ cp sample.env .env
 bash start
 ```
 
-### Docker Deployment
-
-```bash
-docker build -t hasii-music-bot .
-docker run -d --env-file .env hasii-music-bot
-```
-
 ---
 
 ## 📖 Commands

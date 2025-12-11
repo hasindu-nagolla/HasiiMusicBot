@@ -62,7 +62,6 @@ As **HasiiMusicBot** is a self-hosted Telegram bot, users are responsible for im
 * **Firewall Configuration:** Configure firewalls to allow only necessary inbound/outbound connections
 * **User Permissions:** Run the bot with minimal required system permissions (avoid root/administrator)
 * **Log Security:** Protect log files from unauthorized access as they may contain sensitive information
-* **Container Security:** If using Docker, follow container security best practices (non-root user, minimal base image)
 * **VPS/Server Hardening:** Keep your hosting environment patched and secure
 
 ### 📦 Dependency Management
@@ -114,7 +113,6 @@ As **HasiiMusicBot** is a self-hosted Telegram bot, users are responsible for im
 * [Telegram Bot Security Best Practices](https://core.telegram.org/bots/security)
 * [Python Security Best Practices](https://python.readthedocs.io/en/stable/library/security_warnings.html)
 * [MongoDB Security Checklist](https://www.mongodb.com/docs/manual/administration/security-checklist/)
-* [Docker Security Best Practices](https://docs.docker.com/engine/security/)
 
 ## 📝 Security Audit History
 

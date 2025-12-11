@@ -20,12 +20,6 @@ This document provides a comprehensive overview of the project structure, explai
   - List of all required packages (Pyrogram, motor, yt-dlp, etc.)
   - Install with: `pip install -r requirements.txt`
 
-### Deployment Files
-- **`Dockerfile`** - Docker container configuration for containerized deployment
-- **`heroku.yml`** - Heroku deployment configuration
-- **`Procfile`** - Process file for Heroku (defines worker process)
-- **`app.json`** - Heroku app manifest with environment variables
-
 ### Startup Scripts
 - **`setup`** - Initial setup script (install dependencies, configure environment)
 - **`start`** - Bot startup script (runs the bot)
@@ -256,13 +250,7 @@ HasiiMusicBot/
 │   ├── sample.env                # Environment template
 │   ├── config.py                 # Configuration loader and validator
 │   ├── requirements.txt          # Python dependencies
-│   └── setup                     # Setup script
-│
-├── 🚀 Deployment
-│   ├── Dockerfile                # Docker containerization
-│   ├── heroku.yml                # Heroku configuration
-│   ├── Procfile                  # Process definition
-│   ├── app.json                  # Heroku app manifest
+│   ├── setup                     # Setup script
 │   └── start                     # Bot startup script
 │
 ├── 📚 Documentation

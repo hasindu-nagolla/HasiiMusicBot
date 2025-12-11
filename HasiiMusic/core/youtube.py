@@ -141,23 +141,51 @@ class YouTube:
         return None
 
     async def playlist(self, limit: int, user: str, url: str, video: bool) -> list[Track]:
-        plist = await Playlist.get(url)
-        tracks = []
-        for data in plist["videos"][:limit]:
-            track = Track(
-                id=data.get("id"),
-                channel_name=data.get("channel", {}).get("name", ""),
-                duration=data.get("duration"),
-                duration_sec=utils.to_seconds(data.get("duration")),
-                title=data.get("title")[:25],
-                thumbnail=data.get("thumbnails")[-1].get("url").split("?")[0],
-                url=data.get("link").split("&list=")[0],
-                user=user,
-                view_count="",
-                video=video,
-            )
-            tracks.append(track)
-        return tracks
+        try:
+            plist = await Playlist.get(url)
+            tracks = []
+            
+            # Check if plist has videos
+            if not plist or "videos" not in plist or not plist["videos"]:
+                return []
+            
+            for data in plist["videos"][:limit]:
+                try:
+                    # Get thumbnail safely
+                    thumbnails = data.get("thumbnails", [])
+                    thumbnail_url = ""
+                    if thumbnails and len(thumbnails) > 0:
+                        thumbnail_url = thumbnails[-1].get("url", "").split("?")[0]
+                    
+                    # Get link safely
+                    link = data.get("link", "")
+                    if "&list=" in link:
+                        link = link.split("&list=")[0]
+                    
+                    track = Track(
+                        id=data.get("id", ""),
+                        channel_name=data.get("channel", {}).get("name", ""),
+                        duration=data.get("duration", "0:00"),
+                        duration_sec=utils.to_seconds(data.get("duration", "0:00")),
+                        title=(data.get("title", "Unknown")[:25]),
+                        thumbnail=thumbnail_url,
+                        url=link,
+                        user=user,
+                        view_count="",
+                        video=video,
+                    )
+                    tracks.append(track)
+                except Exception as e:
+                    # Skip individual track errors
+                    continue
+            
+            return tracks
+        except KeyError as e:
+            # Handle YouTube API structure changes
+            raise Exception(f"Failed to parse playlist. YouTube may have changed their structure.")
+        except Exception as e:
+            # Re-raise other exceptions
+            raise
 
     async def download(self, video_id: str, video: bool = False, is_live: bool = False) -> Optional[str]:
         url = self.base + video_id

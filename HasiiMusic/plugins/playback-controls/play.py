@@ -85,9 +85,16 @@ async def play_hndlr(
     if url:
         if "playlist" in url:
             await sent.edit_text(m.lang["playlist_fetch"])
-            tracks = await yt.playlist(
-                config.PLAYLIST_LIMIT, mention, url, False
-            )
+            try:
+                tracks = await yt.playlist(
+                    config.PLAYLIST_LIMIT, mention, url, False
+                )
+            except Exception as e:
+                return await sent.edit_text(
+                    f"<blockquote>❌ Failed to fetch playlist.\n\n"
+                    f"YouTube playlists are currently experiencing issues. "
+                    f"Please try playing individual songs instead.</blockquote>"
+                )
 
             if not tracks:
                 return await sent.edit_text(m.lang["playlist_error"])
