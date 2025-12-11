@@ -61,7 +61,8 @@ def checkUB(play):
                     f"• Delete Messages\n\n"
                     f"Please promote me as admin with the required permissions.</blockquote>"
                 )
-        except errors.ChatAdminRequired:
+        except Exception:
+            # If we can't check bot status, it likely means bot is not admin
             return await m.reply_text(
                 f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
                 f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
