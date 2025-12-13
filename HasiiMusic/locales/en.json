@@ -29,7 +29,7 @@
   "eval_error": "<blockquote>⚠️ 𝗘𝗿𝗿𝗼𝗿 𝗲𝘅𝗲𝗰𝘂𝘁𝗶𝗻𝗴 𝘀𝗻𝗶𝗽𝗽𝗲𝘁\n\n</blockquote>",
   "eval_inp": "<blockquote>𝗪𝗵𝗮𝘁?</blockquote>",
   "eval_out": "<blockquote><b>𝗢𝘂𝘁𝗽𝘂𝘁:</b>\n<code>{0}</code></blockquote>",
-  "gcast_usage": "<blockquote>𝗨𝘀𝗮𝗴𝗲: /broadcast <𝗺𝗲𝘀𝘀𝗮𝗴𝗲>\n\n𝗘𝘅𝗮𝗺𝗽𝗹𝗲: /broadcast 𝗛𝗲𝗹𝗹𝗼 𝗲𝘃𝗲𝗿𝘆𝗼𝗻𝗲!\n\n𝗢𝗽𝘁𝗶𝗼𝗻𝘀:\n-𝘂𝘀𝗲𝗿 : 𝗔𝗹𝘀𝗼 𝘀𝗲𝗻𝗱 𝘁𝗼 𝘂𝘀𝗲𝗿𝘀\n-𝗻𝗼𝗰𝗵𝗮𝘁 : 𝗗𝗼𝗻'𝘁 𝘀𝗲𝗻𝗱 𝘁𝗼 𝗴𝗿𝗼𝘂𝗽𝘀</blockquote>",
+  "gcast_usage": "<blockquote>𝗨𝘀𝗮𝗴𝗲: /broadcast [𝗿𝗲𝗽𝗹𝘆 𝘁𝗼 𝗺𝗲𝘀𝘀𝗮𝗴𝗲]\n\n𝗘𝘅𝗮𝗺𝗽𝗹𝗲: /broadcast (𝗿𝗲𝗽𝗹𝘆 𝘁𝗼 𝗮 𝗺𝗲𝘀𝘀𝗮𝗴𝗲)\n\n𝗢𝗽𝘁𝗶𝗼𝗻𝘀:\n-𝘂𝘀𝗲𝗿 : 𝗔𝗹𝘀𝗼 𝘀𝗲𝗻𝗱 𝘁𝗼 𝘂𝘀𝗲𝗿𝘀\n-𝗻𝗼𝗰𝗵𝗮𝘁 : 𝗗𝗼𝗻'𝘁 𝘀𝗲𝗻𝗱 𝘁𝗼 𝗴𝗿𝗼𝘂𝗽𝘀\n-𝗰𝗼𝗽𝘆 : 𝗦𝗲𝗻𝗱 𝗮𝘀 𝗰𝗼𝗽𝘆 (𝗻𝗼 𝗳𝗼𝗿𝘄𝗮𝗿𝗱 𝘁𝗮𝗴)</blockquote>",
   "gcast_active": "<blockquote>𝗣𝗹𝗲𝗮𝘀𝗲 𝘄𝗮𝗶𝘁 𝗳𝗼𝗿 𝘁𝗵𝗲 𝗼𝗻𝗴𝗼𝗶𝗻𝗴 𝗯𝗿𝗼𝗮𝗱𝗰𝗮𝘀𝘁 𝘁𝗼 𝗳𝗶𝗻𝗶𝘀𝗵.</blockquote>",
   "gcast_inactive": "<blockquote>𝗕𝗿𝗼𝗮𝗱𝗰𝗮𝘀𝘁𝗶𝗻𝗴 𝗶𝘀 𝗰𝘂𝗿𝗿𝗲𝗻𝘁𝗹𝘆 𝗶𝗻𝗮𝗰𝘁𝗶𝘃𝗲.</blockquote>",
   "gcast_start": "<blockquote>𝗕𝗿𝗼𝗮𝗱𝗰𝗮𝘀𝘁𝗶𝗻𝗴 𝘀𝘁𝗮𝗿𝘁𝗲𝗱.</blockquote>",

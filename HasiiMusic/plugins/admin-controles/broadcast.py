@@ -6,7 +6,7 @@ where the bot is active. It supports various options like sending to users only,
 excluding groups, and more.
 
 Commands:
-    /broadcast <message> [-user] [-nochat] [-pin] [-pinloud]: Broadcast a message
+    /broadcast <message> [-user] [-nochat] [-pin] [-pinloud] [-copy]: Broadcast a message
     /stop_gcast, /stop_broadcast: Stop ongoing broadcast
 
 Flags:
@@ -14,6 +14,7 @@ Flags:
     -nochat: Don't send to groups (only valid with -user)
     -pin: Pin the broadcasted message (silently)
     -pinloud: Pin the broadcasted message (with notification)
+    -copy: Send as a copy without forward tag (default: forwards with tag)
 """
 
 import os
@@ -36,8 +37,9 @@ async def broadcast_message(_, message: types.Message) -> None:
     Broadcast a message to all groups and/or users.
     
     Usage:
-        /broadcast <message> - Send to all groups
-        /broadcast -user <message> - Send to all groups and users
+        /broadcast <reply to message> - Forward message to all groups
+        /broadcast -copy <reply to message> - Send as copy (no forward tag) to all groups
+        /broadcast -user <reply to message> - Forward to all groups and users
         /broadcast -nochat -user <message> - Send only to users
     
     Args:
@@ -289,60 +291,86 @@ async def _send_broadcast(
                 except:
                     pass  # If can't get chat info, try to send anyway
 
-            # If a media message was provided, send media directly (not forward)
+            # If a media message was provided, forward or copy based on -copy flag
             if media_message:
-                caption = text if text else (media_message.caption or "")
                 sent_message = None
-                try:
-                    if media_message.photo:
-                        # Photo is a list of PhotoSize objects, get the largest
-                        file_id = media_message.photo.file_id if hasattr(media_message.photo, 'file_id') else media_message.photo[-1].file_id
-                        sent_message = await app.send_photo(chat_id=chat_id, photo=file_id, caption=caption)
-                    elif getattr(media_message, 'video', None):
-                        file_id = media_message.video.file_id
-                        sent_message = await app.send_video(chat_id=chat_id, video=file_id, caption=caption)
-                    elif getattr(media_message, 'audio', None):
-                        file_id = media_message.audio.file_id
-                        sent_message = await app.send_audio(chat_id=chat_id, audio=file_id, caption=caption)
-                    elif getattr(media_message, 'voice', None):
-                        file_id = media_message.voice.file_id
-                        sent_message = await app.send_voice(chat_id=chat_id, voice=file_id, caption=caption)
-                    elif getattr(media_message, 'document', None):
-                        file_id = media_message.document.file_id
-                        sent_message = await app.send_document(chat_id=chat_id, document=file_id, caption=caption)
-                    elif getattr(media_message, 'animation', None):
-                        file_id = media_message.animation.file_id
-                        sent_message = await app.send_animation(chat_id=chat_id, animation=file_id, caption=caption)
-                    elif getattr(media_message, 'sticker', None):
-                        file_id = media_message.sticker.file_id
-                        sent_message = await app.send_sticker(chat_id=chat_id, sticker=file_id)
-                    else:
-                        # Fallback to text if media type not recognized
-                        if text:
-                            sent_message = await app.send_message(chat_id, text)
+                
+                # Check if -copy flag is present
+                if "-copy" in flags:
+                    # Copy mode: send media without forward tag
+                    caption = text if text else (media_message.caption or "")
+                    try:
+                        if media_message.photo:
+                            # Photo is a list of PhotoSize objects, get the largest
+                            file_id = media_message.photo.file_id if hasattr(media_message.photo, 'file_id') else media_message.photo[-1].file_id
+                            sent_message = await app.send_photo(chat_id=chat_id, photo=file_id, caption=caption)
+                        elif getattr(media_message, 'video', None):
+                            file_id = media_message.video.file_id
+                            sent_message = await app.send_video(chat_id=chat_id, video=file_id, caption=caption)
+                        elif getattr(media_message, 'audio', None):
+                            file_id = media_message.audio.file_id
+                            sent_message = await app.send_audio(chat_id=chat_id, audio=file_id, caption=caption)
+                        elif getattr(media_message, 'voice', None):
+                            file_id = media_message.voice.file_id
+                            sent_message = await app.send_voice(chat_id=chat_id, voice=file_id, caption=caption)
+                        elif getattr(media_message, 'document', None):
+                            file_id = media_message.document.file_id
+                            sent_message = await app.send_document(chat_id=chat_id, document=file_id, caption=caption)
+                        elif getattr(media_message, 'animation', None):
+                            file_id = media_message.animation.file_id
+                            sent_message = await app.send_animation(chat_id=chat_id, animation=file_id, caption=caption)
+                        elif getattr(media_message, 'sticker', None):
+                            file_id = media_message.sticker.file_id
+                            sent_message = await app.send_sticker(chat_id=chat_id, sticker=file_id)
                         else:
-                            failed_log += f"{chat_id} - Unsupported media type or empty caption\n"
-                            await asyncio.sleep(0.3)
-                            continue
-                    
-                    # Handle pinning if requested
-                    if sent_message and chat_id in groups:
-                        if "-pin" in flags:
-                            try:
-                                await sent_message.pin(disable_notification=True)
-                                pinned_count += 1
-                            except:
-                                pass
-                        elif "-pinloud" in flags:
-                            try:
-                                await sent_message.pin(disable_notification=False)
-                                pinned_count += 1
-                            except:
-                                pass
-                                
-                except Exception as send_ex:
-                    failed_log += f"{chat_id} - Media send failed: {type(send_ex).__name__}: {str(send_ex)}\n"
-                    continue
+                            # Fallback to text if media type not recognized
+                            if text:
+                                sent_message = await app.send_message(chat_id, text)
+                            else:
+                                failed_log += f"{chat_id} - Unsupported media type or empty caption\n"
+                                await asyncio.sleep(0.3)
+                                continue
+                        
+                        # Handle pinning if requested
+                        if sent_message and chat_id in groups:
+                            if "-pin" in flags:
+                                try:
+                                    await sent_message.pin(disable_notification=True)
+                                    pinned_count += 1
+                                except:
+                                    pass
+                            elif "-pinloud" in flags:
+                                try:
+                                    await sent_message.pin(disable_notification=False)
+                                    pinned_count += 1
+                                except:
+                                    pass
+                                    
+                    except Exception as send_ex:
+                        failed_log += f"{chat_id} - Media send failed: {type(send_ex).__name__}: {str(send_ex)}\n"
+                        continue
+                else:
+                    # Forward mode: forward the message with forward tag
+                    try:
+                        sent_message = await media_message.forward(chat_id)
+                        
+                        # Handle pinning if requested
+                        if sent_message and chat_id in groups:
+                            if "-pin" in flags:
+                                try:
+                                    await sent_message.pin(disable_notification=True)
+                                    pinned_count += 1
+                                except:
+                                    pass
+                            elif "-pinloud" in flags:
+                                try:
+                                    await sent_message.pin(disable_notification=False)
+                                    pinned_count += 1
+                                except:
+                                    pass
+                    except Exception as fwd_ex:
+                        failed_log += f"{chat_id} - Forward failed: {type(fwd_ex).__name__}: {str(fwd_ex)}\n"
+                        continue
             else:
                 # No media: send text message
                 sent_message = await app.send_message(chat_id, text)
@@ -388,31 +416,36 @@ async def _send_broadcast(
             try:
                 retry_sent = None
                 if media_message:
-                    caption = text if text else (media_message.caption or "")
-                    if media_message.photo:
-                        # Photo is a list of PhotoSize objects, get the largest
-                        file_id = media_message.photo.file_id if hasattr(media_message.photo, 'file_id') else media_message.photo[-1].file_id
-                        retry_sent = await app.send_photo(chat_id=chat_id, photo=file_id, caption=caption)
-                    elif getattr(media_message, 'video', None):
-                        file_id = media_message.video.file_id
-                        retry_sent = await app.send_video(chat_id=chat_id, video=file_id, caption=caption)
-                    elif getattr(media_message, 'audio', None):
-                        file_id = media_message.audio.file_id
-                        retry_sent = await app.send_audio(chat_id=chat_id, audio=file_id, caption=caption)
-                    elif getattr(media_message, 'voice', None):
-                        file_id = media_message.voice.file_id
-                        retry_sent = await app.send_voice(chat_id=chat_id, voice=file_id, caption=caption)
-                    elif getattr(media_message, 'document', None):
-                        file_id = media_message.document.file_id
-                        retry_sent = await app.send_document(chat_id=chat_id, document=file_id, caption=caption)
-                    elif getattr(media_message, 'animation', None):
-                        file_id = media_message.animation.file_id
-                        retry_sent = await app.send_animation(chat_id=chat_id, animation=file_id, caption=caption)
-                    elif getattr(media_message, 'sticker', None):
-                        file_id = media_message.sticker.file_id
-                        retry_sent = await app.send_sticker(chat_id=chat_id, sticker=file_id)
+                    # Check if -copy flag for retry as well
+                    if "-copy" in flags:
+                        caption = text if text else (media_message.caption or "")
+                        if media_message.photo:
+                            # Photo is a list of PhotoSize objects, get the largest
+                            file_id = media_message.photo.file_id if hasattr(media_message.photo, 'file_id') else media_message.photo[-1].file_id
+                            retry_sent = await app.send_photo(chat_id=chat_id, photo=file_id, caption=caption)
+                        elif getattr(media_message, 'video', None):
+                            file_id = media_message.video.file_id
+                            retry_sent = await app.send_video(chat_id=chat_id, video=file_id, caption=caption)
+                        elif getattr(media_message, 'audio', None):
+                            file_id = media_message.audio.file_id
+                            retry_sent = await app.send_audio(chat_id=chat_id, audio=file_id, caption=caption)
+                        elif getattr(media_message, 'voice', None):
+                            file_id = media_message.voice.file_id
+                            retry_sent = await app.send_voice(chat_id=chat_id, voice=file_id, caption=caption)
+                        elif getattr(media_message, 'document', None):
+                            file_id = media_message.document.file_id
+                            retry_sent = await app.send_document(chat_id=chat_id, document=file_id, caption=caption)
+                        elif getattr(media_message, 'animation', None):
+                            file_id = media_message.animation.file_id
+                            retry_sent = await app.send_animation(chat_id=chat_id, animation=file_id, caption=caption)
+                        elif getattr(media_message, 'sticker', None):
+                            file_id = media_message.sticker.file_id
+                            retry_sent = await app.send_sticker(chat_id=chat_id, sticker=file_id)
+                        else:
+                            retry_sent = await app.send_message(chat_id, text)
                     else:
-                        retry_sent = await app.send_message(chat_id, text)
+                        # Forward mode for retry
+                        retry_sent = await media_message.forward(chat_id)
                 else:
                     retry_sent = await app.send_message(chat_id, text)
                 
