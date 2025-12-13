@@ -82,20 +82,20 @@ class Bot(pyrogram.Client):
         
         # Verify logger group access
         try:
-            await self.send_message(self.logger, "🤖 Bot Started")
+            await self.send_message(self.logger, "🤖 ʙᴏᴛ ꜱᴛᴀʀᴛᴇᴅ")
             member = await self.get_chat_member(self.logger, self.id)
         except Exception as ex:
             raise SystemExit(
-                f"❌ Bot failed to access logger group: {self.logger}\n"
-                f"Reason: {ex}\n"
-                f"Please ensure the bot is added to the logger group."
+                f"❌ ʙᴏᴛ ꜰᴀɪʟᴇᴅ ᴛᴏ ᴀᴄᴄᴇꜱꜱ ʟᴏɢɢᴇʀ ɢʀᴏᴜᴘ: {self.logger}\n"
+                f"ʀᴇᴀꜱᴏɴ: {ex}\n"
+                f"ᴘʟᴇᴀꜱᴇ ᴇɴꜱᴜʀᴇ ᴛʜᴇ ʙᴏᴛ ɪꜱ ᴀᴅᴅᴇᴅ ᴛᴏ ᴛʜᴇ ʟᴏɢɢᴇʀ ɢʀᴏᴜᴘ."
             )
         
         # Verify admin status
         if member.status != pyrogram.enums.ChatMemberStatus.ADMINISTRATOR:
             raise SystemExit(
-                f"❌ Bot is not an administrator in logger group: {self.logger}\n"
-                f"Please promote the bot to administrator with necessary permissions."
+                f"❌ ʙᴏᴛ ɪꜱ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴɪꜱᴛʀᴀᴛᴏʀ ɪɴ ʟᴏɢɢᴇʀ ɢʀᴏᴜᴘ: {self.logger}\n"
+                f"ᴘʟᴇᴀꜱᴇ ᴘʀᴏᴍᴏᴛᴇ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴀᴅᴍɪɴɪꜱᴛʀᴀᴛᴏʀ ᴡɪᴛʜ ɴᴇᴄᴇꜱꜱᴀʀʏ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ."
             )
         
         logger.info(f"🤖 Bot started successfully as @{self.username}")

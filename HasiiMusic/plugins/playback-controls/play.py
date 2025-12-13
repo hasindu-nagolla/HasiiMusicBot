@@ -72,8 +72,8 @@ async def play_hndlr(
         except:
             await db.set_cmode(m.chat.id, None)
             return await m.reply_text(
-                "❌ **Failed to get channel.**\n\n"
-                "Make sure I'm admin in the channel and channel play is set correctly."
+                "❌ **ꜰᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ᴄʜᴀɴɴᴇʟ.**\n\n"
+                "ᴍᴀᴋᴇ ꜱᴜʀᴇ ɪ'ᴍ ᴀᴅᴍɪɴ ɪɴ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ ɪꜱ ꜱᴇᴛ ᴄᴏʀʀᴇᴄᴛʟʏ."
             )
 
     sent = await m.reply_text(m.lang["play_searching"])
@@ -91,9 +91,9 @@ async def play_hndlr(
                 )
             except Exception as e:
                 return await sent.edit_text(
-                    f"<blockquote>❌ Failed to fetch playlist.\n\n"
-                    f"YouTube playlists are currently experiencing issues. "
-                    f"Please try playing individual songs instead.</blockquote>"
+                    f"<blockquote>❌ ꜰᴀɪʟᴇᴅ ᴛᴏ ꜰᴇᴛᴄʜ ᴘʟᴀʏʟɪꜱᴛ.\n\n"
+                    f"ʏᴏᴜᴛᴜʙᴇ ᴘʟᴀʏʟɪꜱᴛꜱ ᴀʀᴇ ᴄᴜʀʀᴇɴᴛʟʏ ᴇxᴘᴇʀɪᴇɴᴄɪɴɢ ɪꜱꜱᴜᴇꜱ. "
+                    f"ᴘʟᴇᴀꜱᴇ ᴛʀʏ ᴘʟᴀʏɪɴɢ ɪɴᴅɪᴠɪᴅᴜᴀʟ ꜱᴏɴɢꜱ ɪɴꜱᴛᴇᴀᴅ.</blockquote>"
                 )
 
             if not tracks:

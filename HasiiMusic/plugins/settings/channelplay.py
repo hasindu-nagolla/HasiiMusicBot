@@ -28,16 +28,16 @@ async def channelplay_command(_, m: Message):
     # Check if user is admin
     member = await app.get_chat_member(m.chat.id, m.from_user.id)
     if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
-        return await m.reply_text("❌ Only admins can use this command.")
+        return await m.reply_text("❌ ᴏɴʟʏ ᴀᴅᴍɪɴꜱ ᴄᴀɴ ᴜꜱᴇ ᴛʜɪꜱ ᴄᴏᴍᴍᴀɴᴅ.")
 
     if len(m.command) < 2:
         return await m.reply_text(
-            f"Channel Play Settings for {m.chat.title}\n\n"
-            "To enable for linked channel:\n"
+            f"ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ ꜱᴇᴛᴛɪɴɢꜱ ꜰᴏʀ {m.chat.title}\n\n"
+            "ᴛᴏ ᴇɴᴀʙʟᴇ ꜰᴏʀ ʟɪɴᴋᴇᴅ ᴄʜᴀɴɴᴇʟ:\n"
             "`/channelplay linked`\n\n"
-            "To enable for any channel:\n"
+            "ᴛᴏ ᴇɴᴀʙʟᴇ ꜰᴏʀ ᴀɴʏ ᴄʜᴀɴɴᴇʟ:\n"
             "`/channelplay [channel_id]`\n\n"
-            "To disable channel play:\n"
+            "ᴛᴏ ᴅɪꜱᴀʙʟᴇ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ:\n"
             "`/channelplay disable`"
         )
 
@@ -46,7 +46,7 @@ async def channelplay_command(_, m: Message):
     # Disable channel play
     if query.lower() == "disable":
         await db.set_cmode(m.chat.id, None)
-        return await m.reply_text("✅ Channel play disabled.")
+        return await m.reply_text("✅ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ ᴅɪꜱᴀʙʟᴇᴅ.")
 
     # Enable for linked channel
     elif query.lower() == "linked":
@@ -55,11 +55,11 @@ async def channelplay_command(_, m: Message):
             channel_id = chat.linked_chat.id
             await db.set_cmode(m.chat.id, channel_id)
             return await m.reply_text(
-                f"✅ Channel play enabled for: {chat.linked_chat.title}\n"
-                f"Channel ID: `{chat.linked_chat.id}`"
+                f"✅ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ ᴇɴᴀʙʟᴇᴅ ꜰᴏʀ: {chat.linked_chat.title}\n"
+                f"ᴄʜᴀɴɴᴇʟ ɪᴅ: `{chat.linked_chat.id}`"
             )
         else:
-            return await m.reply_text("❌ This chat doesn't have a linked channel.")
+            return await m.reply_text("❌ ᴛʜɪꜱ ᴄʜᴀᴛ ᴅᴏᴇꜱɴ'ᴛ ʜᴀᴠᴇ ᴀ ʟɪɴᴋᴇᴅ ᴄʜᴀɴɴᴇʟ.")
 
     # Enable for specific channel
     else:
@@ -73,15 +73,15 @@ async def channelplay_command(_, m: Message):
             chat = await app.get_chat(channel_id)
         except Exception as e:
             return await m.reply_text(
-                f"❌ Failed to get channel.\n\n"
-                f"Error: `{type(e).__name__}`\n\n"
-                "Make sure you've added the bot as admin in the channel and promoted it as admin.\n\n"
-                "For numeric IDs: Use the full ID including `-100` prefix\n"
-                "Example: `/channelplay -1001234567890`"
+                f"❌ ꜰᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ᴄʜᴀɴɴᴇʟ.\n\n"
+                f"ᴇʀʀᴏʀ: `{type(e).__name__}`\n\n"
+                "ᴍᴀᴋᴇ ꜱᴜʀᴇ ʏᴏᴜ'ᴠᴇ ᴀᴅᴅᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴀꜱ ᴀᴅᴍɪɴ ɪɴ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴘʀᴏᴍᴏᴛᴇᴅ ɪᴛ ᴀꜱ ᴀᴅᴍɪɴ.\n\n"
+                "ꜰᴏʀ ɴᴜᴍᴇʀɪᴄ ɪᴅꜱ: ᴜꜱᴇ ᴛʜᴇ ꜰᴜʟʟ ɪᴅ ɪɴᴄʟᴜᴅɪɴɢ `-100` ᴘʀᴇꜰɪx\n"
+                "ᴇxᴀᴍᴘʟᴇ: `/channelplay -1001234567890`"
             )
 
         if chat.type != ChatType.CHANNEL:
-            return await m.reply_text("❌ Only channels are supported.")
+            return await m.reply_text("❌ ᴏɴʟʏ ᴄʜᴀɴɴᴇʟꜱ ᴀʀᴇ ꜱᴜᴘᴘᴏʀᴛᴇᴅ.")
 
         # Check if user is owner of the channel
         owner_username = None
@@ -96,26 +96,26 @@ async def channelplay_command(_, m: Message):
                     break
         except Exception as e:
             return await m.reply_text(
-                f"❌ Failed to get channel administrators.\n\n"
-                f"Error: `{type(e).__name__}`\n\n"
-                "Make sure the bot is admin in the channel."
+                f"❌ ꜰᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ᴄʜᴀɴɴᴇʟ ᴀᴅᴍɪɴɪꜱᴛʀᴀᴛᴏʀꜱ.\n\n"
+                f"ᴇʀʀᴏʀ: `{type(e).__name__}`\n\n"
+                "ᴍᴀᴋᴇ ꜱᴜʀᴇ ᴛʜᴇ ʙᴏᴛ ɪꜱ ᴀᴅᴍɪɴ ɪɴ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ."
             )
 
         if not owner_id:
             return await m.reply_text(
-                "❌ Could not find channel owner.\n\n"
-                "Make sure the bot has permission to view channel admins."
+                "❌ ᴄᴏᴜʟᴅ ɴᴏᴛ ꜰɪɴᴅ ᴄʜᴀɴɴᴇʟ ᴏᴡɴᴇʀ.\n\n"
+                "ᴍᴀᴋᴇ ꜱᴜʀᴇ ᴛʜᴇ ʙᴏᴛ ʜᴀꜱ ᴘᴇʀᴍɪꜱꜱɪᴏɴ ᴛᴏ ᴠɪᴇᴡ ᴄʜᴀɴɴᴇʟ ᴀᴅᴍɪɴꜱ."
             )
 
         if owner_id != m.from_user.id:
             return await m.reply_text(
-                f"❌ You need to be the owner of channel {chat.title} to connect it with this group.\n\n"
-                f"Channel's Owner: @{owner_username}\n\n"
-                "Alternatively, you can link your chat's channel and connect with `/channelplay linked`"
+                f"❌ ʏᴏᴜ ɴᴇᴇᴅ ᴛᴏ ʙᴇ ᴛʜᴇ ᴏᴡɴᴇʀ ᴏꜰ ᴄʜᴀɴɴᴇʟ {chat.title} ᴛᴏ ᴄᴏɴɴᴇᴄᴛ ɪᴛ ᴡɪᴛʜ ᴛʜɪꜱ ɢʀᴏᴜᴘ.\n\n"
+                f"ᴄʜᴀɴɴᴇʟ'ꜱ ᴏᴡɴᴇʀ: @{owner_username}\n\n"
+                "ᴀʟᴛᴇʀɴᴀᴛɪᴠᴇʟʏ, ʏᴏᴜ ᴄᴀɴ ʟɪɴᴋ ʏᴏᴜʀ ᴄʜᴀᴛ'ꜱ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴄᴏɴɴᴇᴄᴛ ᴡɪᴛʜ `/channelplay linked`"
             )
 
         await db.set_cmode(m.chat.id, chat.id)
         return await m.reply_text(
-            f"✅ Channel play enabled for: {chat.title}\n"
-            f"Channel ID: `{chat.id}`"
+            f"✅ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ ᴇɴᴀʙʟᴇᴅ ꜰᴏʀ: {chat.title}\n"
+            f"ᴄʜᴀɴɴᴇʟ ɪᴅ: `{chat.id}`"
         )

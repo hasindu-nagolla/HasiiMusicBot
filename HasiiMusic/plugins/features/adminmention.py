@@ -40,13 +40,13 @@ async def mention_admins(_, message: types.Message):
             user_display += f" (@{sender.username})"
     else:
         # Anonymous admin or channel
-        user_display = "Anonymous Admin"
+        user_display = "ᴀɴᴏɴʏᴍᴏᴜꜱ ᴀᴅᴍɪɴ"
     
     # Guard condition if user sends empty mentions
     if not cleaned_text:
         warning_msg = (
-            "<blockquote><b>⚠️ You can't mention admins without a reason.</b></blockquote>\n"
-            "<blockquote>Please include a message. Example: <b>@admin your complaint</b></blockquote>"
+            "<blockquote><b>⚠️ ʏᴏᴜ ᴄᴀɴ'ᴛ ᴍᴇɴᴛɪᴏɴ ᴀᴅᴍɪɴꜱ ᴡɪᴛʜᴏᴜᴛ ᴀ ʀᴇᴀꜱᴏɴ.</b></blockquote>\n"
+            "<blockquote>ᴘʟᴇᴀꜱᴇ ɪɴᴄʟᴜᴅᴇ ᴀ ᴍᴇꜱꜱᴀɢᴇ. ᴇxᴀᴍᴘʟᴇ: <b>@admin ʏᴏᴜʀ ᴄᴏᴍᴘʟᴀɪɴᴛ</b></blockquote>"
         )
         await message.reply_text(warning_msg)
         return
@@ -54,7 +54,7 @@ async def mention_admins(_, message: types.Message):
     # Build formatted reply message
     reply_msg = (
         f"<blockquote><b><i>\"{cleaned_text}\"</i></b>\n"
-        f"Reported by: {user_display} 🔔</blockquote>\n\n"
+        f"ʀᴇᴘᴏʀᴛᴇᴅ ʙʏ: {user_display} 🔔</blockquote>\n\n"
     )
     
     # Get all administrators
