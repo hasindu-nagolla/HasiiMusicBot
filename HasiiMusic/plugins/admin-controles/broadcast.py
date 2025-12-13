@@ -322,11 +322,12 @@ async def _send_broadcast(
                             file_id = media_message.sticker.file_id
                             sent_message = await app.send_sticker(chat_id=chat_id, sticker=file_id)
                         else:
-                            # Fallback to text if media type not recognized
-                            if text:
-                                sent_message = await app.send_message(chat_id, text)
+                            # Text-only message: copy the text
+                            message_text = text if text else (media_message.text or media_message.caption or "")
+                            if message_text:
+                                sent_message = await app.send_message(chat_id, message_text)
                             else:
-                                failed_log += f"{chat_id} - Unsupported media type or empty caption\n"
+                                failed_log += f"{chat_id} - Empty message\n"
                                 await asyncio.sleep(0.3)
                                 continue
                         
