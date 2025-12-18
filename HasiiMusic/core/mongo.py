@@ -273,6 +273,20 @@ class MongoDB:
                 upsert=True,
             )
 
+    # AUTO LEAVE METHODS
+    async def get_autoleave(self, chat_id: int) -> bool:
+        """Get auto-leave status for a chat. Default is False."""
+        doc = await self.cache.find_one({"_id": f"autoleave_{chat_id}"})
+        return doc.get("enabled", False) if doc else False
+
+    async def set_autoleave(self, chat_id: int, enabled: bool) -> None:
+        """Enable or disable auto-leave for a chat."""
+        await self.cache.update_one(
+            {"_id": f"autoleave_{chat_id}"},
+            {"$set": {"enabled": enabled}},
+            upsert=True,
+        )
+
     # PLAY MODE METHODS
     async def get_play_mode(self, chat_id: int) -> bool:
         if chat_id not in self.play_mode:

@@ -167,27 +167,64 @@ async def update_timer(length=10):
 
 
 async def vc_watcher(sleep=15):
+    """Leave voice chat after 5 minutes if no users are listening."""
+    alone_times = {}  # Track when assistant started being alone in VC
+    LEAVE_TIMEOUT = 300  # 5 minutes in seconds (hardcoded)
+    
     while True:
         await asyncio.sleep(sleep)
-        for chat_id in db.active_calls:
-            client = await db.get_assistant(chat_id)
-            played = await client.time(chat_id)
-            participants = await client.get_participants(chat_id)
-            if len(participants) < 2 and played > 30:
-                _lang = await lang.get_lang(chat_id)
-                sent = await app.edit_message_reply_markup(
-                    chat_id=chat_id,
-                    message_id=queue.get_current(chat_id).message_id,
-                    reply_markup=buttons.controls(
-                        chat_id=chat_id, status=_lang["stopped"], remove=True
-                    ),
-                )
-                await tune.stop(chat_id)
-                await sent.reply_text(_lang["auto_left"])
+        current_time = time.time()
+        
+        for chat_id in list(db.active_calls):
+            try:
+                # Check if auto-leave is enabled for this chat
+                if not await db.get_autoleave(chat_id):
+                    alone_times.pop(chat_id, None)
+                    continue
+                
+                client = await db.get_assistant(chat_id)
+                participants = await client.get_participants(chat_id)
+                
+                # Check if only assistant is in VC (participants < 2 means only assistant)
+                if len(participants) < 2:
+                    # Start tracking alone time
+                    if chat_id not in alone_times:
+                        alone_times[chat_id] = current_time
+                    else:
+                        # Check if alone for 5 minutes
+                        alone_duration = current_time - alone_times[chat_id]
+                        if alone_duration >= LEAVE_TIMEOUT:
+                            _lang = await lang.get_lang(chat_id)
+                            try:
+                                current_media = queue.get_current(chat_id)
+                                if current_media and current_media.message_id:
+                                    sent = await app.edit_message_reply_markup(
+                                        chat_id=chat_id,
+                                        message_id=current_media.message_id,
+                                        reply_markup=buttons.controls(
+                                            chat_id=chat_id, status=_lang["stopped"], remove=True
+                                        ),
+                                    )
+                                    await sent.reply_text(_lang["auto_left"])
+                            except:
+                                pass
+                            
+                            # Stop playback and leave
+                            await tune.stop(chat_id)
+                            await client.leave_chat(chat_id)
+                            alone_times.pop(chat_id, None)
+                else:
+                    # Reset timer if users join
+                    alone_times.pop(chat_id, None)
+                    
+            except Exception as e:
+                print(f"vc_watcher error for chat {chat_id}: {e}")
+                alone_times.pop(chat_id, None)
+                continue
 
 
-if config.AUTO_END:
-    tasks.append(asyncio.create_task(vc_watcher()))
+# Always run VC watcher to check for empty voice chats
+tasks.append(asyncio.create_task(vc_watcher()))
 if config.AUTO_LEAVE:
     tasks.append(asyncio.create_task(auto_leave()))
 tasks.append(asyncio.create_task(track_time()))
