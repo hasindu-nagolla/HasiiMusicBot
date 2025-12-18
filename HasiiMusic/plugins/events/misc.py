@@ -211,7 +211,7 @@ async def vc_watcher(sleep=15):
                             
                             # Stop playback and leave
                             await tune.stop(chat_id)
-                            await client.leave_chat(chat_id)
+                            await client.leave_call(chat_id, close=False)
                             alone_times.pop(chat_id, None)
                 else:
                     # Reset timer if users join
