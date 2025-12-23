@@ -54,6 +54,7 @@ class TgCall(PyTgCalls):
         message: Message,
         media: Media | Track,
         seek_time: int = 0,
+        video: bool = False,
     ) -> None:
         client = await db.get_assistant(chat_id)
         _lang = await lang.get_lang(chat_id)
@@ -66,12 +67,13 @@ class TgCall(PyTgCalls):
         if not media.file_path:
             return await message.edit_text(_lang["error_no_file"].format(config.SUPPORT_CHAT))
 
+        # Configure stream based on video or audio mode
         stream = types.MediaStream(
             media_path=media.file_path,
             audio_parameters=types.AudioQuality.STUDIO,
             video_parameters=types.VideoQuality.HD_720p,
             audio_flags=types.MediaStream.Flags.REQUIRED,
-            video_flags=types.MediaStream.Flags.IGNORE,  # Audio only, no video
+            video_flags=types.MediaStream.Flags.REQUIRED if video else types.MediaStream.Flags.IGNORE,
             ffmpeg_parameters=f"-ss {seek_time}" if seek_time > 1 else None,
         )
         try:

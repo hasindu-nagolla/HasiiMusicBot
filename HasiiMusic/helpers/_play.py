@@ -41,6 +41,11 @@ def checkUB(play):
             len(m.command) > 1 and "-f" in m.command[1]
         )
         cplay = m.command[0][0] == "c"
+        
+        # Detect video mode: command starts with 'v' or has 'v' as second char (cvplay)
+        command = m.command[0].lower()
+        video = command[0] == 'v' or (len(command) > 1 and command[1] == 'v')
+        
         url = yt.url(m)
         if url and not yt.valid(url):
             return await m.reply_text(m.lang["play_unsupported"])
@@ -141,6 +146,6 @@ def checkUB(play):
         except:
             pass
 
-        return await play(_, m, force, url, cplay)
+        return await play(_, m, force, url, cplay, video)
 
     return wrapper

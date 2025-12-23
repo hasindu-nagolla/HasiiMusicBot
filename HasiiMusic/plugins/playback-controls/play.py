@@ -73,7 +73,7 @@ def playlist_to_queue(chat_id: int, tracks: list) -> str:
     return text
 
 @app.on_message(
-    filters.command(["play", "playforce", "cplay", "cplayforce"])
+    filters.command(["play", "vplay", "playforce", "vplayforce", "cplay", "cvplay", "cplayforce", "cvplayforce"])
     & filters.group
     & ~app.bl_users
 )
@@ -85,7 +85,14 @@ async def play_hndlr(
     force: bool = False,
     url: str = None,
     cplay: bool = False,
+    video: bool = False,
 ) -> None:
+    # Detect if video mode is requested
+    # Check if command starts with 'v' (vplay, vplayforce) or has 'v' as second character (cvplay, cvplayforce)
+    command = m.command[0].lower()
+    if command[0] == 'v' or (len(command) > 1 and command[1] == 'v'):
+        video = True
+    
     # Handle channel play mode
     chat_id = m.chat.id
     if cplay:
@@ -145,7 +152,7 @@ async def play_hndlr(
             tracks.remove(file)
             file.message_id = sent.id
         else:
-            file = await yt.search(url, sent.id, video=False)
+            file = await yt.search(url, sent.id, video=video)
 
         if not file:
             await safe_edit(
@@ -156,7 +163,7 @@ async def play_hndlr(
 
     elif len(m.command) >= 2:
         query = " ".join(m.command[1:])
-        file = await yt.search(query, sent.id, video=False)
+        file = await yt.search(query, sent.id, video=video)
         if not file:
             await safe_edit(
                 sent,
@@ -214,7 +221,7 @@ async def play_hndlr(
             return
 
     if not file.file_path:
-        file.file_path = await yt.download(file.id, video=False, is_live=file.is_live)
+        file.file_path = await yt.download(file.id, video=video, is_live=file.is_live)
         if not file.file_path:
             await safe_edit(
                 sent,
@@ -227,7 +234,7 @@ async def play_hndlr(
             )
 
     try:
-        await tune.play_media(chat_id=chat_id, message=sent, media=file)
+        await tune.play_media(chat_id=chat_id, message=sent, media=file, video=video)
     except Exception as e:
         error_msg = str(e)
         if "bot" in error_msg.lower() or "sign in" in error_msg.lower():
