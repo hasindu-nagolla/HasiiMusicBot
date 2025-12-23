@@ -136,7 +136,8 @@ class TgCall(PyTgCalls):
             await self.stop(chat_id)
             await message.edit_text(_lang["error_no_call"])
         except exceptions.NoAudioSourceFound:
-            await message.edit_text(_lang["error_no_audio"])
+            error_msg = _lang["error_no_video"] if video else _lang["error_no_audio"]
+            await message.edit_text(error_msg)
             await self.play_next(chat_id)
         except (ConnectionNotFound, TelegramServerError):
             await self.stop(chat_id)

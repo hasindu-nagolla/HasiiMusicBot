@@ -24,6 +24,7 @@
   "dl_progress": "<blockquote><u><b>ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ꜰɪʟᴇ</b></u>\n\n<b>ᴘʀᴏɢʀᴇꜱꜱ:</b> {0} / {1} [{2:.1f}%]\n<b>ꜱᴘᴇᴇᴅ:</b> {3}/𝘀 | <b>ᴇᴛᴀ:</b> {4}</blockquote>",
   "dl_not_found": "<blockquote>ᴅᴏᴡɴʟᴏᴀᴅ ᴀʟʀᴇᴀᴅʏ ᴄᴀɴᴄᴇʟʟᴇᴅ.</blockquote>",
   "error_no_audio": "<blockquote>ᴍᴏᴠɪɴɢ ᴛᴏ ᴛʜᴇ ɴᴇxᴛ ᴛʀᴀᴄᴋ...\n\nᴀᴜᴅɪᴏ ꜱᴏᴜʀᴄᴇ ɴᴏᴛ ꜰᴏᴜɴᴅ ɪɴ ᴛʜᴇ ꜰɪʟᴇ.</blockquote>",
+  "error_no_video": "<blockquote>ᴍᴏᴠɪɴɢ ᴛᴏ ᴛʜᴇ ɴᴇxᴛ ᴛʀᴀᴄᴋ...\n\nɴᴏ ᴠɪᴅᴇᴏ ꜱᴛʀᴇᴀᴍ ꜰᴏᴜɴᴅ ɪɴ ᴛʜᴇ ꜰɪʟᴇ. ᴛʜᴇ ꜰɪʟᴇ ᴍɪɢʜᴛ ʙᴇ ᴄᴏʀʀᴜᴘᴛᴇᴅ ᴏʀ ᴜɴꜱᴜᴘᴘᴏʀᴛᴇᴅ ꜰᴏʀᴍᴀᴛ.</blockquote>",
   "error_no_call": "<blockquote><b>ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ꜰᴏᴜɴᴅ.</b>\n\nᴘʟᴇᴀꜱᴇ ꜱᴛᴀʀᴛ ᴏɴᴇ ᴀɴᴅ <b>ᴛʀʏ ᴀɢᴀɪɴ</b>.</blockquote>",
   "error_no_file": "<blockquote>ᴅᴏᴡɴʟᴏᴀᴅ ꜰᴀɪʟᴇᴅ.\n\nɪꜰ ᴛʜᴇ ɪꜱꜱᴜᴇ ᴘᴇʀꜱɪꜱᴛꜱ, ʀᴇᴘᴏʀᴛ ɪᴛ ᴛᴏ ᴛʜᴇ <a href={0}>ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ</a></blockquote>",
   "error_tg_server": "<blockquote><u><b>ᴛᴇʟᴇɢʀᴀᴍ ꜱᴇʀᴠᴇʀ ᴇʀʀᴏʀ</b></u>\n\nᴛᴇʟᴇɢʀᴀᴍ ɪꜱ ᴇxᴘᴇʀɪᴇɴᴄɪɴɢ ɪɴᴛᴇʀɴᴀʟ ɪꜱꜱᴜᴇꜱ. ᴄʟᴇᴀʀɪɴɢ ᴛʜᴇ ǫᴜᴇᴜᴇ ᴀɴᴅ ʟᴇᴀᴠɪɴɢ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ.</blockquote>",
