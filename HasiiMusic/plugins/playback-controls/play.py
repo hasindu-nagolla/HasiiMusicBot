@@ -233,8 +233,11 @@ async def play_hndlr(
                 f"**Support:** {config.SUPPORT_CHAT}"
             )
 
+    # Use file.video if it's set (Telegram files), otherwise use command video flag
+    is_video = file.video if hasattr(file, 'video') and file.video else video
+    
     try:
-        await tune.play_media(chat_id=chat_id, message=sent, media=file, video=video)
+        await tune.play_media(chat_id=chat_id, message=sent, media=file, video=is_video)
     except Exception as e:
         error_msg = str(e)
         if "bot" in error_msg.lower() or "sign in" in error_msg.lower():
