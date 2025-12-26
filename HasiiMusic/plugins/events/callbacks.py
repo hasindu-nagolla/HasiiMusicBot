@@ -38,23 +38,24 @@ async def _controls(_, query: types.CallbackQuery):
 
     # Handle close action first - allow any user to delete the message
     if action == "close":
-        username = query.from_user.mention
         try:
             await query.message.delete()
         except:
             pass
         
-        # Send notification message
-        try:
-            notification = await app.send_message(
-                chat_id=chat_id,
-                text=f"ᴅᴇʟᴇᴛᴇᴅ ʙʏ: {username}"
-            )
-            # Auto-delete after 3 seconds
-            await asyncio.sleep(3)
-            await notification.delete()
-        except:
-            pass
+        # Only show notification for non-sudo users
+        if query.from_user.id not in app.sudoers:
+            username = query.from_user.mention
+            try:
+                notification = await app.send_message(
+                    chat_id=chat_id,
+                    text=f"ᴅᴇʟᴇᴛᴇᴅ ʙʏ: {username}"
+                )
+                # Auto-delete after 3 seconds
+                await asyncio.sleep(3)
+                await notification.delete()
+            except:
+                pass
         
         return await query.answer()
 
