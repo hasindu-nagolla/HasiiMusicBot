@@ -30,20 +30,13 @@ async def cancel_dl(_, query: types.CallbackQuery):
 
 @app.on_callback_query(filters.regex("controls") & ~app.bl_users)
 @lang.language()
-@can_manage_vc
 async def _controls(_, query: types.CallbackQuery):
     args = query.data.split()
     action, chat_id = args[1], int(args[2])
     qaction = len(args) == 4
     user = query.from_user.mention
 
-    if not await db.get_call(chat_id):
-        return await query.answer(query.lang["not_playing"], show_alert=True)
-
-    if action == "status":
-        return await query.answer()
-    
-    # Handle close action - delete message and send auto-delete notification
+    # Handle close action first - allow any user to delete the message
     if action == "close":
         username = query.from_user.mention
         try:
@@ -55,7 +48,7 @@ async def _controls(_, query: types.CallbackQuery):
         try:
             notification = await app.send_message(
                 chat_id=chat_id,
-                text=f"ᴍᴇssᴀɢᴇ ᴅᴇʟᴇᴛᴇᴅ : {username}"
+                text=f"ᴅᴇʟᴇᴛᴇᴅ ʙʏ: {username}"
             )
             # Auto-delete after 3 seconds
             await asyncio.sleep(3)
@@ -63,6 +56,18 @@ async def _controls(_, query: types.CallbackQuery):
         except:
             pass
         
+        return await query.answer()
+
+    # Check admin permissions for all other controls
+    if not await can_manage_vc(_, query):
+        return await query.answer("⚠️ ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴜsᴇ ᴛʜɪs.", show_alert=True)
+
+    if not await db.get_call(chat_id):
+        return await query.answer(query.lang["not_playing"], show_alert=True)
+
+    if action == "status":
+        return await query.answer()
+    
         return await query.answer()
     
     await query.answer(query.lang["processing"], show_alert=True)
