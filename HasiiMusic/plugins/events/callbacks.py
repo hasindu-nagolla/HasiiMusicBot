@@ -41,6 +41,15 @@ async def _controls(_, query: types.CallbackQuery):
 
     if action == "status":
         return await query.answer()
+    
+    # Skip processing alert for close action
+    if action == "close":
+        try:
+            await query.message.delete()
+        except:
+            pass
+        return await query.answer()
+    
     await query.answer(query.lang["processing"], show_alert=True)
 
     if action == "pause":
@@ -108,14 +117,6 @@ async def _controls(_, query: types.CallbackQuery):
         await tune.stop(chat_id)
         status = query.lang["stopped"]
         reply = query.lang["play_stopped"].format(user)
-
-    elif action == "close":
-        # Close button - delete the message
-        try:
-            await query.message.delete()
-        except:
-            pass
-        return await query.answer("✅ Closed", show_alert=False)
 
     try:
         if action in ["skip", "replay", "stop"]:
