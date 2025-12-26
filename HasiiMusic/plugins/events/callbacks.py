@@ -13,6 +13,7 @@
 # ==============================================================================
 
 import re
+import asyncio
 
 from pyrogram import filters, types
 
@@ -42,12 +43,26 @@ async def _controls(_, query: types.CallbackQuery):
     if action == "status":
         return await query.answer()
     
-    # Skip processing alert for close action
+    # Handle close action - delete message and send auto-delete notification
     if action == "close":
+        username = query.from_user.mention
         try:
             await query.message.delete()
         except:
             pass
+        
+        # Send notification message
+        try:
+            notification = await app.send_message(
+                chat_id=chat_id,
+                text=f"ᴍᴇssᴀɢᴇ ᴅᴇʟᴇᴛᴇᴅ : {username}"
+            )
+            # Auto-delete after 3 seconds
+            await asyncio.sleep(3)
+            await notification.delete()
+        except:
+            pass
+        
         return await query.answer()
     
     await query.answer(query.lang["processing"], show_alert=True)
