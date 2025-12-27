@@ -76,9 +76,9 @@ class Inline:
             keyboard.append(
                 [
                     self.ikb(
-                        text="🔁", callback_data=f"controls loop {chat_id}"),
+                        text="ʟᴏᴏᴘ", callback_data=f"controls loop {chat_id}"),
                     self.ikb(
-                        text="🔀", callback_data=f"controls shuffle {chat_id}"),
+                        text="ꜱʜᴜꜰꜰʟᴇ", callback_data=f"controls shuffle {chat_id}"),
                     self.ikb(
                         text="ᴅᴇʟᴇᴛᴇ", callback_data=f"controls close {chat_id}"),
                 ]
