@@ -173,10 +173,10 @@ async def handle_seek(query: types.CallbackQuery, chat_id: int, action: str, use
     """Handle seek forward/backward actions."""
     media = queue.get_current(chat_id)
     if not media or media.is_live:
-        return await query.answer("⚠️ Cannot seek in live streams!", show_alert=True)
+        return await query.answer("⚠️ ᴄᴀɴɴᴏᴛ ꜱᴇᴇᴋ ɪɴ ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍꜱ!", show_alert=True)
     
     if not media.duration_sec or media.duration_sec == 0:
-        return await query.answer("⚠️ Cannot seek in this track!", show_alert=True)
+        return await query.answer("⚠️ ᴄᴀɴɴᴏᴛ ꜱᴇᴇᴋ ɪɴ ᴛʜɪꜱ ᴛʀᴀᴄᴋ!", show_alert=True)
     
     # Determine seek amount and direction
     if action == "seek_back_10":
@@ -192,7 +192,7 @@ async def handle_seek(query: types.CallbackQuery, chat_id: int, action: str, use
         seconds = 30
         label = "30s »"
     else:
-        return await query.answer("⚠️ Invalid seek action!", show_alert=True)
+        return await query.answer("⚠️ ɪɴᴠᴀʟɪᴅ ꜱᴇᴇᴋ ᴀᴄᴛɪᴏɴ!", show_alert=True)
     
     # Calculate new position
     current_time = getattr(media, 'time', 0)
@@ -200,11 +200,11 @@ async def handle_seek(query: types.CallbackQuery, chat_id: int, action: str, use
     
     # Check if we're at the boundaries
     if new_time == 0 and seconds < 0:
-        return await query.answer(f"⏮️ Already at the beginning!", show_alert=True)
+        return await query.answer(f"⏮️ ᴀʟʀᴇᴀᴅʏ ᴀᴛ ᴛʜᴇ ʙᴇɢɪɴɴɪɴɢ!", show_alert=True)
     if new_time >= media.duration_sec - 5 and seconds > 0:
-        return await query.answer(f"⏭️ Too close to the end!", show_alert=True)
+        return await query.answer(f"⏭️ ᴛᴏᴏ ᴄʟᴏꜱᴇ ᴛᴏ ᴛʜᴇ ᴇɴᴅ!", show_alert=True)
     
-    await query.answer(f"⏩ Seeking {label}...", show_alert=False)
+    await query.answer(f"⏩ ꜱᴇᴇᴋɪɴɢ {label}...", show_alert=False)
     
     # Perform seek
     success = await tune.seek_stream(chat_id, int(new_time))
@@ -216,7 +216,7 @@ async def handle_seek(query: types.CallbackQuery, chat_id: int, action: str, use
         else:
             time_str = time_module.strftime('%M:%S', time_module.gmtime(new_time))
         await query.message.reply_text(
-            f"✅ Seeked to {time_str}\n\n<blockquote>By {user}</blockquote>",
+            f"✅ ꜱᴇᴇᴋᴇᴅ ᴛᴏ {time_str}\n\n<blockquote>ʙʏ {user}</blockquote>",
             quote=False
         )
 
@@ -228,16 +228,16 @@ async def handle_loop(query: types.CallbackQuery, chat_id: int, user: str):
     # Cycle through loop modes: 0 (off) -> 1 (single) -> 10 (queue) -> 0
     if current_loop == 0:
         new_loop = 1
-        text = "🔂 Loop: Single Track"
-        message = f"🔂 Loop mode set to **Single Track**\n\n<blockquote>By {user}</blockquote>"
+        text = "🔂 ʟᴏᴏᴘ: ꜱɪɴɢʟᴇ ᴛʀᴀᴄᴋ"
+        message = f"🔂 ʟᴏᴏᴘ ᴍᴏᴅᴇ ꜱᴇᴛ ᴛᴏ <b>ꜱɪɴɢʟᴇ ᴛʀᴀᴄᴋ</b>"
     elif current_loop == 1:
         new_loop = 10
-        text = "🔁 Loop: Queue"
-        message = f"🔁 Loop mode set to **Queue**\n\n<blockquote>By {user}</blockquote>"
+        text = "🔁 ʟᴏᴏᴘ: ǫᴜᴇᴜᴇ"
+        message = f"🔁 ʟᴏᴏᴘ ᴍᴏᴅᴇ ꜱᴇᴛ ᴛᴏ <b>ǫᴜᴇᴜᴇ</b>"
     else:
         new_loop = 0
-        text = "➡️ Loop: Off"
-        message = f"➡️ Loop mode **disabled**\n\n<blockquote>By {user}</blockquote>"
+        text = "➡️ ʟᴏᴏᴘ: ᴏꜰꜰ"
+        message = f"➡️ ʟᴏᴏᴘ ᴍᴏᴅᴇ <b>ᴅɪꜱᴀʙʟᴇᴅ</b>"
     
     await db.set_loop(chat_id, new_loop)
     await query.answer(text, show_alert=False)
@@ -250,14 +250,14 @@ async def handle_shuffle(query: types.CallbackQuery, chat_id: int, user: str):
     
     items = queue.get_all(chat_id)
     if not items or len(items) <= 1:
-        return await query.answer("⚠️ Queue is empty or has only one track!", show_alert=True)
+        return await query.answer("⚠️ ǫᴜᴇᴜᴇ ɪꜱ ᴇᴍᴘᴛʏ ᴏʀ ʜᴀꜱ ᴏɴʟʏ ᴏɴᴇ ᴛʀᴀᴄᴋ!", show_alert=True)
     
     # Get current track and remove from list
     current = items[0] if items else None
     remaining = items[1:] if len(items) > 1 else []
     
     if not remaining:
-        return await query.answer("⚠️ No tracks to shuffle!", show_alert=True)
+        return await query.answer("⚠️ ɴᴏ ᴛʀᴀᴄᴋꜱ ᴛᴏ ꜱʜᴜꜰꜰʟᴇ!", show_alert=True)
     
     # Shuffle remaining tracks
     random.shuffle(remaining)
@@ -269,9 +269,9 @@ async def handle_shuffle(query: types.CallbackQuery, chat_id: int, user: str):
     for item in remaining:
         queue.add(chat_id, item)
     
-    await query.answer("🔀 Queue shuffled!", show_alert=False)
+    await query.answer("🔀 ǫᴜᴇᴜᴇ ꜱʜᴜꜰꜰʟᴇᴅ!", show_alert=False)
     await query.message.reply_text(
-        f"🔀 Queue **shuffled** ({len(remaining)} tracks)\n\n<blockquote>By {user}</blockquote>",
+        f"🔀 ǫᴜᴇᴜᴇ **ꜱʜᴜꜰꜰʟᴇᴅ** ({len(remaining)} ᴛʀᴀᴄᴋꜱ)\n\n<blockquote>ʙʏ {user}</blockquote>",
         quote=False
     )
 
