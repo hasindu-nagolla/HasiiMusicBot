@@ -194,7 +194,15 @@ async def vc_watcher(sleep=15):
                     continue
                 
                 client = await db.get_assistant(chat_id)
-                participants = await client.get_participants(chat_id)
+                
+                # Check if userbot is actually in the call
+                try:
+                    participants = await client.get_participants(chat_id)
+                except Exception as call_err:
+                    # Userbot is not in the call or call doesn't exist
+                    # Remove from tracking and continue
+                    alone_times.pop(chat_id, None)
+                    continue
                 
                 # Check if only assistant is in VC (participants < 2 means only assistant)
                 if len(participants) < 2:
