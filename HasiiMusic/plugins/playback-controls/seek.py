@@ -45,19 +45,21 @@ async def _seek(_, m: types.Message):
         return await m.reply_text(m.lang["play_seek_no_dur"])
 
     sent = await m.reply_text(m.lang["play_seeking"])
+    
+    current_time = getattr(media, 'time', 0)
     if m.command[0] == "seekback":
         stype = m.lang["backward"]
-        start_from = media.time - to_seek
-        if start_from < 1:
-            start_from = 1
+        start_from = max(1, current_time - to_seek)
     else:
         stype = m.lang["forward"]
-        start_from = media.time + to_seek
-        if start_from + 10 > media.duration_sec:
-            start_from = media.duration_sec - 5
+        start_from = min(current_time + to_seek, media.duration_sec - 5)
 
-    await tune.play_media(m.chat.id, sent, media, start_from)
-    media.time = start_from
-    await sent.edit_text(
-        m.lang["play_seeked"].format(stype, start_from, m.from_user.mention)
-    )
+    # Use the new seek_stream method
+    success = await tune.seek_stream(m.chat.id, int(start_from))
+    
+    if success:
+        await sent.edit_text(
+            m.lang["play_seeked"].format(stype, start_from, m.from_user.mention)
+        )
+    else:
+        await sent.edit_text("❌ Failed to seek!")

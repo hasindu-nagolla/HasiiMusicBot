@@ -101,11 +101,14 @@ class TgCall(PyTgCalls):
                     import time as time_module
                     played = media.time  # Use actual media.time value
                     duration = media.duration_sec
-                    # Build progress bar with same length as update_timer
-                    length = 10
-                    pos = min(int((played / duration) * length),
-                              length - 1) if duration else 0
-                    timer_bar = "—" * pos + "●" + "—" * (length - pos - 1)
+                    # Build progress bar with original style
+                    bar_length = 12
+                    if duration == 0:
+                        percentage = 0
+                    else:
+                        percentage = min((played / duration) * 100, 100)
+                    filled = int(round(bar_length * percentage / 100))
+                    timer_bar = "—" * filled + "●" + "—" * (bar_length - filled)
                     # Format time properly with hours support
                     if duration >= 3600:
                         played_time = time_module.strftime(
@@ -159,13 +162,65 @@ class TgCall(PyTgCalls):
         msg = await app.send_message(chat_id=chat_id, text=_lang["play_again"])
         await self.play_media(chat_id, msg, media)
 
+    async def seek_stream(self, chat_id: int, seconds: int) -> bool:
+        """Seek to a specific position in the current stream."""
+        if not await db.get_call(chat_id):
+            return False
+
+        media = queue.get_current(chat_id)
+        if not media or media.is_live:
+            return False
+
+        client = await db.get_assistant(chat_id)
+        _lang = await lang.get_lang(chat_id)
+        
+        # Update media time
+        media.time = seconds
+        
+        # Get message to update
+        msg = await app.get_messages(chat_id, media.message_id)
+        if not msg:
+            msg = await app.send_message(chat_id=chat_id, text=_lang["seeking"])
+        
+        # Replay from new position
+        await self.play_media(chat_id, msg, media, seek_time=seconds)
+        return True
+
     async def play_next(self, chat_id: int) -> None:
         if not await db.get_call(chat_id):
             return
 
+        # Check loop mode
+        loop_mode = await db.get_loop(chat_id)
+        
+        if loop_mode == 1:
+            # Single track loop - replay current track
+            media = queue.get_current(chat_id)
+            if media:
+                _lang = await lang.get_lang(chat_id)
+                msg = await app.send_message(chat_id=chat_id, text=_lang["play_again"])
+                await self.play_media(chat_id, msg, media)
+                return
+        
         media = queue.get_next(chat_id)
+        
+        # If queue loop and no more tracks, start from beginning
+        if not media and loop_mode == 10:
+            all_items = queue.get_all(chat_id)
+            if all_items:
+                # Reset queue to beginning
+                first_track = all_items[0]
+                _lang = await lang.get_lang(chat_id)
+                msg = await app.send_message(chat_id=chat_id, text="🔁 Looping queue...")
+                if not first_track.file_path:
+                    is_live = getattr(first_track, 'is_live', False)
+                    first_track.file_path = await yt.download(first_track.id, video=False, is_live=is_live)
+                first_track.message_id = msg.id
+                await self.play_media(chat_id, msg, first_track)
+                return
+        
         try:
-            if media.message_id:
+            if media and media.message_id:
                 await app.delete_messages(
                     chat_id=chat_id,
                     message_ids=media.message_id,

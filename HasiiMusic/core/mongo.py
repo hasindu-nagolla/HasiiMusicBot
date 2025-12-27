@@ -287,6 +287,23 @@ class MongoDB:
             upsert=True,
         )
 
+    # LOOP MODE METHODS
+    async def get_loop(self, chat_id: int) -> int:
+        """Get loop mode for a chat. 0=off, 1=single, 10=queue"""
+        doc = await self.cache.find_one({"_id": f"loop_{chat_id}"})
+        return doc.get("mode", 0) if doc else 0
+
+    async def set_loop(self, chat_id: int, mode: int) -> None:
+        """Set loop mode for a chat."""
+        if mode == 0:
+            await self.cache.delete_one({"_id": f"loop_{chat_id}"})
+        else:
+            await self.cache.update_one(
+                {"_id": f"loop_{chat_id}"},
+                {"$set": {"mode": mode}},
+                upsert=True,
+            )
+
     # PLAY MODE METHODS
     async def get_play_mode(self, chat_id: int) -> bool:
         if chat_id not in self.play_mode:

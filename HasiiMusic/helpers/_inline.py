@@ -44,23 +44,41 @@ class Inline:
             )
 
         if not remove:
+            # Seek buttons row
+            keyboard.append(
+                [
+                    self.ikb(
+                        text="« 10", callback_data=f"controls seek_back_10 {chat_id}"),
+                    self.ikb(
+                        text="« 30", callback_data=f"controls seek_back_30 {chat_id}"),
+                    self.ikb(
+                        text="30 »", callback_data=f"controls seek_forward_30 {chat_id}"),
+                    self.ikb(
+                        text="10 »", callback_data=f"controls seek_forward_10 {chat_id}"),
+                ]
+            )
+            # Main control buttons row
             keyboard.append(
                 [
                     self.ikb(
                         text="▷", callback_data=f"controls resume {chat_id}"),
                     self.ikb(
-                        text="∣ ∣", callback_data=f"controls pause {chat_id}"),
+                        text="II", callback_data=f"controls pause {chat_id}"),
                     self.ikb(
-                        text="⟳", callback_data=f"controls replay {chat_id}"),
+                        text="↻", callback_data=f"controls replay {chat_id}"),
                     self.ikb(
-                        text=">>", callback_data=f"controls skip {chat_id}"),
+                        text="‣‣I", callback_data=f"controls skip {chat_id}"),
                     self.ikb(
-                        text="▣", callback_data=f"controls stop {chat_id}"),
+                        text="▢", callback_data=f"controls stop {chat_id}"),
                 ]
             )
-            # Add CLOSE button in a new row
+            # Loop and Shuffle buttons row
             keyboard.append(
                 [
+                    self.ikb(
+                        text="🔁", callback_data=f"controls loop {chat_id}"),
+                    self.ikb(
+                        text="🔀", callback_data=f"controls shuffle {chat_id}"),
                     self.ikb(
                         text="ᴅᴇʟᴇᴛᴇ", callback_data=f"controls close {chat_id}"),
                 ]

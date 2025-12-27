@@ -111,8 +111,14 @@ async def update_timer(length=10):
 
                 played = media.time
                 remaining = duration - played
-                pos = min(int((played / duration) * length), length - 1)
-                timer_bar = "—" * pos + "●" + "—" * (length - pos - 1)
+                # Generate progress bar with original style
+                bar_length = 12
+                if duration == 0:
+                    percentage = 0
+                else:
+                    percentage = min((played / duration) * 100, 100)
+                filled = int(round(bar_length * percentage / 100))
+                timer_bar = "—" * filled + "●" + "—" * (bar_length - filled)
 
                 # Pre-download next song if needed (don't block timer update)
                 if remaining <= 30:
