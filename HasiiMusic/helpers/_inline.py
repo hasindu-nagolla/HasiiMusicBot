@@ -142,6 +142,10 @@ class Inline:
                         text=">>", callback_data=f"controls skip {chat_id}"),
                     self.ikb(
                         text="▣", callback_data=f"controls stop {chat_id}"),
+                ],
+                [
+                    self.ikb(
+                        text="ᴅᴇʟᴇᴛᴇ", callback_data=f"controls close {chat_id}"),
                 ]
             ]
         )
