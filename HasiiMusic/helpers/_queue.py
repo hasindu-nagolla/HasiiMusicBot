@@ -69,6 +69,10 @@ class Queue:
     def get_queue(self, chat_id: int) -> list[MediaItem]:
         """Return the full queue including the currently playing item."""
         return list(self.queues[chat_id])
+    
+    def get_all(self, chat_id: int) -> list[MediaItem]:
+        """Alias for get_queue() - return the full queue including currently playing item."""
+        return self.get_queue(chat_id)
 
     def remove_current(self, chat_id: int) -> None:
         """Remove the currently playing item only (if exists)."""
