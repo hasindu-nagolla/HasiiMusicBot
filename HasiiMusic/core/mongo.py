@@ -163,14 +163,33 @@ class MongoDB:
             num = doc["num"] if doc else await self.set_assistant(chat_id)
             self.assistant[chat_id] = num
 
+        # Check if assigned assistant is out of range (e.g., assistant was removed)
+        if self.assistant[chat_id] > len(userbot.clients):
+            # Reassign to a valid assistant
+            num = await self.set_assistant(chat_id)
+            self.assistant[chat_id] = num
+
         return tune.clients[self.assistant[chat_id] - 1]
 
     async def get_client(self, chat_id: int):
         if chat_id not in self.assistant:
             await self.get_assistant(chat_id)
-        return {1: userbot.one, 2: userbot.two, 3: userbot.three}.get(
-            self.assistant[chat_id]
-        )
+        
+        # Check if assigned assistant is out of range
+        if self.assistant[chat_id] > len(userbot.clients):
+            # Reassign to a valid assistant
+            await self.set_assistant(chat_id)
+        
+        # Get available clients dynamically based on what's actually running
+        available_clients = {}
+        if hasattr(userbot, 'one') and userbot.one in userbot.clients:
+            available_clients[1] = userbot.one
+        if hasattr(userbot, 'two') and userbot.two in userbot.clients:
+            available_clients[2] = userbot.two
+        if hasattr(userbot, 'three') and userbot.three in userbot.clients:
+            available_clients[3] = userbot.three
+        
+        return available_clients.get(self.assistant[chat_id])
 
     # BLACKLIST METHODS
     async def add_blacklist(self, chat_id: int) -> None:
