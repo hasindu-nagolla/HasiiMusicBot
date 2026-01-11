@@ -83,15 +83,19 @@ def checkUB(play):
                             )
                         )
             except errors.ChatAdminRequired:
-                return await m.reply_text(
-                    f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
-                    f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
-                    f"<b>Required permissions:</b>\n"
-                    f"• Manage Voice Chats\n"
-                    f"• Invite Users via Link\n"
-                    f"• Delete Messages\n\n"
-                    f"Please promote me as admin with the required permissions.</blockquote>"
-                )
+                try:
+                    return await m.reply_text(
+                        f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
+                        f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
+                        f"<b>Required permissions:</b>\n"
+                        f"• Manage Voice Chats\n"
+                        f"• Invite Users via Link\n"
+                        f"• Delete Messages\n\n"
+                        f"Please promote me as admin with the required permissions.</blockquote>"
+                    )
+                except errors.ChatWriteForbidden:
+                    # Bot can't send messages, silently return
+                    return
             except errors.UserNotParticipant:
                 if m.chat.username:
                     invite_link = m.chat.username
@@ -105,20 +109,28 @@ def checkUB(play):
                         if not invite_link:
                             invite_link = await app.export_chat_invite_link(m.chat.id)
                     except errors.ChatAdminRequired:
-                        return await m.reply_text(
-                            f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
-                            f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
-                            f"<b>Required permissions:</b>\n"
-                            f"• Manage Voice Chats\n"
-                            f"• Invite Users via Link\n"
-                            f"• Delete Messages\n\n"
-                            f"Please promote me as admin with the required permissions.</blockquote>"
-                        )
+                        try:
+                            return await m.reply_text(
+                                f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
+                                f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
+                                f"<b>Required permissions:</b>\n"
+                                f"• Manage Voice Chats\n"
+                                f"• Invite Users via Link\n"
+                                f"• Delete Messages\n\n"
+                                f"Please promote me as admin with the required permissions.</blockquote>"
+                            )
+                        except errors.ChatWriteForbidden:
+                            # Bot can't send messages, silently return
+                            return
                     except Exception as ex:
-                        return await m.reply_text(
-                            m.lang["play_invite_error"].format(
-                                type(ex).__name__)
-                        )
+                        try:
+                            return await m.reply_text(
+                                m.lang["play_invite_error"].format(
+                                    type(ex).__name__)
+                            )
+                        except errors.ChatWriteForbidden:
+                            # Bot can't send messages, silently return
+                            return
 
                 umm = await m.reply_text(m.lang["play_invite"].format(app.name))
                 await asyncio.sleep(2)

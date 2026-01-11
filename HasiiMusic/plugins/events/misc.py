@@ -240,7 +240,14 @@ async def vc_watcher(sleep=15):
                             
                             # Stop playback and leave
                             await tune.stop(chat_id)
-                            await client.leave_call(chat_id, close=False)
+                            try:
+                                await client.leave_call(chat_id, close=False)
+                            except Exception as e:
+                                # Suppress "No active group call" errors
+                                error_msg = str(e)
+                                if ("No active group call" not in error_msg and
+                                    "not in the group call" not in error_msg.lower()):
+                                    print(f"Error leaving call for {chat_id}: {e}")
                             alone_times.pop(chat_id, None)
                 else:
                     # Reset timer if users join

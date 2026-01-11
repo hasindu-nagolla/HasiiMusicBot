@@ -99,7 +99,10 @@ class TgCall(PyTgCalls):
         except Exception as e:
             # Only log unexpected errors
             error_msg = str(e)
-            if "not in a call" not in error_msg.lower() and "GROUPCALL_FORBIDDEN" not in error_msg:
+            if ("not in a call" not in error_msg.lower() and 
+                "GROUPCALL_FORBIDDEN" not in error_msg and
+                "No active group call" not in error_msg and
+                "not in the group call" not in error_msg.lower()):
                 logger.warning(f"Error leaving call for {chat_id}: {e}")
 
     async def play_media(
