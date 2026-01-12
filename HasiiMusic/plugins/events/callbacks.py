@@ -14,16 +14,33 @@
 
 import re
 import asyncio
+from functools import wraps
 
 from pyrogram import filters, types
 from pyrogram.errors import FloodWait
 
-from HasiiMusic import tune, app, db, lang, queue, tg, yt
+from HasiiMusic import tune, app, db, lang, logger, queue, tg, yt
 from HasiiMusic.helpers import admin_check, buttons, can_manage_vc
+
+
+def safe_callback(func):
+    """Decorator to handle exceptions in callback handlers."""
+    @wraps(func)
+    async def wrapper(client, query: types.CallbackQuery):
+        try:
+            return await func(client, query)
+        except Exception as e:
+            logger.error(f"Error in callback {func.__name__}: {e}", exc_info=True)
+            try:
+                await query.answer("❌ An error occurred. Please try again.", show_alert=True)
+            except Exception:
+                pass
+    return wrapper
 
 
 @app.on_callback_query(filters.regex("cancel_dl") & ~app.bl_users)
 @lang.language()
+@safe_callback
 async def cancel_dl(_, query: types.CallbackQuery):
     await query.answer()
     await tg.cancel(query)
@@ -31,6 +48,7 @@ async def cancel_dl(_, query: types.CallbackQuery):
 
 @app.on_callback_query(filters.regex("controls") & ~app.bl_users)
 @lang.language()
+@safe_callback
 async def _controls(_, query: types.CallbackQuery):
     args = query.data.split()
     action, chat_id = args[1], int(args[2])

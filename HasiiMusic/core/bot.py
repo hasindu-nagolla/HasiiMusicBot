@@ -62,17 +62,6 @@ class Bot(pyrogram.Client):
         self.name: Optional[str] = None
         self.username: Optional[str] = None
         self.mention: Optional[str] = None
-        
-    async def start(self):
-        """Override start to add global exception handler."""
-        await super().start()
-        
-        # Add global error handler for all message handlers
-        @self.on_raw_update(group=-1)
-        async def error_handler(client, update, users, chats):
-            """Catch all unhandled exceptions in message handlers."""
-            # This will silently catch and log errors without crashing
-            return True  # Continue processing
 
     async def boot(self) -> None:
         """

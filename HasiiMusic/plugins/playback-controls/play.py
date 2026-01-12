@@ -217,10 +217,14 @@ async def play_hndlr(
             )
             if tracks:
                 added = playlist_to_queue(chat_id, tracks)
-                await app.send_message(
-                    chat_id=m.chat.id,
-                    text=m.lang["playlist_queued"].format(len(tracks)) + added,
-                )
+                try:
+                    await app.send_message(
+                        chat_id=m.chat.id,
+                        text=m.lang["playlist_queued"].format(len(tracks)) + added,
+                    )
+                except Exception:
+                    # Can't send message, continue anyway
+                    pass
             return
 
     if not file.file_path:
@@ -284,7 +288,11 @@ async def play_hndlr(
     if not tracks:
         return
     added = playlist_to_queue(chat_id, tracks)
-    await app.send_message(
-        chat_id=m.chat.id,
-        text=m.lang["playlist_queued"].format(len(tracks)) + added,
-    )
+    try:
+        await app.send_message(
+            chat_id=m.chat.id,
+            text=m.lang["playlist_queued"].format(len(tracks)) + added,
+        )
+    except Exception:
+        # Can't send message, but playback is working
+        pass

@@ -224,127 +224,170 @@ class TgCall(PyTgCalls):
                     if sent_photo:
                         media.message_id = sent_photo.id
         except FileNotFoundError:
-            await message.edit_text(_lang["error_no_file"].format(config.SUPPORT_CHAT))
+            try:
+                await message.edit_text(_lang["error_no_file"].format(config.SUPPORT_CHAT))
+            except Exception:
+                pass
             await self.play_next(chat_id)
         except exceptions.NoActiveGroupCall:
             await self.stop(chat_id)
-            await message.edit_text(_lang["error_no_call"])
+            try:
+                await message.edit_text(_lang["error_no_call"])
+            except Exception:
+                pass
         except errors.RPCError as e:
             # Handle Telegram API errors (GROUPCALL_INVALID, etc.)
             if "GROUPCALL_INVALID" in str(e) or "GROUPCALL" in str(e):
                 await self.stop(chat_id)
-                await message.edit_text(_lang["error_no_call"])
+                try:
+                    await message.edit_text(_lang["error_no_call"])
+                except Exception:
+                    pass
             else:
-                # Re-raise if it's a different RPC error
-                raise
+                # Log but don't crash for other RPC errors
+                logger.error(f"RPC error in play_media for {chat_id}: {e}")
+                await self.stop(chat_id)
         except exceptions.NoAudioSourceFound:
             error_msg = _lang["error_no_video"] if video else _lang["error_no_audio"]
-            await message.edit_text(error_msg)
+            try:
+                await message.edit_text(error_msg)
+            except Exception:
+                pass
             await self.play_next(chat_id)
         except (ConnectionNotFound, TelegramServerError):
             await self.stop(chat_id)
-            await message.edit_text(_lang["error_tg_server"])
+            try:
+                await message.edit_text(_lang["error_tg_server"])
+            except Exception:
+                pass
+        except Exception as e:
+            # Catch all other exceptions to prevent bot crash
+            logger.error(f"Unexpected error in play_media for {chat_id}: {e}", exc_info=True)
+            await self.stop(chat_id)
+            try:
+                await message.edit_text(f"❌ Playback error: {str(e)[:100]}")
+            except Exception:
+                pass
 
     async def replay(self, chat_id: int) -> None:
-        if not await db.get_call(chat_id):
-            return
+        try:
+            if not await db.get_call(chat_id):
+                return
 
-        media = queue.get_current(chat_id)
-        _lang = await lang.get_lang(chat_id)
-        msg = await app.send_message(chat_id=chat_id, text=_lang["play_again"])
-        is_video = getattr(media, 'video', False)
-        await self.play_media(chat_id, msg, media, video=is_video)
+            media = queue.get_current(chat_id)
+            _lang = await lang.get_lang(chat_id)
+            msg = await app.send_message(chat_id=chat_id, text=_lang["play_again"])
+            is_video = getattr(media, 'video', False)
+            await self.play_media(chat_id, msg, media, video=is_video)
+        except Exception as e:
+            logger.error(f"Error in replay for {chat_id}: {e}", exc_info=True)
 
     async def seek_stream(self, chat_id: int, seconds: int) -> bool:
         """Seek to a specific position in the current stream."""
-        if not await db.get_call(chat_id):
-            return False
+        try:
+            if not await db.get_call(chat_id):
+                return False
 
-        media = queue.get_current(chat_id)
-        if not media or media.is_live:
-            return False
+            media = queue.get_current(chat_id)
+            if not media or media.is_live:
+                return False
 
-        client = await db.get_assistant(chat_id)
-        _lang = await lang.get_lang(chat_id)
-        
-        # Update media time
-        media.time = seconds
-        
-        # Get message to update
-        msg = await app.get_messages(chat_id, media.message_id)
-        if not msg:
-            msg = await app.send_message(chat_id=chat_id, text=_lang["seeking"])
-        
-        # Replay from new position with correct video mode
-        is_video = getattr(media, 'video', False)
-        await self.play_media(chat_id, msg, media, seek_time=seconds, video=is_video)
-        return True
+            client = await db.get_assistant(chat_id)
+            _lang = await lang.get_lang(chat_id)
+            
+            # Update media time
+            media.time = seconds
+            
+            # Get message to update
+            msg = await app.get_messages(chat_id, media.message_id)
+            if not msg:
+                msg = await app.send_message(chat_id=chat_id, text=_lang["seeking"])
+            
+            # Replay from new position with correct video mode
+            is_video = getattr(media, 'video', False)
+            await self.play_media(chat_id, msg, media, seek_time=seconds, video=is_video)
+            return True
+        except Exception as e:
+            logger.error(f"Error in seek_stream for {chat_id}: {e}", exc_info=True)
+            return False
 
     async def play_next(self, chat_id: int) -> None:
-        if not await db.get_call(chat_id):
-            return
-
-        # Check loop mode
-        loop_mode = await db.get_loop(chat_id)
-        
-        if loop_mode == 1:
-            # Single track loop - replay current track
-            media = queue.get_current(chat_id)
-            if media:
-                _lang = await lang.get_lang(chat_id)
-                msg = await app.send_message(chat_id=chat_id, text=_lang["play_again"])
-                is_video = getattr(media, 'video', False)
-                await self.play_media(chat_id, msg, media, video=is_video)
-                return
-        
-        media = queue.get_next(chat_id)
-        
-        # If queue loop and no more tracks, start from beginning
-        if not media and loop_mode == 10:
-            all_items = queue.get_all(chat_id)
-            if all_items:
-                # Reset queue to beginning
-                first_track = all_items[0]
-                _lang = await lang.get_lang(chat_id)
-                msg = await app.send_message(chat_id=chat_id, text="🔁 Looping queue...")
-                if not first_track.file_path:
-                    is_live = getattr(first_track, 'is_live', False)
-                    is_video = getattr(first_track, 'video', False)
-                    first_track.file_path = await yt.download(first_track.id, video=is_video, is_live=is_live)
-                first_track.message_id = msg.id
-                is_video = getattr(first_track, 'video', False)
-                await self.play_media(chat_id, msg, first_track, video=is_video)
-                return
-        
         try:
-            if media and media.message_id:
-                await app.delete_messages(
-                    chat_id=chat_id,
-                    message_ids=media.message_id,
-                    revoke=True,
-                )
-                media.message_id = 0
-        except Exception as e:
-            logger.debug(f"Could not delete previous message in {chat_id}: {e}")
+            if not await db.get_call(chat_id):
+                return
 
-        if not media:
-            return await self.stop(chat_id)
+            # Check loop mode
+            loop_mode = await db.get_loop(chat_id)
+            
+            if loop_mode == 1:
+                # Single track loop - replay current track
+                media = queue.get_current(chat_id)
+                if media:
+                    _lang = await lang.get_lang(chat_id)
+                    msg = await app.send_message(chat_id=chat_id, text=_lang["play_again"])
+                    is_video = getattr(media, 'video', False)
+                    await self.play_media(chat_id, msg, media, video=is_video)
+                    return
+            
+            media = queue.get_next(chat_id)
+            
+            # If queue loop and no more tracks, start from beginning
+            if not media and loop_mode == 10:
+                all_items = queue.get_all(chat_id)
+                if all_items:
+                    # Reset queue to beginning
+                    first_track = all_items[0]
+                    _lang = await lang.get_lang(chat_id)
+                    msg = await app.send_message(chat_id=chat_id, text="🔁 Looping queue...")
+                    if not first_track.file_path:
+                        is_live = getattr(first_track, 'is_live', False)
+                        is_video = getattr(first_track, 'video', False)
+                        first_track.file_path = await yt.download(first_track.id, video=is_video, is_live=is_live)
+                    first_track.message_id = msg.id
+                    is_video = getattr(first_track, 'video', False)
+                    await self.play_media(chat_id, msg, first_track, video=is_video)
+                    return
+            
+            try:
+                if media and media.message_id:
+                    await app.delete_messages(
+                        chat_id=chat_id,
+                        message_ids=media.message_id,
+                        revoke=True,
+                    )
+                    media.message_id = 0
+            except Exception as e:
+                logger.debug(f"Could not delete previous message in {chat_id}: {e}")
 
-        _lang = await lang.get_lang(chat_id)
-        msg = await app.send_message(chat_id=chat_id, text=_lang["play_next"])
-        if not media.file_path:
-            is_live = getattr(media, 'is_live', False)
-            is_video = getattr(media, 'video', False)
-            media.file_path = await yt.download(media.id, video=is_video, is_live=is_live)
+            if not media:
+                return await self.stop(chat_id)
+
+            _lang = await lang.get_lang(chat_id)
+            msg = await app.send_message(chat_id=chat_id, text=_lang["play_next"])
             if not media.file_path:
-                await self.stop(chat_id)
-                return await msg.edit_text(
-                    _lang["error_no_file"].format(config.SUPPORT_CHAT)
-                )
+                is_live = getattr(media, 'is_live', False)
+                is_video = getattr(media, 'video', False)
+                media.file_path = await yt.download(media.id, video=is_video, is_live=is_live)
+                if not media.file_path:
+                    await self.stop(chat_id)
+                    try:
+                        await msg.edit_text(
+                            _lang["error_no_file"].format(config.SUPPORT_CHAT)
+                        )
+                    except Exception:
+                        pass
+                    return
 
-        media.message_id = msg.id
-        is_video = getattr(media, 'video', False)
-        await self.play_media(chat_id, msg, media, video=is_video)
+            media.message_id = msg.id
+            is_video = getattr(media, 'video', False)
+            await self.play_media(chat_id, msg, media, video=is_video)
+        except Exception as e:
+            logger.error(f"Error in play_next for {chat_id}: {e}", exc_info=True)
+            # Try to stop the call gracefully
+            try:
+                await self.stop(chat_id)
+            except Exception:
+                pass
 
     async def ping(self) -> float:
         pings = [client.ping for client in self.clients]

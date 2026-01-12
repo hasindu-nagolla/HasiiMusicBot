@@ -290,6 +290,21 @@ class YouTube:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 try:
                     ydl.download([url])
+                    # Check if file was actually downloaded (handle .part rename issues)
+                    if not Path(filename).exists():
+                        # Try to find .part file and rename it
+                        part_file = Path(f"{filename}.part")
+                        if part_file.exists():
+                            try:
+                                import shutil
+                                shutil.move(str(part_file), filename)
+                                logger.info(f"✅ Renamed {part_file} to {filename}")
+                            except Exception as rename_ex:
+                                logger.error(f"❌ Failed to rename .part file: {rename_ex}")
+                                return None
+                        else:
+                            logger.error(f"❌ Download completed but file not found: {filename}")
+                            return None
                 except yt_dlp.utils.ExtractorError as ex:
                     error_msg = str(ex)
                     if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
