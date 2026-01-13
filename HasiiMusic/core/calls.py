@@ -236,8 +236,16 @@ class TgCall(PyTgCalls):
             except Exception:
                 pass
         except errors.RPCError as e:
-            # Handle Telegram API errors (GROUPCALL_INVALID, etc.)
-            if "GROUPCALL_INVALID" in str(e) or "GROUPCALL" in str(e):
+            # Handle Telegram API errors (GROUPCALL_INVALID, CHAT_ADMIN_REQUIRED, etc.)
+            error_str = str(e)
+            if "CHAT_ADMIN_REQUIRED" in error_str or "phone.CreateGroupCall" in error_str:
+                # Voice chat is disabled or assistant doesn't have admin permissions
+                await self.stop(chat_id)
+                try:
+                    await message.edit_text(_lang.get("error_vc_disabled", _lang["error_no_call"]))
+                except Exception:
+                    pass
+            elif "GROUPCALL_INVALID" in error_str or "GROUPCALL" in error_str:
                 await self.stop(chat_id)
                 try:
                     await message.edit_text(_lang["error_no_call"])

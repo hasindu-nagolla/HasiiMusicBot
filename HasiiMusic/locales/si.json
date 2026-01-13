@@ -24,6 +24,7 @@
   "dl_progress": "<blockquote><u><b>File එක Download කරමින්</b></u>\n\n<b>Progress:</b> {0} / {1} [{2:.1f}%]\n<b>Speed:</b> {3}/s | <b>Time Left:</b> {4}</blockquote>",
   "dl_not_found": "<blockquote>Download එක cancel කරලා ඉවරයි.</blockquote>",
   "error_no_audio": "<blockquote>මීළඟ සින්දුවට යනවා...\n\nFile එකේ audio source එකක් නෑනේ.</blockquote>",  "error_no_video": "<blockquote>මීළල video එකට යනවා...\n\nFile එකේ video stream එකක් නෑතුණ විය හැකියි. File එක corrupt වී විය හැකි නැත්නම් format එක support නැති විය හැකියි.</blockquote>",  "error_no_call": "<blockquote><b>Active Voice Chat එකක් නෑනේ...</b>\n\nකරුණාකර එකක් පටන් අරන් <b>ආයෙත් try කරන්න</b>.</blockquote>",
+  "error_vc_disabled": "<blockquote>❌ <b>Voice Chat එක disable කරලා හෝ available නෑ</b>\n\nකරුණාකර මෙම Group එකේ Voice Chat enable කරන්න හෝ Bot Assistant ට Voice Chat පටන් ගන්න <b>Admin Permissions</b> දෙන්න.</blockquote>",
   "error_no_file": "<blockquote>Download කරන්න බැරි වුනා.\n\nගැටලුව තාමත් තියෙනවනම්, <a href={0}>Support Chat</a> එකට කියන්න.</blockquote>",
   "error_tg_server": "<blockquote><u><b>Telegram Server Error</b></u>\n\nTelegram වල අවුලක් වගේ. මම Queue එක clear කරලා VC එකෙන් යනවා.</blockquote>",
   "eval_error": "<blockquote>⚠️ Code එක run කරද්දී error එකක් ආවා\n\n</blockquote>",
