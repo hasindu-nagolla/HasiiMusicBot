@@ -35,6 +35,7 @@ class TgCall(PyTgCalls):
     def __init__(self):
         self.clients = []
         self._play_next_locks = {}  # Lock to prevent concurrent play_next calls per chat
+        self._stream_end_cache = {}  # Cache to prevent duplicate stream end processing
 
     async def _edit_media_with_retry(self, message: Message, media_obj: InputMediaPhoto, reply_markup):
         """Edit media with basic FloodWait handling."""
@@ -469,7 +470,26 @@ class TgCall(PyTgCalls):
             async def update_handler(_, update: types.Update) -> None:
                 if isinstance(update, types.StreamEnded):
                     if update.stream_type == types.StreamEnded.Type.AUDIO:
-                        await self.play_next(update.chat_id)
+                        # Deduplicate stream end events from multiple assistants
+                        chat_id = update.chat_id
+                        current_time = asyncio.get_event_loop().time()
+                        
+                        # Check if we recently processed a stream end for this chat (within 2 seconds)
+                        if chat_id in self._stream_end_cache:
+                            if current_time - self._stream_end_cache[chat_id] < 2.0:
+                                # Duplicate event from another assistant, skip it
+                                return
+                        
+                        # Mark this stream end as processed
+                        self._stream_end_cache[chat_id] = current_time
+                        
+                        # Clean up old cache entries (older than 5 seconds)
+                        self._stream_end_cache = {
+                            cid: t for cid, t in self._stream_end_cache.items()
+                            if current_time - t < 5.0
+                        }
+                        
+                        await self.play_next(chat_id)
                 elif isinstance(update, types.ChatUpdate):
                     if update.status in [
                         types.ChatUpdate.Status.KICKED,
