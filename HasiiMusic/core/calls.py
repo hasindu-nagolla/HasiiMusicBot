@@ -352,12 +352,14 @@ class TgCall(PyTgCalls):
         if chat_id not in self._play_next_locks:
             self._play_next_locks[chat_id] = asyncio.Lock()
         
+        lock = self._play_next_locks[chat_id]
+        
         # If already processing play_next for this chat, return immediately
-        if self._play_next_locks[chat_id].locked():
+        if lock.locked():
             logger.info(f"play_next already running for {chat_id}, skipping duplicate call")
             return
         
-        async with self._play_next_locks[chat_id]:
+        async with lock:
             try:
                 if not await db.get_call(chat_id):
                     return
