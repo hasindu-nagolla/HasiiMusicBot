@@ -119,7 +119,6 @@ class TgCall(PyTgCalls):
         message: Message | None,
         media: Media | Track,
         seek_time: int = 0,
-        video: bool = False,
     ) -> None:
         client = await db.get_assistant(chat_id)
         _lang = await lang.get_lang(chat_id)
@@ -136,13 +135,12 @@ class TgCall(PyTgCalls):
                 logger.error(f"No file path for media in {chat_id}")
                 return
 
-        # Configure stream based on video or audio mode
+        # Configure audio stream
         stream = types.MediaStream(
             media_path=media.file_path,
             audio_parameters=types.AudioQuality.STUDIO,
-            video_parameters=types.VideoQuality.HD_720p,
             audio_flags=types.MediaStream.Flags.REQUIRED,
-            video_flags=types.MediaStream.Flags.REQUIRED if video else types.MediaStream.Flags.IGNORE,
+            video_flags=types.MediaStream.Flags.IGNORE,
             ffmpeg_parameters=f"-ss {seek_time}" if seek_time > 1 else None,
         )
         
@@ -282,32 +280,9 @@ class TgCall(PyTgCalls):
                 logger.error(f"RPC error in play_media for {chat_id}: {e}")
                 await self.stop(chat_id)
         except exceptions.NoAudioSourceFound:
-            error_msg = _lang["error_no_video"] if video else _lang["error_no_audio"]
             if message:
                 try:
-                    await message.edit_text(error_msg)
-                except Exception:
-                    pass
-            await self.play_next(chat_id)
-        except exceptions.NoVideoSourceFound:
-            # Video source not found - try audio-only fallback or skip
-            if video:
-                logger.warning(f"Video source not found for {chat_id}, attempting audio-only fallback")
-                if message:
-                    try:
-                        await message.edit_text("⚠️ Video source unavailable, trying audio-only...")
-                    except Exception:
-                        pass
-                # Retry with audio-only mode
-                try:
-                    await self.play_media(chat_id, message, media, seek_time=seek_time, video=False)
-                    return
-                except Exception as retry_error:
-                    logger.error(f"Audio-only fallback failed for {chat_id}: {retry_error}")
-            # If audio-only also fails or was already audio, skip to next
-            if message:
-                try:
-                    await message.edit_text("❌ Stream unavailable, playing next...")
+                    await message.edit_text(_lang["error_no_audio"])
                 except Exception:
                     pass
             await self.play_next(chat_id)
@@ -359,13 +334,11 @@ class TgCall(PyTgCalls):
             
             # Get message to update
             msg = await app.get_messages(chat_id, media.message_id)
-            if not msg:
-                msg = await app.send_message(chat_id=chat_id, text=_lang["seeking"])
+            await self.play_media(chat_id, msg, mediaang["seeking"])
             
             # Replay from new position with correct video mode
-            is_video = getattr(media, 'video', False)
-            await self.play_media(chat_id, msg, media, seek_time=seconds, video=is_video)
-            return True
+            is_video = getattr(media, 
+            await self.play_media(chat_id, msg, media, seek_time=seconds
         except Exception as e:
             logger.error(f"Error in seek_stream for {chat_id}: {e}", exc_info=True)
             return False
@@ -396,8 +369,7 @@ class TgCall(PyTgCalls):
                     if media:
                         _lang = await lang.get_lang(chat_id)
                         msg = await app.send_message(chat_id=chat_id, text=_lang["play_again"])
-                        is_video = getattr(media, 'video', False)
-                        await self.play_media(chat_id, msg, media, video=is_video)
+                        await self.play_media(chat_id, msg, media)
                         return
                 
                 media = queue.get_next(chat_id)
@@ -412,11 +384,9 @@ class TgCall(PyTgCalls):
                         msg = await app.send_message(chat_id=chat_id, text="🔁 Looping queue...")
                         if not first_track.file_path:
                             is_live = getattr(first_track, 'is_live', False)
-                            is_video = getattr(first_track, 'video', False)
-                            first_track.file_path = await yt.download(first_track.id, video=is_video, is_live=is_live)
+                            first_track.file_path = await yt.download(first_track.id, is_live=is_live)
                         first_track.message_id = msg.id
-                        is_video = getattr(first_track, 'video', False)
-                        await self.play_media(chat_id, msg, first_track, video=is_video)
+                        await self.play_media(chat_id, msg, first_track)
                         return
                 
                 try:
@@ -452,8 +422,7 @@ class TgCall(PyTgCalls):
                 
                 if not media.file_path:
                     is_live = getattr(media, 'is_live', False)
-                    is_video = getattr(media, 'video', False)
-                    media.file_path = await yt.download(media.id, video=is_video, is_live=is_live)
+                    media.file_path = await yt.download(media.id, is_live=is_live)
                     if not media.file_path:
                         await self.stop(chat_id)
                         if msg:
@@ -466,14 +435,13 @@ class TgCall(PyTgCalls):
                         return
 
                 media.message_id = msg.id if msg else 0
-                is_video = getattr(media, 'video', False)
                 if msg:
-                    await self.play_media(chat_id, msg, media, video=is_video)
+                    await self.play_media(chat_id, msg, media)
                 else:
                     # No message object due to errors, but continue playback
                     # Create a temporary message or handle without UI update
                     logger.info(f"Playing next track for {chat_id} without message update")
-                    await self.play_media(chat_id, None, media, video=is_video)
+                    await self.play_media(chat_id, None, media)
             except Exception as e:
                 logger.error(f"Error in play_next for {chat_id}: {e}", exc_info=True)
                 # Try to stop the call gracefully

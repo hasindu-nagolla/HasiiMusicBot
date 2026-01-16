@@ -20,7 +20,6 @@
   "dl_cancelling": "<blockquote>පොඩ්ඩක් ඉන්න, download එක cancel කරනවා!</blockquote>",
   "dl_active": "<blockquote>ඒ file එක දැනටමත් download වෙන ගමන්. ඉවර වෙනකම් ඉමුද?</blockquote>",
   "dl_limit": "<blockquote>File එක process කරන්න බෑ. Download කරන්න පුළුවන් උපරිම <b>200 MB</b> විතරයි.</blockquote>",
-  "vplay_sudo_only": "<blockquote>❌ Video playback එක sudo users ලට විතරයි resource usage වැඩි වෙන නිසා.\n\nAudio playback එකට /play use කරන්න.</blockquote>",
   "dl_progress": "<blockquote><u><b>File එක Download කරමින්</b></u>\n\n<b>Progress:</b> {0} / {1} [{2:.1f}%]\n<b>Speed:</b> {3}/s | <b>Time Left:</b> {4}</blockquote>",
   "dl_not_found": "<blockquote>Download එක cancel කරලා ඉවරයි.</blockquote>",
   "error_no_audio": "<blockquote>මීළඟ සින්දුවට යනවා...\n\nFile එකේ audio source එකක් නෑනේ.</blockquote>",  "error_no_video": "<blockquote>මීළල video එකට යනවා...\n\nFile එකේ video stream එකක් නෑතුණ විය හැකියි. File එක corrupt වී විය හැකි නැත්නම් format එක support නැති විය හැකියි.</blockquote>",  "error_no_call": "<blockquote><b>Active Voice Chat එකක් නෑනේ...</b>\n\nකරුණාකර එකක් පටන් අරන් <b>ආයෙත් try කරන්න</b>.</blockquote>",

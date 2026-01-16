@@ -73,7 +73,7 @@ def playlist_to_queue(chat_id: int, tracks: list) -> str:
     return text
 
 @app.on_message(
-    filters.command(["play", "vplay", "playforce", "cplay", "cplayforce"])
+    filters.command(["play", "playforce", "cplay", "cplayforce"])
     & filters.group
     & ~app.bl_users
 )
@@ -85,16 +85,7 @@ async def play_hndlr(
     force: bool = False,
     url: str = None,
     cplay: bool = False,
-    video: bool = False,
 ) -> None:
-    # Detect if video mode is requested (only /vplay command)
-    command = m.command[0].lower()
-    video = (command == 'vplay')
-    
-    # Restrict video playback to sudo users only
-    if video and m.from_user.id not in app.sudoers:
-        return await m.reply_text(m.lang["vplay_sudo_only"])
-    
     # Handle channel play mode
     chat_id = m.chat.id
     if cplay:
@@ -228,7 +219,7 @@ async def play_hndlr(
             return
 
     if not file.file_path:
-        file.file_path = await yt.download(file.id, video=video, is_live=file.is_live)
+        file.file_path = await yt.download(file.id, is_live=file.is_live)
         if not file.file_path:
             await safe_edit(
                 sent,
@@ -240,11 +231,8 @@ async def play_hndlr(
                 f"**Support:** {config.SUPPORT_CHAT}"
             )
 
-    # Use file.video if it's set (Telegram files), otherwise use command video flag
-    is_video = file.video if hasattr(file, 'video') and file.video else video
-    
     try:
-        await tune.play_media(chat_id=chat_id, message=sent, media=file, video=is_video)
+        await tune.play_media(chat_id=chat_id, message=sent, media=file)
     except Exception as e:
         error_msg = str(e)
         if "bot" in error_msg.lower() or "sign in" in error_msg.lower():

@@ -55,10 +55,6 @@ def checkUB(play):
         )
         cplay = m.command[0][0] == "c"
         
-        # Detect video mode: command starts with 'v' or has 'v' as second char (cvplay)
-        command = m.command[0].lower()
-        video = command[0] == 'v' or (len(command) > 1 and command[1] == 'v')
-        
         url = yt.url(m)
         # Only validate URL if not replying to media (Telegram files have t.me URLs)
         if url and not m.reply_to_message and not yt.valid(url):
@@ -180,6 +176,6 @@ def checkUB(play):
         except:
             pass
 
-        return await play(_, m, force, url, cplay, video)
+        return await play(_, m, force, url, cplay)
 
     return wrapper

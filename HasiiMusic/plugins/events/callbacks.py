@@ -151,11 +151,9 @@ async def _controls(_, query: types.CallbackQuery):
 
         msg = await app.send_message(chat_id=chat_id, text=query.lang["play_next"])
         if not media.file_path:
-            is_video = getattr(media, 'video', False)
-            media.file_path = await yt.download(media.id, video=is_video)
+            media.file_path = await yt.download(media.id)
         media.message_id = msg.id
-        is_video = getattr(media, 'video', False)
-        return await tune.play_media(chat_id, msg, media, video=is_video)
+        return await tune.play_media(chat_id, msg, media)
 
     elif action == "replay":
         media = queue.get_current(chat_id)
