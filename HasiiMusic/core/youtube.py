@@ -201,8 +201,11 @@ class YouTube:
                 "quiet": True,
                 "no_warnings": True,
                 "cookiefile": cookie,
-                # More flexible format selection for live streams
-                "format": "best[height<=720]/best" if video else "bestaudio/best",
+                # For live streams: use specific format codes that PyTgCalls can handle
+                # Video formats: 96 (1080p), 95 (720p), 94 (480p) + 140 (audio)
+                # Force direct URL extraction instead of manifest
+                "format": "95+140/94+140/96+140/best" if video else "bestaudio/best",
+                "format_sort": ["proto:https"],  # Prefer HTTPS
             }
 
             def _extract_url():
@@ -292,6 +295,12 @@ class YouTube:
                     ydl.download([url])
                     # Check if file was actually downloaded (handle .part rename issues)
                     if not Path(filename).exists():
+                        # Wait briefly for filesystem operations to complete
+                        import time
+                        time.sleep(0.5)
+                        if Path(filename).exists():
+                            return filename
+                        
                         # Try to find .part file and rename it
                         part_file = Path(f"{filename}.part")
                         if part_file.exists():
@@ -299,12 +308,14 @@ class YouTube:
                                 import shutil
                                 shutil.move(str(part_file), filename)
                                 logger.info(f"✅ Renamed {part_file} to {filename}")
+                                return filename
                             except Exception as rename_ex:
                                 logger.error(f"❌ Failed to rename .part file: {rename_ex}")
                                 return None
                         else:
                             logger.error(f"❌ Download completed but file not found: {filename}")
                             return None
+                    return filename
                 except yt_dlp.utils.ExtractorError as ex:
                     error_msg = str(ex)
                     if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():

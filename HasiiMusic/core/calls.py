@@ -289,6 +289,28 @@ class TgCall(PyTgCalls):
                 except Exception:
                     pass
             await self.play_next(chat_id)
+        except exceptions.NoVideoSourceFound:
+            # Video source not found - try audio-only fallback or skip
+            if video:
+                logger.warning(f"Video source not found for {chat_id}, attempting audio-only fallback")
+                if message:
+                    try:
+                        await message.edit_text("⚠️ Video source unavailable, trying audio-only...")
+                    except Exception:
+                        pass
+                # Retry with audio-only mode
+                try:
+                    await self.play_media(chat_id, message, media, seek_time=seek_time, video=False)
+                    return
+                except Exception as retry_error:
+                    logger.error(f"Audio-only fallback failed for {chat_id}: {retry_error}")
+            # If audio-only also fails or was already audio, skip to next
+            if message:
+                try:
+                    await message.edit_text("❌ Stream unavailable, playing next...")
+                except Exception:
+                    pass
+            await self.play_next(chat_id)
         except (ConnectionNotFound, TelegramServerError):
             await self.stop(chat_id)
             if message:
