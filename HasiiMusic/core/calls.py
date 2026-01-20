@@ -164,7 +164,7 @@ class TgCall(PyTgCalls):
                     if "GROUPCALL_INVALID" in error_msg or "GROUPCALL" in error_msg or isinstance(e, exceptions.NoActiveGroupCall):
                         if attempt < max_retries - 1:
                             # Wait for group call state to stabilize
-                            logger.info(f"Group call transitioning for {chat_id}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries})")
+                            logger.debug(f"Group call transitioning for {chat_id}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries})")
                             await asyncio.sleep(retry_delay)
                             continue
                         else:

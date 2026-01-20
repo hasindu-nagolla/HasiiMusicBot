@@ -283,9 +283,9 @@ class YouTube:
                     ydl.download([url])
                     # Check if file was actually downloaded (handle .part rename issues)
                     if not Path(filename).exists():
-                        # Wait briefly for filesystem operations to complete
+                        # Wait for filesystem operations to complete
                         import time
-                        time.sleep(0.5)
+                        time.sleep(2.0)  # Increased wait time for slower filesystems
                         if Path(filename).exists():
                             return filename
                         
