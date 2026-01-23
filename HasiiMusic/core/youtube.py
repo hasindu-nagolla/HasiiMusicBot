@@ -271,6 +271,16 @@ class YouTube:
         # Download audio file
         ext = "webm"
         filename = f"downloads/{video_id}.{ext}"
+        
+        # Ensure downloads directory exists with write permissions
+        downloads_dir = Path("downloads")
+        if not downloads_dir.exists():
+            try:
+                downloads_dir.mkdir(parents=True, exist_ok=True)
+                logger.info("📁 Created downloads directory")
+            except Exception as e:
+                logger.error(f"❌ Cannot create downloads directory: {e}")
+                return None
 
         if Path(filename).exists():
             return filename
@@ -278,10 +288,10 @@ class YouTube:
         cookie = self.get_cookies()
         base_opts = {
             "outtmpl": "downloads/%(id)s.%(ext)s",
-            "quiet": True,
+            "quiet": False,  # Enable output to see what's happening
             "noplaylist": True,
             "geo_bypass": True,
-            "no_warnings": True,
+            "no_warnings": False,  # Show warnings
             "overwrites": False,
             "nocheckcertificate": True,
             "cookiefile": cookie,
@@ -292,7 +302,7 @@ class YouTube:
             "socket_timeout": 15,
             "retries": 1,
             "fragment_retries": 1,
-            "ignoreerrors": True,
+            "ignoreerrors": False,  # Raise errors instead of silently skipping
         }
 
         # High-quality audio: Opus codec in WebM container for best quality
