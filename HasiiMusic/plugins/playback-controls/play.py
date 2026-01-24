@@ -112,7 +112,14 @@ async def play_hndlr(
         sent = await m.reply_text(m.lang["play_searching"])
     except FloodWait as e:
         await asyncio.sleep(e.value)
-        sent = await m.reply_text(m.lang["play_searching"])
+        try:
+            sent = await m.reply_text(m.lang["play_searching"])
+        except FloodWait as e2:
+            # If still flood wait, wait longer and give up gracefully
+            await asyncio.sleep(e2.value)
+            return  # Abort silently
+        except Exception:
+            return  # Abort silently
     except Exception:
         return  # If we can't even send initial message, abort
     
