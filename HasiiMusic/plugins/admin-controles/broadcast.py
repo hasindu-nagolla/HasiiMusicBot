@@ -56,8 +56,18 @@ async def broadcast_message(_, message: types.Message) -> None:
 
     # Determine if the command was a reply to a media message
     media_message = None
+    media_group = None
     if message.reply_to_message:
         media_message = message.reply_to_message
+        
+        # Check if it's part of a media group (album)
+        if media_message.media_group_id:
+            try:
+                # Get all messages in the media group
+                media_group = await _get_media_group(message.chat.id, media_message)
+            except Exception as e:
+                # If fetching media group fails, just use single message
+                pass
 
     # Parse command: extract flags and actual message
     flags, broadcast_text = _parse_broadcast_command(message.text)
@@ -85,7 +95,7 @@ async def broadcast_message(_, message: types.Message) -> None:
 
     # Perform the broadcast (supports text and media messages)
     success_groups, success_users, failed_chats = await _send_broadcast(
-        broadcast_text, groups, users, sent, media_message, flags, message.lang
+        broadcast_text, groups, users, sent, media_message, flags, message.lang, media_group
     )
 
     # Reset broadcasting flag
@@ -126,6 +136,74 @@ async def stop_broadcast(_, message: types.Message) -> None:
     )).pin(disable_notification=False)
 
     await message.reply_text(message.lang["gcast_stop"])
+
+
+def _parse_broadcast_command(text: str) -> Tuple[List[str], str]:
+    """
+    Parse broadcast command to extract flags and message.
+
+    Args:
+        text: The full command text.
+
+    Returns:
+        Tuple of (flags list, message text)
+    """
+    # Handle None or empty text
+    if not text:
+        return [], ""
+
+    # Split command from the rest (preserve everything after command)
+    parts = text.split(None, 1)
+    if len(parts) < 2:
+        return [], ""
+
+    remaining_text = parts[1]
+
+    # Extract flags (words starting with '-') from the beginning
+    flags = []
+    lines = remaining_text.split('\n')
+    first_line_parts = lines[0].split()
+
+
+async def _get_media_group(chat_id: int, message: types.Message) -> List[types.Message]:
+    """
+    Get all messages in a media group (album).
+
+    Args:
+        chat_id: The chat ID where the media group is.
+        message: One message from the media group.
+
+    Returns:
+        List of messages in the media group, sorted by message ID.
+    """
+    if not message.media_group_id:
+        return None
+
+    media_group_id = message.media_group_id
+    messages = []
+    
+    # Search backward and forward from the current message to find all messages with same media_group_id
+    # Telegram typically sends media group messages with consecutive IDs
+    search_range = 20  # Search 20 messages before and after
+    
+    try:
+        # Get messages around the replied message
+        start_id = max(1, message.id - search_range)
+        end_id = message.id + search_range
+        
+        for msg_id in range(start_id, end_id + 1):
+            try:
+                msg = await app.get_messages(chat_id, msg_id)
+                if msg and hasattr(msg, 'media_group_id') and msg.media_group_id == media_group_id:
+                    messages.append(msg)
+            except:
+                continue
+                
+        # Sort by message ID to maintain order
+        messages.sort(key=lambda x: x.id)
+        return messages if messages else None
+    except Exception as e:
+        return None
 
 
 def _parse_broadcast_command(text: str) -> Tuple[List[str], str]:
@@ -252,6 +330,7 @@ async def _send_broadcast(
     media_message: types.Message | None = None,
     flags: List[str] = None,
     lang: dict = None,
+    media_group: List[types.Message] = None,
 ) -> Tuple[int, int, str]:
     """
     Send broadcast message to all recipients.
@@ -264,6 +343,7 @@ async def _send_broadcast(
         media_message: Optional media message to broadcast.
         flags: List of command flags.
         lang: Language dictionary for localized strings.
+        media_group: Optional list of messages if broadcasting a media group (album).
 
     Returns:
         Tuple of (successful groups count, successful users count, failed chats log)
@@ -315,8 +395,88 @@ async def _send_broadcast(
                 except:
                     pass  # If can't get chat info, try to send anyway
 
-            # If a media message was provided, forward or copy based on -copy flag
-            if media_message:
+            # Priority 1: If media_group exists (album), send as media group
+            if media_group:
+                sent_message = None
+                try:
+                    # Check if -copy flag is present
+                    if "-copy" in flags:
+                        # Copy mode: send as media group without forward tag
+                        media_list = []
+                        for idx, msg in enumerate(media_group):
+                            # Use caption from first media or provided text
+                            caption = text if (idx == 0 and text) else (msg.caption if idx == 0 else None)
+                            
+                            if msg.photo:
+                                file_id = msg.photo.file_id if hasattr(msg.photo, 'file_id') else msg.photo[-1].file_id
+                                media_list.append(types.InputMediaPhoto(media=file_id, caption=caption))
+                            elif getattr(msg, 'video', None):
+                                media_list.append(types.InputMediaVideo(media=msg.video.file_id, caption=caption))
+                            elif getattr(msg, 'audio', None):
+                                media_list.append(types.InputMediaAudio(media=msg.audio.file_id, caption=caption))
+                            elif getattr(msg, 'document', None):
+                                media_list.append(types.InputMediaDocument(media=msg.document.file_id, caption=caption))
+                        
+                        if media_list:
+                            sent_messages = await app.send_media_group(chat_id=chat_id, media=media_list)
+                            sent_message = sent_messages[0] if sent_messages else None
+                            
+                            # Handle pinning if requested (pin first message)
+                            if sent_message and chat_id in groups:
+                                if "-pin" in flags:
+                                    try:
+                                        await sent_message.pin(disable_notification=True)
+                                        pinned_count += 1
+                                    except:
+                                        pass
+                                elif "-pinloud" in flags:
+                                    try:
+                                        await sent_message.pin(disable_notification=False)
+                                        pinned_count += 1
+                                    except:
+                                        pass
+                        else:
+                            failed_log += f"{chat_id} - No valid media in group\n"
+                            await asyncio.sleep(0.3)
+                            continue
+                    else:
+                        # Forward mode: forward all messages in the group
+                        sent_messages = []
+                        for msg in media_group:
+                            try:
+                                fwd = await msg.forward(chat_id)
+                                sent_messages.append(fwd)
+                            except Exception as fwd_ex:
+                                continue
+                        
+                        if sent_messages:
+                            sent_message = sent_messages[0]
+                            # Handle pinning if requested (pin first message)
+                            if sent_message and chat_id in groups:
+                                if "-pin" in flags:
+                                    try:
+                                        await sent_message.pin(disable_notification=True)
+                                        pinned_count += 1
+                                    except:
+                                        pass
+                                elif "-pinloud" in flags:
+                                    try:
+                                        await sent_message.pin(disable_notification=False)
+                                        pinned_count += 1
+                                    except:
+                                        pass
+                        else:
+                            failed_log += f"{chat_id} - Failed to forward media group\n"
+                            await asyncio.sleep(0.3)
+                            continue
+                            
+                except Exception as mg_ex:
+                    failed_log += f"{chat_id} - Media group send failed: {type(mg_ex).__name__}: {str(mg_ex)}\n"
+                    await asyncio.sleep(0.3)
+                    continue
+
+            # Priority 2: If a single media message was provided, forward or copy based on -copy flag
+            elif media_message:
                 sent_message = None
 
                 # Check if -copy flag is present
@@ -442,7 +602,36 @@ async def _send_broadcast(
             # Retry sending after waiting
             try:
                 retry_sent = None
-                if media_message:
+                
+                # Retry media group if it was a media group
+                if media_group:
+                    if "-copy" in flags:
+                        media_list = []
+                        for idx, msg in enumerate(media_group):
+                            caption = text if (idx == 0 and text) else (msg.caption if idx == 0 else None)
+                            if msg.photo:
+                                file_id = msg.photo.file_id if hasattr(msg.photo, 'file_id') else msg.photo[-1].file_id
+                                media_list.append(types.InputMediaPhoto(media=file_id, caption=caption))
+                            elif getattr(msg, 'video', None):
+                                media_list.append(types.InputMediaVideo(media=msg.video.file_id, caption=caption))
+                            elif getattr(msg, 'audio', None):
+                                media_list.append(types.InputMediaAudio(media=msg.audio.file_id, caption=caption))
+                            elif getattr(msg, 'document', None):
+                                media_list.append(types.InputMediaDocument(media=msg.document.file_id, caption=caption))
+                        if media_list:
+                            retry_msgs = await app.send_media_group(chat_id=chat_id, media=media_list)
+                            retry_sent = retry_msgs[0] if retry_msgs else None
+                    else:
+                        for msg in media_group:
+                            try:
+                                fwd = await msg.forward(chat_id)
+                                if not retry_sent:
+                                    retry_sent = fwd
+                            except:
+                                continue
+                
+                # Retry single media message
+                elif media_message:
                     # Check if -copy flag for retry as well
                     if "-copy" in flags:
                         caption = text if text else (
