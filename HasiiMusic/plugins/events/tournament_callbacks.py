@@ -87,7 +87,7 @@ async def tournament_create_callback(_, query: CallbackQuery):
                 [InlineKeyboardButton("✅ Join Tournament", callback_data="tour_join_auto")],
                 [InlineKeyboardButton("📊 View Standings", callback_data="tour_scores")],
                 [InlineKeyboardButton("🎮 Start Tournament", callback_data="tour_begin")],
-                [InlineKeyboardButton("❌ Cancel", callback_data="tour_cancel")]
+                [InlineKeyboardButton("🏁 End Tournament", callback_data="tour_end")]
             ])
             
             type_name = "Team Battle" if tournament_type == "team" else "Solo Competition"
@@ -318,9 +318,24 @@ async def tournament_end_callback(_, query: CallbackQuery):
         if not tournament:
             return await query.answer("❌ No active tournament!", show_alert=True)
         
-        if tournament["status"] != "active":
-            return await query.answer("⚠️ Tournament hasn't started yet! Use /gamecancel to cancel.", show_alert=True)
+        # If pending, cancel it instead
+        if tournament["status"] == "pending":
+            success = await TournamentHelper.cancel_tournament(query.message.chat.id)
+            if success:
+                try:
+                    await query.message.edit_text(
+                        "🏁 <b>Tournament Ended</b>\n\n"
+                        "The tournament was ended before it started."
+                    )
+                    await query.answer("✅ Tournament ended!")
+                except Exception:
+                    await query.message.reply_text("🏁 Tournament ended!")
+                    await query.answer("✅ Ended!")
+            else:
+                await query.answer("❌ Failed to end tournament!", show_alert=True)
+            return
         
+        # If active, stop it and show results
         success, results = await TournamentHelper.stop_tournament(query.message.chat.id)
         if success and results:
             from HasiiMusic.plugins.features.tournament_admin import format_results
