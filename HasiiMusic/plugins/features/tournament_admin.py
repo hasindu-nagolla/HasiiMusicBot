@@ -7,7 +7,7 @@ from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from HasiiMusic import app, lang
 from HasiiMusic.helpers._tournament import TournamentHelper
-from HasiiMusic.helpers._admins import is_admin
+from HasiiMusic.helpers._admins import admin_check
 
 GAME_TYPES = {
     "all": "🎮 All Games",
@@ -28,13 +28,10 @@ TOURNAMENT_TYPES = {
 
 @app.on_message(filters.command(["tournamentstart", "gameon"]) & filters.group)
 @lang.language()
+@admin_check
 async def start_tournament_cmd(_, message: Message):
     """Start a tournament - Admin only"""
     try:
-        # Check if admin
-        if not await is_admin(message):
-            return await message.reply_text(message.lang["user_not_admin"])
-        
         # Check if tournament already exists
         existing = await TournamentHelper.get_active_tournament(message.chat.id)
         if existing:
@@ -83,12 +80,10 @@ async def start_tournament_cmd(_, message: Message):
 
 @app.on_message(filters.command(["tournamentbegin", "gamestart"]) & filters.group)
 @lang.language()
+@admin_check
 async def begin_tournament_cmd(_, message: Message):
     """Begin the tournament (start accepting plays) - Admin only"""
     try:
-        if not await is_admin(message):
-            return await message.reply_text(message.lang["user_not_admin"])
-        
         tournament = await TournamentHelper.get_active_tournament(message.chat.id)
         if not tournament:
             return await message.reply_text(message.lang.get(
@@ -133,12 +128,10 @@ async def begin_tournament_cmd(_, message: Message):
 
 @app.on_message(filters.command(["tournamentstop", "gamestop"]) & filters.group)
 @lang.language()
+@admin_check
 async def stop_tournament_cmd(_, message: Message):
     """Stop and finish the tournament - Admin only"""
     try:
-        if not await is_admin(message):
-            return await message.reply_text(message.lang["user_not_admin"])
-        
         success, results = await TournamentHelper.stop_tournament(message.chat.id)
         if success and results:
             # Format final results
@@ -156,12 +149,10 @@ async def stop_tournament_cmd(_, message: Message):
 
 @app.on_message(filters.command(["tournamentcancel", "gamecancel"]) & filters.group)
 @lang.language()
+@admin_check
 async def cancel_tournament_cmd(_, message: Message):
     """Cancel the tournament - Admin only"""
     try:
-        if not await is_admin(message):
-            return await message.reply_text(message.lang["user_not_admin"])
-        
         success = await TournamentHelper.cancel_tournament(message.chat.id)
         if success:
             await message.reply_text(message.lang.get(
