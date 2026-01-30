@@ -91,6 +91,13 @@ async def stop() -> None:
     """
     logger.info("🛑 Stopping bot...")
     
+    # Stop tournament timer monitor
+    try:
+        from HasiiMusic.helpers._tournament import stop_timer_monitor
+        stop_timer_monitor()
+    except Exception as e:
+        logger.error(f"Error stopping tournament timer: {e}")
+    
     # Cancel all background tasks
     for task in tasks:
         task.cancel()
