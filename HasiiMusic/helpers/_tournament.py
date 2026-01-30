@@ -55,11 +55,11 @@ class TournamentHelper:
                 "winner": None
             }
             
-            # Initialize teams only for team mode
+            # Initialize teams only for team mode (always show all 4 teams)
             if tournament_type == "team":
                 team_names = ["🔴 Red Dragons", "🔵 Blue Wolves", "🟢 Green Vipers", "🟡 Yellow Tigers"]
-                for i in range(teams_count):
-                    tournament_data["teams"][team_names[i]] = []
+                for team_name in team_names:
+                    tournament_data["teams"][team_name] = []
             
             await tournaments_col.insert_one(tournament_data)
             return True

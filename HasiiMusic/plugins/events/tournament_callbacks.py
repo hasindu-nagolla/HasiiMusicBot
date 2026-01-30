@@ -78,7 +78,7 @@ async def tournament_create_callback(_, query: CallbackQuery):
             tournament_type=tournament_type,
             game_type=game_type,
             max_players=20,
-            teams_count=2 if tournament_type == "team" else 0,
+            teams_count=4 if tournament_type == "team" else 0,
             duration=30
         )
         
