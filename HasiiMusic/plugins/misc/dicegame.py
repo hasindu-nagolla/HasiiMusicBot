@@ -7,6 +7,7 @@
 # ==============================================================================
 
 from pyrogram import filters
+from pyrogram.enums import DiceEmoji
 from HasiiMusic import app
 
 # Dice 🎲
@@ -19,11 +20,10 @@ async def roll_dice(bot, message):
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
 
-@app.on_message(filters.regex(r"^🎲$") & filters.text)
-async def roll_dice_emoji(bot, message):
+@app.on_message(filters.dice(DiceEmoji.DICE))
+async def dice_emoji_handler(bot, message):
     try:
-        x = await bot.send_dice(message.chat.id, "🎲")
-        m = x.dice.value
+        m = message.dice.value
         await message.reply_text(f"🎲 Hey {message.from_user.mention}, your score is: {m}", quote=True)
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
@@ -38,11 +38,10 @@ async def throw_dart(bot, message):
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
 
-@app.on_message(filters.regex(r"^🎯$") & filters.text)
-async def throw_dart_emoji(bot, message):
+@app.on_message(filters.dice(DiceEmoji.DART))
+async def dart_emoji_handler(bot, message):
     try:
-        x = await bot.send_dice(message.chat.id, "🎯")
-        m = x.dice.value
+        m = message.dice.value
         await message.reply_text(f"🎯 Hey {message.from_user.mention}, your score is: {m}", quote=True)
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
@@ -57,11 +56,10 @@ async def shoot_basket(bot, message):
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
 
-@app.on_message(filters.regex(r"^🏀$") & filters.text)
-async def shoot_basket_emoji(bot, message):
+@app.on_message(filters.dice(DiceEmoji.BASKETBALL))
+async def basket_emoji_handler(bot, message):
     try:
-        x = await bot.send_dice(message.chat.id, "🏀")
-        m = x.dice.value
+        m = message.dice.value
         await message.reply_text(f"🏀 Hey {message.from_user.mention}, your score is: {m}", quote=True)
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
@@ -76,11 +74,10 @@ async def spin_jackpot(bot, message):
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
 
-@app.on_message(filters.regex(r"^🎰$") & filters.text)
-async def spin_jackpot_emoji(bot, message):
+@app.on_message(filters.dice(DiceEmoji.SLOT_MACHINE))
+async def jackpot_emoji_handler(bot, message):
     try:
-        x = await bot.send_dice(message.chat.id, "🎰")
-        m = x.dice.value
+        m = message.dice.value
         await message.reply_text(f"🎰 Hey {message.from_user.mention}, your score is: {m}", quote=True)
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
@@ -95,11 +92,10 @@ async def roll_ball(bot, message):
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
 
-@app.on_message(filters.regex(r"^🎳$") & filters.text)
-async def roll_ball_emoji(bot, message):
+@app.on_message(filters.dice(DiceEmoji.BOWLING))
+async def ball_emoji_handler(bot, message):
     try:
-        x = await bot.send_dice(message.chat.id, "🎳")
-        m = x.dice.value
+        m = message.dice.value
         await message.reply_text(f"🎳 Hey {message.from_user.mention}, your score is: {m}", quote=True)
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
@@ -114,11 +110,10 @@ async def kick_football(bot, message):
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
 
-@app.on_message(filters.regex(r"^⚽$") & filters.text)
-async def kick_football_emoji(bot, message):
+@app.on_message(filters.dice(DiceEmoji.FOOTBALL))
+async def football_emoji_handler(bot, message):
     try:
-        x = await bot.send_dice(message.chat.id, "⚽")
-        m = x.dice.value
+        m = message.dice.value
         await message.reply_text(f"⚽ Hey {message.from_user.mention}, your score is: {m}", quote=True)
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
