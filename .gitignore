@@ -28,3 +28,9 @@ HasiiMusic/plugins/features/tournament_admin.py
 HasiiMusic/plugins/misc/dicegame.py
 HasiiMusic/plugins/events/tournament_callbacks.py
 HasiiMusic/helpers/_tournament.py
+
+# Documentation - Private
+SETUP_TOURNAMENT.md
+TOURNAMENT_SYSTEM.md
+IMPLEMENTATION_COMPLETE.md
+COMPARISON.md
