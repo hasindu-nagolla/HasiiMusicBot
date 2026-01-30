@@ -5,9 +5,8 @@ Admin controls for managing tournaments
 
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from HasiiMusic import app
+from HasiiMusic import app, lang
 from HasiiMusic.helpers._tournament import TournamentHelper
-from HasiiMusic.core.lang import Language
 from HasiiMusic.helpers._admins import is_admin
 
 GAME_TYPES = {
@@ -28,7 +27,7 @@ TOURNAMENT_TYPES = {
 
 
 @app.on_message(filters.command(["tournamentstart", "gameon"]) & filters.group)
-@language
+@lang.language()
 async def start_tournament_cmd(_, message: Message):
     """Start a tournament - Admin only"""
     try:
@@ -83,7 +82,7 @@ async def start_tournament_cmd(_, message: Message):
 
 
 @app.on_message(filters.command(["tournamentbegin", "gamestart"]) & filters.group)
-@language
+@lang.language()
 async def begin_tournament_cmd(_, message: Message):
     """Begin the tournament (start accepting plays) - Admin only"""
     try:
@@ -133,7 +132,7 @@ async def begin_tournament_cmd(_, message: Message):
 
 
 @app.on_message(filters.command(["tournamentstop", "gamestop"]) & filters.group)
-@language
+@lang.language()
 async def stop_tournament_cmd(_, message: Message):
     """Stop and finish the tournament - Admin only"""
     try:
@@ -156,7 +155,7 @@ async def stop_tournament_cmd(_, message: Message):
 
 
 @app.on_message(filters.command(["tournamentcancel", "gamecancel"]) & filters.group)
-@language
+@lang.language()
 async def cancel_tournament_cmd(_, message: Message):
     """Cancel the tournament - Admin only"""
     try:
@@ -180,7 +179,7 @@ async def cancel_tournament_cmd(_, message: Message):
 
 
 @app.on_message(filters.command(["score", "scores", "standings"]) & filters.group)
-@language
+@lang.language()
 async def view_scores_cmd(_, message: Message):
     """View current tournament scores"""
     try:
@@ -203,7 +202,7 @@ async def view_scores_cmd(_, message: Message):
 
 
 @app.on_message(filters.command(["leaderboard", "topleaders", "rankings"]) & filters.group)
-@language
+@lang.language()
 async def leaderboard_cmd(_, message: Message):
     """View chat leaderboard"""
     try:

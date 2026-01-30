@@ -5,13 +5,12 @@ Player participation, joining teams, and viewing stats
 
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from HasiiMusic import app
+from HasiiMusic import app, lang
 from HasiiMusic.helpers._tournament import TournamentHelper
-from HasiiMusic.core.lang import Language
 
 
 @app.on_message(filters.command(["join", "jointeam", "register"]) & filters.group)
-@language
+@lang.language()
 async def join_tournament_cmd(_, message: Message):
     """Join the tournament"""
     try:
@@ -80,7 +79,7 @@ async def join_tournament_cmd(_, message: Message):
 
 
 @app.on_message(filters.command(["leave", "leaveteam", "quit"]) & filters.group)
-@language
+@lang.language()
 async def leave_tournament_cmd(_, message: Message):
     """Leave the tournament"""
     try:
@@ -105,7 +104,7 @@ async def leave_tournament_cmd(_, message: Message):
 
 
 @app.on_message(filters.command(["teams", "myteam", "participants"]) & filters.group)
-@language
+@lang.language()
 async def view_teams_cmd(_, message: Message):
     """View tournament teams"""
     try:
@@ -151,7 +150,7 @@ async def view_teams_cmd(_, message: Message):
 
 
 @app.on_message(filters.command(["mystats", "profile", "tournamentstats"]) & filters.group)
-@language
+@lang.language()
 async def player_stats_cmd(_, message: Message):
     """View player tournament stats"""
     try:
@@ -223,7 +222,7 @@ async def player_stats_cmd(_, message: Message):
 
 
 @app.on_message(filters.command(["tournamentinfo", "gameinfo"]) & filters.group)
-@language
+@lang.language()
 async def tournament_info_cmd(_, message: Message):
     """Show tournament information and rules"""
     try:
