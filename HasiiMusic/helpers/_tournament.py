@@ -216,7 +216,7 @@ class TournamentHelper:
                     {"_id": tournament["_id"]},
                     {
                         "$push": {f"teams.{team}": user_id},
-                        "$set": {f"scores.{user_id}": 0}
+                        "$set": {f"scores.{str(user_id)}": 0}
                     }
                 )
             else:
@@ -225,7 +225,7 @@ class TournamentHelper:
                     {"_id": tournament["_id"]},
                     {
                         "$push": {"players": user_id},
-                        "$set": {f"scores.{user_id}": 0}
+                        "$set": {f"scores.{str(user_id)}": 0}
                     }
                 )
                 team = "solo"
@@ -267,7 +267,7 @@ class TournamentHelper:
                             {"_id": tournament["_id"]},
                             {
                                 "$pull": {f"teams.{team_name}": user_id},
-                                "$unset": {f"scores.{user_id}": ""}
+                                "$unset": {f"scores.{str(user_id)}": ""}
                             }
                         )
                         return True
@@ -278,7 +278,7 @@ class TournamentHelper:
                         {"_id": tournament["_id"]},
                         {
                             "$pull": {"players": user_id},
-                            "$unset": {f"scores.{user_id}": ""}
+                            "$unset": {f"scores.{str(user_id)}": ""}
                         }
                     )
                     return True
@@ -318,10 +318,10 @@ class TournamentHelper:
             if not user_in_tournament:
                 return False
             
-            # Add score
+            # Add score (use string key for consistency)
             await tournaments_col.update_one(
                 {"_id": tournament["_id"]},
-                {"$inc": {f"scores.{user_id}": score}}
+                {"$inc": {f"scores.{str(user_id)}": score}}
             )
             
             return True
