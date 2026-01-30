@@ -29,6 +29,61 @@ async def tournament_setup_callback(_, query: CallbackQuery):
         # Update tournament type
         tournament_settings[chat_id]["type"] = action
         
+        # Get current settings
+        settings = tournament_settings[chat_id]
+        selected_type = settings["type"]
+        selected_game = settings["game"]
+        
+        # Update keyboard with checkmarks
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(
+                    "✅ Team Battle" if selected_type == "team" else "👥 Team Battle",
+                    callback_data="tour_setup_team"
+                ),
+                InlineKeyboardButton(
+                    "✅ Solo" if selected_type == "solo" else "🏆 Solo",
+                    callback_data="tour_setup_solo"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "✅ All Games" if selected_game == "all" else "🎮 All Games",
+                    callback_data="tour_game_all"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    "✅ Dice" if selected_game == "dice" else "🎲 Dice",
+                    callback_data="tour_game_dice"
+                ),
+                InlineKeyboardButton(
+                    "✅ Dart" if selected_game == "dart" else "🎯 Dart",
+                    callback_data="tour_game_dart"
+                ),
+                InlineKeyboardButton(
+                    "✅ Basket" if selected_game == "basket" else "🏀 Basket",
+                    callback_data="tour_game_basket"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "✅ Jackpot" if selected_game == "jackpot" else "🎰 Jackpot",
+                    callback_data="tour_game_jackpot"
+                ),
+                InlineKeyboardButton(
+                    "✅ Bowling" if selected_game == "ball" else "🎳 Bowling",
+                    callback_data="tour_game_ball"
+                ),
+                InlineKeyboardButton(
+                    "✅ Football" if selected_game == "football" else "⚽ Football",
+                    callback_data="tour_game_football"
+                )
+            ],
+            [InlineKeyboardButton("✅ Create Tournament", callback_data="tour_create_default")]
+        ])
+        
+        await query.edit_message_reply_markup(reply_markup=keyboard)
         await query.answer(f"Selected: {action.capitalize()} mode")
         
     except Exception as e:
@@ -49,6 +104,61 @@ async def tournament_game_callback(_, query: CallbackQuery):
         # Update game type
         tournament_settings[chat_id]["game"] = game_type
         
+        # Get current settings
+        settings = tournament_settings[chat_id]
+        selected_type = settings["type"]
+        selected_game = settings["game"]
+        
+        # Update keyboard with checkmarks
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(
+                    "✅ Team Battle" if selected_type == "team" else "👥 Team Battle",
+                    callback_data="tour_setup_team"
+                ),
+                InlineKeyboardButton(
+                    "✅ Solo" if selected_type == "solo" else "🏆 Solo",
+                    callback_data="tour_setup_solo"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "✅ All Games" if selected_game == "all" else "🎮 All Games",
+                    callback_data="tour_game_all"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    "✅ Dice" if selected_game == "dice" else "🎲 Dice",
+                    callback_data="tour_game_dice"
+                ),
+                InlineKeyboardButton(
+                    "✅ Dart" if selected_game == "dart" else "🎯 Dart",
+                    callback_data="tour_game_dart"
+                ),
+                InlineKeyboardButton(
+                    "✅ Basket" if selected_game == "basket" else "🏀 Basket",
+                    callback_data="tour_game_basket"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "✅ Jackpot" if selected_game == "jackpot" else "🎰 Jackpot",
+                    callback_data="tour_game_jackpot"
+                ),
+                InlineKeyboardButton(
+                    "✅ Bowling" if selected_game == "ball" else "🎳 Bowling",
+                    callback_data="tour_game_ball"
+                ),
+                InlineKeyboardButton(
+                    "✅ Football" if selected_game == "football" else "⚽ Football",
+                    callback_data="tour_game_football"
+                )
+            ],
+            [InlineKeyboardButton("✅ Create Tournament", callback_data="tour_create_default")]
+        ])
+        
+        await query.edit_message_reply_markup(reply_markup=keyboard)
         await query.answer(f"Selected game: {game_type}")
         
     except Exception as e:

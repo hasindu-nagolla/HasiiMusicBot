@@ -40,14 +40,14 @@ async def start_tournament_cmd(_, message: Message):
                 "❌ A tournament is already active! Use /tournamentstop to end it first."
             ))
         
-        # Show tournament setup keyboard
+        # Show tournament setup keyboard (default: Team + All Games)
         keyboard = InlineKeyboardMarkup([
             [
-                InlineKeyboardButton("👥 Team Battle", callback_data="tour_setup_team"),
+                InlineKeyboardButton("✅ Team Battle", callback_data="tour_setup_team"),
                 InlineKeyboardButton("🏆 Solo", callback_data="tour_setup_solo")
             ],
             [
-                InlineKeyboardButton("🎮 All Games", callback_data="tour_game_all"),
+                InlineKeyboardButton("✅ All Games", callback_data="tour_game_all"),
             ],
             [
                 InlineKeyboardButton("🎲 Dice", callback_data="tour_game_dice"),
