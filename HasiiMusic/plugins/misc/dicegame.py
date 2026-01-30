@@ -3,13 +3,14 @@
 # ==============================================================================
 # Fun emoji dice games using Telegram's built-in dice feature.
 # Commands: /dice, /dart, /basket, /jackpot, /ball, /football
+# Can also be triggered by sending the emoji directly: 🎲, 🎯, 🏀, 🎰, 🎳, ⚽
 # ==============================================================================
 
 from pyrogram import filters
 from HasiiMusic import app
 
 # Dice 🎲
-@app.on_message(filters.command("dice"))
+@app.on_message(filters.command("dice") | filters.regex("^🎲$"))
 async def roll_dice(bot, message):
     try:
         x = await bot.send_dice(message.chat.id, "🎲")
@@ -19,7 +20,7 @@ async def roll_dice(bot, message):
         await message.reply_text(f"❌ Error: {str(e)}")
 
 # Dart 🎯
-@app.on_message(filters.command("dart"))
+@app.on_message(filters.command("dart") | filters.regex("^🎯$"))
 async def throw_dart(bot, message):
     try:
         x = await bot.send_dice(message.chat.id, "🎯")
@@ -29,7 +30,7 @@ async def throw_dart(bot, message):
         await message.reply_text(f"❌ Error: {str(e)}")
 
 # Basketball 🏀
-@app.on_message(filters.command("basket"))
+@app.on_message(filters.command("basket") | filters.regex("^🏀$"))
 async def shoot_basket(bot, message):
     try:
         x = await bot.send_dice(message.chat.id, "🏀")
@@ -39,7 +40,7 @@ async def shoot_basket(bot, message):
         await message.reply_text(f"❌ Error: {str(e)}")
 
 # Jackpot 🎰
-@app.on_message(filters.command("jackpot"))
+@app.on_message(filters.command("jackpot") | filters.regex("^🎰$"))
 async def spin_jackpot(bot, message):
     try:
         x = await bot.send_dice(message.chat.id, "🎰")
@@ -49,7 +50,7 @@ async def spin_jackpot(bot, message):
         await message.reply_text(f"❌ Error: {str(e)}")
 
 # Bowling Ball 🎳
-@app.on_message(filters.command("ball"))
+@app.on_message(filters.command("ball") | filters.regex("^🎳$"))
 async def roll_ball(bot, message):
     try:
         x = await bot.send_dice(message.chat.id, "🎳")
@@ -59,7 +60,7 @@ async def roll_ball(bot, message):
         await message.reply_text(f"❌ Error: {str(e)}")
 
 # Football ⚽
-@app.on_message(filters.command("football"))
+@app.on_message(filters.command("football") | filters.regex("^⚽$"))
 async def kick_football(bot, message):
     try:
         x = await bot.send_dice(message.chat.id, "⚽")
