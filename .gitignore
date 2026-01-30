@@ -21,3 +21,4 @@ anony/cookies/*.txt
 *.session-journal
 .vscode
 HasiiMusic/plugins/playback-controls/radio.py
+HasiiMusic/plugins/misc/dicegame.py
