@@ -132,6 +132,19 @@ async def begin_tournament_cmd(_, message: Message):
 async def stop_tournament_cmd(_, message: Message):
     """Stop and finish the tournament - Admin only"""
     try:
+        # Check if tournament exists and its status
+        tournament = await TournamentHelper.get_active_tournament(message.chat.id)
+        if not tournament:
+            return await message.reply_text(message.lang.get(
+                "no_active_tournament",
+                "❌ No active tournament found!"
+            ))
+        
+        if tournament["status"] == "pending":
+            return await message.reply_text(
+                "❌ Tournament hasn't started yet! Use /gamestart to begin, or /gamecancel to cancel."
+            )
+        
         success, results = await TournamentHelper.stop_tournament(message.chat.id)
         if success and results:
             # Format final results
