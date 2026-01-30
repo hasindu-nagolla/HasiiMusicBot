@@ -28,44 +28,48 @@ async def join_tournament_cmd(_, message: Message):
                 "❌ Tournament already started! Wait for the next one."
             ))
         
-        # Get user info
+        # Check if already joined
+        is_team_mode = tournament["tournament_type"] == "team"
         user = message.from_user
-        user_name = user.first_name or f"User{user.id}"
         
-        # Check if team specified
-        args = message.command[1:] if len(message.command) > 1 else []
-        team = args[0] if args else None
+        # Check if user already joined
+        if is_team_mode:
+            already_joined = any(user.id in players for players in tournament["teams"].values())
+        else:
+            already_joined = user.id in tournament.get("players", [])
         
-        success, result = await TournamentHelper.join_tournament(
-            message.chat.id,
-            user.id,
-            user_name,
-            team
-        )
+        if already_joined:
+            return await message.reply_text(message.lang.get(
+                "tournament_already_joined",
+                "❌ You've already joined this tournament!"
+            ))
         
-        if success:
-            is_team_mode = tournament["tournament_type"] == "team"
+        if is_team_mode:
+            # Team mode - show team selection menu
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔴 Red Dragons", callback_data="tour_select_🔴 Red Dragons")],
+                [InlineKeyboardButton("🔵 Blue Wolves", callback_data="tour_select_🔵 Blue Wolves")],
+                [InlineKeyboardButton("🟢 Green Vipers", callback_data="tour_select_🟢 Green Vipers")],
+                [InlineKeyboardButton("🟡 Yellow Tigers", callback_data="tour_select_🟡 Yellow Tigers")],
+                [InlineKeyboardButton("📊 View Teams", callback_data="tour_scores")]
+            ])
             
-            if is_team_mode:
-                # Show team selection keyboard for team mode
-                keyboard = InlineKeyboardMarkup([
-                    [InlineKeyboardButton(f"🔴 Red Dragons", callback_data=f"tour_team_🔴 Red Dragons")],
-                    [InlineKeyboardButton(f"🔵 Blue Wolves", callback_data=f"tour_team_🔵 Blue Wolves")],
-                    [InlineKeyboardButton(f"🟢 Green Vipers", callback_data=f"tour_team_🟢 Green Vipers")],
-                    [InlineKeyboardButton(f"🟡 Yellow Tigers", callback_data=f"tour_team_🟡 Yellow Tigers")],
-                    [InlineKeyboardButton("📊 View Teams", callback_data="tour_scores")]
-                ])
-                
-                await message.reply_text(
-                    message.lang.get(
-                        "tournament_joined",
-                        "✅ You joined <b>{0}</b>!\n\n"
-                        "Want to switch teams? Choose below:"
-                    ).format(result),
-                    reply_markup=keyboard
-                )
-            else:
-                # Solo mode - no team selection needed
+            await message.reply_text(
+                "🎮 <b>SELECT YOUR TEAM</b>\n\n"
+                "Choose which team you want to join:",
+                reply_markup=keyboard
+            )
+        else:
+            # Solo mode - join directly
+            user_name = user.first_name or f"User{user.id}"
+            success, result = await TournamentHelper.join_tournament(
+                message.chat.id,
+                user.id,
+                user_name,
+                None
+            )
+            
+            if success:
                 keyboard = InlineKeyboardMarkup([
                     [InlineKeyboardButton("📊 View Players", callback_data="tour_scores")]
                 ])
@@ -79,6 +83,8 @@ async def join_tournament_cmd(_, message: Message):
                     ),
                     reply_markup=keyboard
                 )
+            else:
+                await message.reply_text("❌ Failed to join tournament!")
         else:
             error_messages = {
                 "no_tournament": "❌ No tournament available!",

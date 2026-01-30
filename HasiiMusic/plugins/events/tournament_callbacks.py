@@ -133,41 +133,79 @@ async def tournament_join_callback(_, query: CallbackQuery):
         
         is_team_mode = tournament["tournament_type"] == "team"
         
+        # Check if already joined
+        if is_team_mode:
+            already_joined = any(user.id in players for players in tournament["teams"].values())
+        else:
+            already_joined = user.id in tournament.get("players", [])
+        
+        if already_joined:
+            return await query.answer("⚠️ You've already joined!", show_alert=True)
+        
+        if is_team_mode:
+            # Team mode - show team selection menu
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔴 Red Dragons", callback_data="tour_select_🔴 Red Dragons")],
+                [InlineKeyboardButton("🔵 Blue Wolves", callback_data="tour_select_🔵 Blue Wolves")],
+                [InlineKeyboardButton("🟢 Green Vipers", callback_data="tour_select_🟢 Green Vipers")],
+                [InlineKeyboardButton("🟡 Yellow Tigers", callback_data="tour_select_🟡 Yellow Tigers")],
+                [InlineKeyboardButton("◀️ Back", callback_data="tour_back")]
+            ])
+            
+            await query.answer("Choose your team!")
+            await query.message.reply_text(
+                f"🎮 <b>SELECT YOUR TEAM</b>\n\n"
+                f"👤 {user_name}, choose which team you want to join:",
+                reply_markup=keyboard
+            )
+        else:
+            # Solo mode - join directly
+            success, result = await TournamentHelper.join_tournament(
+                chat_id,
+                user.id,
+                user_name,
+                None
+            )
+            
+            if success:
+                await query.answer("✅ Joined tournament!")
+                await query.message.reply_text(
+                    f"✅ {user_name} joined the tournament!\n\n"
+                    f"🏆 Solo mode - compete individually!"
+                )
+            else:
+                await query.answer("❌ Failed to join!", show_alert=True)
+    except Exception as e:
+        await query.answer(f"Error: {str(e)}", show_alert=True)
+
+
+@app.on_callback_query(filters.regex(r"^tour_select_"))
+async def tournament_select_team_callback(_, query: CallbackQuery):
+    """Select and join a specific team"""
+    try:
+        team_name = query.data.replace("tour_select_", "")
+        user = query.from_user
+        user_name = user.first_name or f"User{user.id}"
+        chat_id = query.message.chat.id
+        
+        # Join the selected team
         success, result = await TournamentHelper.join_tournament(
             chat_id,
             user.id,
             user_name,
-            None  # Auto-assign team
+            team_name
         )
         
         if success:
-            if is_team_mode:
-                # Team mode - show team selection
-                keyboard = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🔴 Red Dragons", callback_data="tour_team_🔴 Red Dragons")],
-                    [InlineKeyboardButton("🔵 Blue Wolves", callback_data="tour_team_🔵 Blue Wolves")],
-                    [InlineKeyboardButton("🟢 Green Vipers", callback_data="tour_team_🟢 Green Vipers")],
-                    [InlineKeyboardButton("🟡 Yellow Tigers", callback_data="tour_team_🟡 Yellow Tigers")],
-                    [InlineKeyboardButton("📊 View Teams", callback_data="tour_scores")]
-                ])
-                
-                await query.answer(f"Joined {result}!")
-                await query.message.reply_text(
-                    f"✅ {user_name} joined <b>{result}</b>!\n\n"
-                    f"Want to switch teams? Choose below:",
-                    reply_markup=keyboard
+            await query.answer(f"✅ Joined {team_name}!")
+            try:
+                await query.message.edit_text(
+                    f"✅ <b>{user_name}</b> joined <b>{team_name}</b>!\n\n"
+                    f"Good luck in the tournament! 🎮"
                 )
-            else:
-                # Solo mode - no team selection
-                keyboard = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("📊 View Players", callback_data="tour_scores")]
-                ])
-                
-                await query.answer("Joined tournament!")
+            except Exception:
                 await query.message.reply_text(
-                    f"✅ {user_name} joined the tournament!\n\n"
-                    f"🏆 Solo mode - compete individually!",
-                    reply_markup=keyboard
+                    f"✅ <b>{user_name}</b> joined <b>{team_name}</b>!"
                 )
         else:
             error_messages = {
@@ -179,7 +217,8 @@ async def tournament_join_callback(_, query: CallbackQuery):
             }
             await query.answer(error_messages.get(result, "Failed to join!"), show_alert=True)
     except Exception as e:
-        await query.answer(f"Error: {str(e)}", show_alert=True)
+        print(f"Error in team selection: {e}")
+        await query.answer("❌ Error selecting team!", show_alert=True)
 
 
 @app.on_callback_query(filters.regex(r"^tour_team_"))
