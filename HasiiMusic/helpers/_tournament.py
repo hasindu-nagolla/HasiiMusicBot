@@ -5,12 +5,12 @@ Manages competitive game tournaments with teams, scores, and leaderboards
 
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timedelta
-from HasiiMusic.core.mongo import db
+from HasiiMusic import db
 
 # Tournament Collections
-tournaments_col = db.tournaments
-players_col = db.tournament_players
-leaderboard_col = db.tournament_leaderboard
+tournaments_col = db.db.tournaments
+players_col = db.db.tournament_players
+leaderboard_col = db.db.tournament_leaderboard
 
 
 class TournamentHelper:
