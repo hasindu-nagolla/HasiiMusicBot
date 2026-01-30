@@ -143,3 +143,20 @@ async def reload_admins(chat_id: int) -> list[int]:
         return [admin.user.id for admin in admins]
     except:
         return []
+
+
+async def is_admin_callback(query: types.CallbackQuery) -> bool:
+    """Check if callback query sender is admin"""
+    if not query.from_user:
+        return False
+    
+    user_id = query.from_user.id
+    chat_id = query.message.chat.id
+    
+    # Sudo users are always admin
+    if user_id in app.sudoers:
+        return True
+    
+    # Check admin list
+    admins = await db.get_admins(chat_id)
+    return user_id in admins
