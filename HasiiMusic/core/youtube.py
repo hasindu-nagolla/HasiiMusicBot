@@ -386,7 +386,3 @@ class YouTube:
 
             # Run blocking download in thread pool to avoid blocking event loop
             return await asyncio.get_event_loop().run_in_executor(None, _download)
-                    return None
-            return filename
-
-        return await asyncio.to_thread(_download)
