@@ -270,12 +270,15 @@ class TgCall(PyTgCalls):
                     except Exception:
                         pass
             elif "CHAT_ADMIN_REQUIRED" in error_str or "phone.CreateGroupCall" in error_str:
-                # Check if voice chat is disabled or if assistant needs admin permissions
+                # When we get CHAT_ADMIN_REQUIRED, we need to determine if:
+                # 1. Voice chat is disabled in group settings, OR
+                # 2. Assistant lacks admin permissions
                 await self.stop(chat_id)
                 if message:
                     try:
-                        # Try to get assistant member info to check permissions
+                        # First, check if assistant has the required permissions
                         has_vc_permission = False
+                        assistant = None
                         try:
                             assistant = await db.get_assistant(chat_id)
                             assistant_member = await app.get_chat_member(chat_id, assistant.id)
@@ -294,12 +297,31 @@ class TgCall(PyTgCalls):
                         except Exception:
                             pass
                         
-                        # If assistant has VC permission, then VC must be disabled
-                        # Otherwise, assistant needs proper permissions
-                        if has_vc_permission:
-                            # Assistant has permissions, so voice chat must be disabled
+                        # Now check if there's an active voice chat
+                        has_active_vc = False
+                        try:
+                            chat = await app.get_chat(chat_id)
+                            # If chat has active_usernames or we can get full chat info, check for active call
+                            if hasattr(chat, 'call') and chat.call:
+                                has_active_vc = True
+                            elif assistant:
+                                # Try to check if assistant can see an active call
+                                try:
+                                    call_info = await assistant.get_call(chat_id)
+                                    if call_info:
+                                        has_active_vc = True
+                                except:
+                                    pass
+                        except Exception:
+                            pass
+                        
+                        # Decision logic:
+                        # If assistant HAS permissions but NO active VC → VC is disabled
+                        # If assistant LACKS permissions → show permission request
+                        if has_vc_permission and not has_active_vc:
+                            # Assistant has permissions but can't create call → VC must be disabled
                             await message.edit_text(_lang["error_vc_disabled"])
-                        else:
+                        elif not has_vc_permission:
                             # Assistant needs admin permissions with VC management
                             await message.edit_text(
                                 f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
@@ -310,6 +332,9 @@ class TgCall(PyTgCalls):
                                 f"• Delete Messages\n\n"
                                 f"Please promote me as admin with the required permissions.</blockquote>"
                             )
+                        else:
+                            # Has permissions and VC is active but still failed - show VC disabled as safest option
+                            await message.edit_text(_lang["error_vc_disabled"])
                     except Exception:
                         pass
             elif "GROUPCALL_INVALID" in error_str or "GROUPCALL" in error_str:
