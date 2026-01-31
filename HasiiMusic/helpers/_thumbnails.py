@@ -69,7 +69,8 @@ class Thumbnail:
     async def save_thumb(self, output_path: str, url: str) -> str:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                open(output_path, "wb").write(await resp.read())
+                with open(output_path, "wb") as f:
+                    f.write(await resp.read())
             return output_path
 
     async def generate(self, song: Track, size=(1280, 720)) -> str:
@@ -81,7 +82,8 @@ class Thumbnail:
 
             # Download and prepare base image
             await self.save_thumb(temp, song.thumbnail)
-            base = Image.open(temp).resize(size).convert("RGBA")
+            with Image.open(temp) as temp_img:
+                base = temp_img.resize(size).convert("RGBA")
 
             # Create blurred background
             bg = ImageEnhance.Brightness(base.filter(
@@ -151,12 +153,12 @@ class Thumbnail:
             # Control icons (if available)
             icons_path = "HasiiMusic/helpers/play_icons.png"
             if os.path.isfile(icons_path):
-                ic = Image.open(icons_path).resize(
-                    (ICONS_W, ICONS_H)).convert("RGBA")
-                r, g, b, a = ic.split()
-                black_ic = Image.merge(
-                    "RGBA", (r.point(lambda _: 0), g.point(lambda _: 0), b.point(lambda _: 0), a))
-                bg.paste(black_ic, (ICONS_X, ICONS_Y), black_ic)
+                with Image.open(icons_path) as icons_img:
+                    ic = icons_img.resize((ICONS_W, ICONS_H)).convert("RGBA")
+                    r, g, b, a = ic.split()
+                    black_ic = Image.merge(
+                        "RGBA", (r.point(lambda _: 0), g.point(lambda _: 0), b.point(lambda _: 0), a))
+                    bg.paste(black_ic, (ICONS_X, ICONS_Y), black_ic)
 
             # Save and cleanup
             bg.save(output)
