@@ -14,7 +14,7 @@
 import asyncio
 import logging
 from ntgcalls import ConnectionNotFound, TelegramServerError
-from pyrogram import errors
+from pyrogram import enums, errors
 from pyrogram.errors import MessageIdInvalid
 from pyrogram.types import InputMediaPhoto, Message
 from pytgcalls import PyTgCalls, exceptions, types
@@ -261,19 +261,37 @@ class TgCall(PyTgCalls):
             # Handle Telegram API errors (GROUPCALL_INVALID, CHAT_ADMIN_REQUIRED, etc.)
             error_str = str(e)
             if "CHAT_ADMIN_REQUIRED" in error_str or "phone.CreateGroupCall" in error_str:
-                # Voice chat is disabled or assistant doesn't have admin permissions
+                # Check if voice chat is disabled or if assistant needs admin permissions
                 await self.stop(chat_id)
                 if message:
                     try:
-                        await message.edit_text(
-                            f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
-                            f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
-                            f"<b>Required permissions:</b>\n"
-                            f"• Manage Voice Chats\n"
-                            f"• Invite Users via Link\n"
-                            f"• Delete Messages\n\n"
-                            f"Please promote me as admin with the required permissions.</blockquote>"
-                        )
+                        # Try to get assistant member info to check permissions
+                        assistant_member = None
+                        try:
+                            assistant = await db.get_assistant(chat_id)
+                            assistant_member = await app.get_chat_member(chat_id, assistant.id)
+                        except Exception:
+                            pass
+                        
+                        # If assistant is admin with proper permissions, VC is disabled
+                        # If assistant is not admin or lacks permissions, show permission request
+                        if assistant_member and assistant_member.status in [
+                            enums.ChatMemberStatus.ADMINISTRATOR,
+                            enums.ChatMemberStatus.OWNER
+                        ]:
+                            # Assistant is admin, so voice chat must be disabled
+                            await message.edit_text(_lang["error_vc_disabled"])
+                        else:
+                            # Assistant needs admin permissions
+                            await message.edit_text(
+                                f"<blockquote><b>🔐 Bot Admin Required</b></blockquote>\n\n"
+                                f"<blockquote>To play music in this chat, I need to be an <b>administrator</b>.\n\n"
+                                f"<b>Required permissions:</b>\n"
+                                f"• Manage Voice Chats\n"
+                                f"• Invite Users via Link\n"
+                                f"• Delete Messages\n\n"
+                                f"Please promote me as admin with the required permissions.</blockquote>"
+                            )
                     except Exception:
                         pass
             elif "GROUPCALL_INVALID" in error_str or "GROUPCALL" in error_str:
