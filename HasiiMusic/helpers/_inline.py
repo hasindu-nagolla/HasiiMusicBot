@@ -99,8 +99,8 @@ class Inline:
             cbs = ["admins", "auth", "blist", "games", "lang",
                    "ping", "play", "queue", "stats", "sudo"]
             buttons = [
-                self.ikb(text=_lang[f"help_{i}"], callback_data=f"help {cb}")
-                for i, cb in enumerate(cbs)
+                self.ikb(text=_lang[f"help_{cb}"], callback_data=f"help {cb}")
+                for cb in cbs
             ]
             rows = [buttons[i: i + 3] for i in range(0, len(buttons), 3)]
 
