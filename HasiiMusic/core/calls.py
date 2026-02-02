@@ -144,6 +144,22 @@ class TgCall(PyTgCalls):
             ffmpeg_parameters=f"-ss {seek_time}" if seek_time > 1 else None,
         )
         
+        # Check if already connected, if so leave first to avoid "Connection cannot be initialized more than once"
+        try:
+            # Check current call status
+            call = await client.get_call(chat_id)
+            if call:
+                # Already connected, need to leave first
+                logger.debug(f"Already connected to {chat_id}, leaving before reconnecting...")
+                await client.leave_call(chat_id, close=False)
+                await asyncio.sleep(0.5)  # Let connection fully close
+        except (ConnectionNotFound, exceptions.NotInCallError):
+            # Not connected, which is what we want
+            pass
+        except Exception as e:
+            # Log but continue - might not be critical
+            logger.debug(f"Error checking connection state for {chat_id}: {e}")
+        
         # Retry logic for race conditions when stopping/starting quickly
         max_retries = 3
         retry_delay = 1  # seconds
@@ -169,6 +185,23 @@ class TgCall(PyTgCalls):
                             continue
                         else:
                             # Final attempt failed
+                            raise
+                    else:
+                        # Different error, don't retry
+                        raise
+                except Exception as e:
+                    error_msg = str(e).lower()
+                    # Handle "Connection cannot be initialized more than once" error
+                    if "cannot be initialized more than once" in error_msg or "connection" in error_msg:
+                        if attempt < max_retries - 1:
+                            logger.debug(f"Connection error for {chat_id}, leaving and retrying... (attempt {attempt + 1}/{max_retries})")
+                            try:
+                                await client.leave_call(chat_id, close=False)
+                                await asyncio.sleep(retry_delay)
+                            except Exception:
+                                pass
+                            continue
+                        else:
                             raise
                     else:
                         # Different error, don't retry
