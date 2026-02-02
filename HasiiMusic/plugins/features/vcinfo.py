@@ -1,6 +1,6 @@
 from pyrogram import filters
 from pyrogram.types import Message
-from pyrogram.enums import ParseMode
+from pyrogram.enums import ParseMode, ChatMemberStatus
 
 from HasiiMusic import app, db
 
@@ -16,7 +16,7 @@ async def vc_info_command(client, message: Message):
     # Check if user is admin
     try:
         member = await app.get_chat_member(chat_id, message.from_user.id)
-        if member.status not in ["administrator", "creator"]:
+        if member.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
             return await message.reply_text(
                 "❌ <b>Admin Only!</b>\n<blockquote>Only administrators can use this command.</blockquote>",
                 parse_mode=ParseMode.HTML
