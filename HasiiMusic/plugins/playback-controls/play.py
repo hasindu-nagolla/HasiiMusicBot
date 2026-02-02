@@ -14,6 +14,7 @@
 # - Channel play mode
 # ==============================================================================
 
+import random
 from pyrogram import filters
 from pyrogram import types
 from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden
@@ -22,6 +23,9 @@ from HasiiMusic import tune, app, config, db, lang, queue, tg, yt
 from HasiiMusic.helpers import buttons, utils
 from HasiiMusic.helpers._play import checkUB
 import asyncio
+
+# Random emojis for play reactions
+PLAY_EMOJIS = ["💞", "🦋", "🔍", "🧪", "⚡️", "🔥", "🎩", "🌈", "🍷", "🥂", "🥃", "🕊️", "🪄", "💌", "🧨"]
 
 
 async def safe_edit(message, text, **kwargs):
@@ -240,6 +244,13 @@ async def play_hndlr(
 
     try:
         await tune.play_media(chat_id=chat_id, message=sent, media=file)
+        # React with random emoji on successful play
+        try:
+            emoji = random.choice(PLAY_EMOJIS)
+            await m.react(emoji)
+        except Exception:
+            # If reaction fails, continue anyway (not critical)
+            pass
     except Exception as e:
         error_msg = str(e)
         if "bot" in error_msg.lower() or "sign in" in error_msg.lower():
