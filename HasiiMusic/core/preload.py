@@ -80,8 +80,6 @@ class PreloadManager:
             task.add_done_callback(
                 lambda t, cid=chat_id: self._cleanup_task(cid, t)
             )
-        
-        logger.info(f"🔄 Started preloading {len(upcoming_tracks)} tracks for chat {chat_id}")
     
     async def _preload_track(self, chat_id: int, track) -> None:
         """
@@ -103,13 +101,12 @@ class PreloadManager:
             if file_path:
                 # Update track with downloaded file path
                 track.file_path = file_path
-                logger.info(f"✅ Preloaded track {track_id} for chat {chat_id}")
             else:
-                logger.warning(f"⚠️ Failed to preload track {track_id} for chat {chat_id}")
+                # Silent failure - track will download normally when needed
+                pass
         
         except asyncio.CancelledError:
             # Task was cancelled (queue changed, playback stopped, etc.)
-            logger.debug(f"🚫 Preload cancelled for track {track.id} in chat {chat_id}")
             raise
         
         except Exception as e:
@@ -151,8 +148,6 @@ class PreloadManager:
         self._preload_tasks[chat_id].clear()
         if chat_id in self._preloading:
             self._preloading[chat_id].clear()
-        
-        logger.info(f"🚫 Cancelled all preload tasks for chat {chat_id}")
     
     def _cleanup_task(self, chat_id: int, task: asyncio.Task) -> None:
         """
