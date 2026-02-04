@@ -152,8 +152,16 @@ class TgCall(PyTgCalls):
                 return
             # For channels, verify assistant is member
             if chat.type == enums.ChatType.CHANNEL:
+                # Get the userbot (Pyrogram client) to access .me attribute
+                userbot_client = await db.get_client(chat_id)
+                if not userbot_client:
+                    logger.error(f"No userbot client available for {chat_id}")
+                    if message:
+                        await message.edit_text("❌ ɴᴏ ᴀꜱꜱɪꜱᴛᴀɴᴛ ᴀᴠᴀɪʟᴀʙʟᴇ.")
+                    return
+                
                 try:
-                    assistant_member = await app.get_chat_member(chat_id, client.me.id)
+                    assistant_member = await app.get_chat_member(chat_id, userbot_client.me.id)
                     if assistant_member.status == enums.ChatMemberStatus.BANNED:
                         logger.error(f"Assistant banned in channel {chat_id}")
                         if message:
@@ -166,7 +174,7 @@ class TgCall(PyTgCalls):
                         if message:
                             await message.edit_text(
                                 "❌ <b>ᴀꜱꜱɪꜱᴛᴀɴᴛ ɴᴏᴛ ɪɴ ᴄʜᴀɴɴᴇʟ!</b>\n\n"
-                                f"<blockquote>ᴘʟᴇᴀꜱᴇ ᴀᴅᴅ @{client.me.username} ᴛᴏ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀꜱ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ.</blockquote>"
+                                f"<blockquote>ᴘʟᴇᴀꜱᴇ ᴀᴅᴅ @{userbot_client.me.username} ᴛᴏ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀꜱ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ.</blockquote>"
                             )
                         await db.set_cmode(chat_id, None)  # Disable channel play
                         return
