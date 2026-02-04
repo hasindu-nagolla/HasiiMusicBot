@@ -33,9 +33,13 @@ from HasiiMusic import app, config, db, lang, userbot
 from HasiiMusic.plugins import all_modules
 
 
-@app.on_message(filters.command(["stats"]) & filters.user(list(app.sudoers)) & ~app.bl_users)
+@app.on_message(filters.command(["stats"]) & ~app.bl_users)
 @lang.language()
 async def _stats(_, m: types.Message):
+    # Check if user is sudo
+    if m.from_user.id not in app.sudoers:
+        return
+    
     sent = await m.reply_photo(
         photo=config.PING_IMG,
         caption=m.lang["stats_fetching"],
