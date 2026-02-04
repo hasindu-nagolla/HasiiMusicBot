@@ -40,9 +40,6 @@ async def _ping(_, m: types.Message):
             caption=m.lang["ping_pong"].format(
                 latency,
                 uptime,
-                psutil.cpu_percent(interval=0),
-                psutil.virtual_memory().percent,
-                psutil.disk_usage("/").percent,
                 await tune.ping(),
             )
         ),
