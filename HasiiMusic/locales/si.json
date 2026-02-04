@@ -8,6 +8,7 @@
   "auth_removed": "<blockquote>{0} ව මගේ හිතවතුන්ගේ list එකෙන් අයින් කළා.</blockquote>",
   "auth_is_admin": "<blockquote>එයා දැනටමත් <b>Admin</b> කෙනෙක්නේ...</blockquote>",
   "auto_left": "<blockquote>ඔයා නැතුව තනියම සින්දු කියන්න බෑ... මම යනවා 🥀</blockquote>",
+  "auto_end": "<blockquote>✅ <b>Queue එක ඉවරයි.</b>\n\nමට stream එක auto වශයෙන් නවත්තන්න වුනා.</blockquote>",
   "bl_usage": "<blockquote><b>භාවිතය:</b>\n\n/{0} [chat_id|user_id]</blockquote>",
   "bl_invalid": "<blockquote>ChatIDs සහ UserIDs විතරයි සුදූ support කරන්නේ.</blockquote>",
   "bl_already": "<blockquote>මේ Chat එක මම දැනටමත් block කරලනේ තියෙන්නේ.</blockquote>",

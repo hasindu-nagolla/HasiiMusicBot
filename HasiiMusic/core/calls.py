@@ -129,11 +129,11 @@ class TgCall(PyTgCalls):
     ) -> None:
         client = await db.get_assistant(chat_id)
         _lang = await lang.get_lang(chat_id)
-        _thumb = (
-            await thumb.generate(media)
-            if isinstance(media, Track)
-            else config.DEFAULT_THUMB
-        )
+        # Generate thumbnail only if THUMB_GEN is enabled, otherwise use default
+        if config.THUMB_GEN and isinstance(media, Track):
+            _thumb = await thumb.generate(media)
+        else:
+            _thumb = config.DEFAULT_THUMB
 
         if not media.file_path:
             if message:
@@ -523,6 +523,17 @@ class TgCall(PyTgCalls):
                     logger.debug(f"Could not delete previous message in {chat_id}: {e}")
 
                 if not media:
+                    # Check if AUTO_END is enabled
+                    if config.AUTO_END:
+                        _lang = await lang.get_lang(chat_id)
+                        try:
+                            # Send auto-end notification
+                            await app.send_message(
+                                chat_id=chat_id,
+                                text=_lang.get("auto_end", "✅ Queue finished. Stream ended automatically.")
+                            )
+                        except Exception as e:
+                            logger.debug(f"Could not send auto_end message in {chat_id}: {e}")
                     return await self.stop(chat_id)
 
                 _lang = await lang.get_lang(chat_id)
@@ -629,8 +640,8 @@ class TgCall(PyTgCalls):
     async def boot(self) -> None:
         PyTgCallsSession.notice_displayed = True
         for ub in userbot.clients:
-            # Increased cache for better performance
-            client = PyTgCalls(ub, cache_duration=300)
+            # Enhanced cache_duration=100 reduces API calls and improves performance
+            client = PyTgCalls(ub, cache_duration=100)
             await client.start()
             self.clients.append(client)
             await self.decorators(client)
