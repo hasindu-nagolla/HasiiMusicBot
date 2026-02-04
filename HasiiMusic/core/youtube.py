@@ -304,13 +304,14 @@ class YouTube:
                 "cookiefile": cookie,
                 "continuedl": True,
                 "noprogress": True,
-                # **PERFORMANCE FIX**: Reduced from 16 to 8 fragments for stability
-                # 8 fragments × 5 concurrent = 40 connections (vs 320 before)
-                "concurrent_fragment_downloads": 8,
-                "http_chunk_size": 1048576,  # 1MB chunks
-                "socket_timeout": 15,
-                "retries": 1,
-                "fragment_retries": 1,
+                # **PERFORMANCE FIX**: Reduced to 4 fragments for maximum stability
+                # 4 fragments × 5 concurrent downloads = 20 total connections (prevents bandwidth saturation)
+                # Lower = more stable but slightly slower downloads (trade-off for zero lag)
+                "concurrent_fragment_downloads": 4,
+                "http_chunk_size": 524288,  # 512KB chunks (smaller = more stable streaming)
+                "socket_timeout": 30,  # Increased from 15s (prevents timeout on slow networks)
+                "retries": 2,  # Increased from 1 (better reliability)
+                "fragment_retries": 2,  # Increased from 1 (handle network hiccups)
                 "ignoreerrors": True,
             }
 

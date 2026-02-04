@@ -179,17 +179,25 @@ class TgCall(PyTgCalls):
                 return
             raise
 
-        # Configure audio stream - simple buffering for stability
-        # Using minimal, safe parameters that work reliably with PyTgCalls
+        # Configure audio stream with optimized buffering for lag-free playback
+        # PERFORMANCE FIX: Increased buffers prevent stuttering/lagging during playback
         if seek_time > 1:
-            ffmpeg_params = f"-ss {seek_time}"
+            # Seeking: Still need buffers but skip to position first
+            ffmpeg_params = f"-ss {seek_time} -probesize 10M -analyzeduration 5M -rtbufsize 5M -fflags +genpts+igndts"
         else:
-            # Just increase probesize slightly for better format detection
-            # Keeping it simple - too many parameters can break streaming
-            ffmpeg_params = "-probesize 1M -analyzeduration 0"
+            # Normal playback with aggressive buffering:
+            # - probesize 10M: Large input buffer (prevents underruns)
+            # - analyzeduration 5M: Analyze more data (better format detection)
+            # - rtbufsize 5M: Real-time buffer (crucial for network streams)
+            # - fflags +genpts+igndts: Generate PTS, ignore DTS (smooth playback)
+            # - sync ext: External sync (reduces A/V desync)
+            ffmpeg_params = "-probesize 10M -analyzeduration 5M -rtbufsize 5M -fflags +genpts+igndts -sync ext"
+        
         stream = types.MediaStream(
             media_path=media.file_path,
-            audio_parameters=types.AudioQuality.STUDIO,
+            # PERFORMANCE FIX: Reduced from STUDIO to HIGH quality
+            # HIGH = 192kbps (vs STUDIO 320kbps) - better network stability, imperceptible quality difference
+            audio_parameters=types.AudioQuality.HIGH,
             audio_flags=types.MediaStream.Flags.REQUIRED,
             video_flags=types.MediaStream.Flags.IGNORE,
             ffmpeg_parameters=ffmpeg_params,
