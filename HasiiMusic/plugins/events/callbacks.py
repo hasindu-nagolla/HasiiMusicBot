@@ -360,7 +360,7 @@ async def _playmode(_, query: types.CallbackQuery):
     await query.answer(query.lang["processing"], show_alert=True)
     chat_id = query.message.chat.id
     admin_only = await db.get_play_mode(chat_id)
-    _language = await db.get_lang(chat_id)
+    _language = "en"
     await db.set_play_mode(chat_id, admin_only)
     await query.edit_message_reply_markup(
         reply_markup=buttons.settings_markup(

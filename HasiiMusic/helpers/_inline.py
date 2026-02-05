@@ -13,7 +13,7 @@
 from pyrogram import types
 
 from HasiiMusic import app, config, lang
-from HasiiMusic.core.lang import lang_codes
+
 
 
 class Inline:
@@ -92,7 +92,7 @@ class Inline:
                 ]
             ]
         else:
-            cbs = ["admins", "auth", "blist", "sudo", "lang",
+            cbs = ["admins", "auth", "blist", "sudo",
                    "ping", "play", "queue", "stats", "games"]
             buttons = [
                 self.ikb(text=_lang[f"help_btn_{cb}"], callback_data=f"help {cb}")
@@ -102,24 +102,6 @@ class Inline:
 
         return self.ikm(rows)
 
-    def lang_markup(self, _lang: str) -> types.InlineKeyboardMarkup:
-        langs = lang.get_languages()
-
-        # Map language codes to flags
-        flags = {
-            "en": "🇬🇧",
-            "si": "🇱🇰"
-        }
-
-        buttons = [
-            self.ikb(
-                text=f"{flags.get(code, '')} {name} {'✔️' if code == _lang else ''}",
-                callback_data=f"lang_change {code}",
-            )
-            for code, name in langs.items()
-        ]
-        rows = [buttons[i: i + 2] for i in range(0, len(buttons), 2)]
-        return self.ikm(rows)
 
     def ping_markup(self, text: str) -> types.InlineKeyboardMarkup:
         return self.ikm([[self.ikb(text=text, url=config.SUPPORT_CHAT)]])
@@ -184,14 +166,6 @@ class Inline:
         rows = [
             [
                 self.ikb(
-                    text=lang["add_me"],
-                    url=f"https://t.me/{app.username}?startgroup=true",
-                )
-            ],
-            [self.ikb(text=lang["help"], callback_data="help")],
-            [
-                self.ikb(text=lang["support"], url=config.SUPPORT_CHAT),
-                self.ikb(text=lang["channel"], url=config.SUPPORT_CHANNEL),
             ],
         ]
         if private:
@@ -211,9 +185,6 @@ class Inline:
     def yt_key(self, link: str) -> types.InlineKeyboardMarkup:
         return self.ikm(
             [
-                [
-                    self.ikb(text="ᴄᴏᴘʏ ʟɪɴᴋ", copy_text=link),
-                    self.ikb(text="ᴏᴘᴇɴ ɪɴ ʏᴏᴜᴛᴜʙᴇ", url=link),
                 ],
             ]
         )

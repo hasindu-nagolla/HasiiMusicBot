@@ -9,7 +9,6 @@
 #
 # Supported Languages:
 # - English (en)
-# - Sinhala (si)
 #
 # Only admins can change the chat language.
 # ==============================================================================

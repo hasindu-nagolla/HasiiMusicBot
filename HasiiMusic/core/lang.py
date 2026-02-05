@@ -16,7 +16,6 @@ from HasiiMusic import db, logger
 # Supported language codes and their display names
 lang_codes = {
     "en": "English",  # English language
-    "si": "Sinhala",  # Sinhala language
 }
 
 
@@ -47,11 +46,7 @@ class Language:
 
     async def get_lang(self, chat_id: int) -> dict:
         """Get the translation dictionary for a specific chat."""
-        lang_code = await db.get_lang(chat_id)  # Get chat's language preference from DB
-        return self.languages[lang_code]  # Return the translation dictionary
-
-    def get_languages(self) -> dict:
-        return {code: name for code, name in sorted(self.lang_codes.items())}
+        return self.languages["en"]  # Return the translation dictionary
 
     def language(self):
         def decorator(func):
@@ -74,7 +69,7 @@ class Language:
                 if chat.id in db.blacklisted:
                     return await chat.leave()
 
-                lang_code = await db.get_lang(chat.id)
+                lang_code = "en"
                 lang_dict = self.languages[lang_code]
 
                 setattr(fallen, "lang", lang_dict)

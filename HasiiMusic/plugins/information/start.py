@@ -96,7 +96,7 @@ async def settings(_, message: types.Message):
     - Options to change settings
     """
     admin_only = await db.get_play_mode(message.chat.id)  # Get play mode setting
-    _language = await db.get_lang(message.chat.id)  # Get current language
+    _language = "en"
     await message.reply_text(
         text=message.lang["start_settings"].format(message.chat.title),
         reply_markup=buttons.settings_markup(
