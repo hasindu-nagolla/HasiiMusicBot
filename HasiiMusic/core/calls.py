@@ -393,6 +393,22 @@ class TgCall(PyTgCalls):
                     await message.edit_text(_lang["error_tg_server"])
                 except Exception:
                     pass
+        except TimeoutError as e:
+            # Handle voice chat connection timeout (network/Telegram issues)
+            error_msg = str(e)
+            logger.warning(f"⏱️ Timeout joining voice chat {chat_id}: {error_msg}")
+            await self.stop(chat_id)
+            if message:
+                try:
+                    await message.edit_text(
+                        "⏱️ <b>ᴄᴏɴɴᴇᴄᴛɪᴏɴ ᴛɪᴍᴇᴅ ᴏᴜᴛ!</b>\n\n"
+                        "<blockquote>ꜰᴀɪʟᴇᴅ ᴛᴏ ᴊᴏɪɴ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ. ᴘʟᴇᴀꜱᴇ ᴄʜᴇᴄᴋ ʏᴏᴜʀ ɴᴇᴛᴡᴏʀᴋ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ.</blockquote>"
+                    )
+                except Exception:
+                    pass
+            # Try to play next track instead of leaving queue stuck
+            await asyncio.sleep(2)
+            await self.play_next(chat_id)
         except Exception as e:
             # Catch all other exceptions to prevent bot crash
             logger.error(f"Unexpected error in play_media for {chat_id}: {e}", exc_info=True)
