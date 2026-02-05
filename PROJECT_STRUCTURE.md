@@ -84,6 +84,12 @@ All bot commands and event handlers, organized by category.
 
 **Purpose:** Commands restricted to bot owner and sudo users for administration.
 
+**Command Details:**
+- **`/leave`** - Make bot and assistant leave the current chat immediately
+- **`/leaveall`** - Make all assistants leave all inactive groups (excludes active calls and logger chat)
+- **`/restart`** - Clear cache and restart bot process
+- **`/update`** - Pull latest code from git, update dependencies, and restart bot
+
 ---
 
 #### 📁 events/ - Event Handlers
