@@ -14,7 +14,6 @@
 # - Channel play mode
 # ==============================================================================
 
-import random
 from pyrogram import filters
 from pyrogram import types
 from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden
@@ -23,9 +22,6 @@ from HasiiMusic import tune, app, config, db, lang, queue, tg, yt
 from HasiiMusic.helpers import buttons, utils
 from HasiiMusic.helpers._play import checkUB
 import asyncio
-
-# Random emojis for play reactions
-PLAY_EMOJIS = ["💞", "🦋", "🔍", "🧪", "⚡️", "🔥", "🎩", "🌈", "🍷", "🥂", "🥃", "🕊️", "🪄", "💌", "🧨"]
 
 
 async def safe_edit(message, text, **kwargs):
@@ -112,15 +108,15 @@ async def play_hndlr(
                 "ᴍᴀᴋᴇ ꜱᴜʀᴇ ɪ'ᴍ ᴀᴅᴍɪɴ ɪɴ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ ɪꜱ ꜱᴇᴛ ᴄᴏʀʀᴇᴄᴛʟʏ."
             )
 
-    # Select random emoji for this play session
-    random_emoji = random.choice(PLAY_EMOJIS)
+    # Select emoji for this play session
+    play_emoji = m.lang["play_emoji"]
     
     try:
-        sent = await m.reply_text(m.lang["play_searching"].format(random_emoji))
+        sent = await m.reply_text(m.lang["play_searching"].format(play_emoji))
     except FloodWait as e:
         await asyncio.sleep(e.value)
         try:
-            sent = await m.reply_text(m.lang["play_searching"].format(random_emoji))
+            sent = await m.reply_text(m.lang["play_searching"].format(play_emoji))
         except FloodWait as e2:
             # If still flood wait, wait longer and give up gracefully
             await asyncio.sleep(e2.value)
@@ -256,9 +252,9 @@ async def play_hndlr(
 
     try:
         await tune.play_media(chat_id=chat_id, message=sent, media=file)
-        # React with random emoji on successful play
+        # React with emoji on successful play
         try:
-            emoji = random.choice(PLAY_EMOJIS)
+            emoji = m.lang["play_emoji"]
             await m.react(emoji)
         except Exception:
             # If reaction fails, continue anyway (not critical)
