@@ -121,6 +121,9 @@ class Inline:
                 ],
                 [
                     self.ikb(text="ɢᴀᴍᴇꜱ", callback_data="help_games"),
+                ],
+                [
+                    self.ikb(text="ʙᴀᴄᴋ", callback_data="help_back"),
                 ]
             ]
         return self.ikm(rows)
