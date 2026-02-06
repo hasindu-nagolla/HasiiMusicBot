@@ -88,7 +88,7 @@ class Inline:
         if back:
             rows = [
                 [
-                    self.ikb(text="ʙᴀᴄᴋ", callback_data="help_back"),
+                    self.ikb(text="ʙᴀᴄᴋ", callback_data="help_main"),
                 ]
             ]
         else:
@@ -123,7 +123,7 @@ class Inline:
                     self.ikb(text="ɢᴀᴍᴇꜱ", callback_data="help_games"),
                 ],
                 [
-                    self.ikb(text="ʙᴀᴄᴋ", callback_data="help_back"),
+                    self.ikb(text="ʙᴀᴄᴋ", callback_data="help_close"),
                 ]
             ]
         return self.ikm(rows)
