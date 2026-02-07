@@ -93,11 +93,11 @@ async def play_hndlr(
         channel_id = await db.get_cmode(m.chat.id)
         if channel_id is None:
             return await m.reply_text(
-                "❌ **Channel play is not enabled.**\n\n"
-                "**To enable for linked channel:**\n"
+                "<blockquote>❌ Channel play is not enabled.\n\n"
+                "To enable for linked channel:\n"
                 "`/channelplay linked`\n\n"
-                "**To enable for any channel:**\n"
-                "`/channelplay [channel_id]`"
+                "To enable for any channel:\n"
+                "`/channelplay [channel_id]`</blockquote>"
             )
         try:
             chat = await app.get_chat(channel_id)
@@ -105,8 +105,8 @@ async def play_hndlr(
         except:
             await db.set_cmode(m.chat.id, None)
             return await m.reply_text(
-                "❌ **ꜰᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ᴄʜᴀɴɴᴇʟ.**\n\n"
-                "ᴍᴀᴋᴇ ꜱᴜʀᴇ ɪ'ᴍ ᴀᴅᴍɪɴ ɪɴ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ ɪꜱ ꜱᴇᴛ ᴄᴏʀʀᴇᴄᴛʟʏ."
+                "<blockquote>❌ ꜰᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ᴄʜᴀɴɴᴇʟ.\n\n"
+                "ᴍᴀᴋᴇ ꜱᴜʀᴇ ɪ'ᴍ ᴀᴅᴍɪɴ ɪɴ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ ɪꜱ ꜱᴇᴛ ᴄᴏʀʀᴇᴄᴛʟʏ.</blockquote>"
             )
         
         # Auto-join assistant to channel if not already a member
@@ -128,14 +128,14 @@ async def play_hndlr(
                             invite_link = await app.export_chat_invite_link(channel_id)
                     except Exception:
                         return await m.reply_text(
-                            f"❌ **ᴀꜱꜱɪꜱᴛᴀɴᴛ ɴᴏᴛ ɪɴ ᴄʜᴀɴɴᴇʟ!**\n\n"
-                            f"<blockquote>ᴘʟᴇᴀꜱᴇ ᴀᴅᴅ @{client.username if client.username else client.mention} "
+                            f"<blockquote>❌ ᴀꜱꜱɪꜱᴛᴀɴᴛ ɴᴏᴛ ɪɴ ᴄʜᴀɴɴᴇʟ!\n\n"
+                            f"ᴘʟᴇᴀꜱᴇ ᴀᴅᴅ @{client.username if client.username else client.mention} "
                             f"ᴛᴏ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀꜱ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ.</blockquote>"
                         )
                 
                 # Show joining message
                 join_msg = await m.reply_text(
-                    f"🔄 **ᴊᴏɪɴɪɴɢ ᴀꜱꜱɪꜱᴛᴀɴᴛ ᴛᴏ ᴄʜᴀɴɴᴇʟ...**"
+                    f"<blockquote>🔄 ᴊᴏɪɴɪɴɢ ᴀꜱꜱɪꜱᴛᴀɴᴛ ᴛᴏ ᴄʜᴀɴɴᴇʟ...</blockquote>"
                 )
                 
                 # Try to join the channel
@@ -151,10 +151,10 @@ async def play_hndlr(
             except Exception as e:
                 error_str = str(e)
                 return await m.reply_text(
-                    f"❌ **ꜰᴀɪʟᴇᴅ ᴛᴏ ᴊᴏɪɴ ᴀꜱꜱɪꜱᴛᴀɴᴛ ᴛᴏ ᴄʜᴀɴɴᴇʟ!**\n\n"
-                    f"<blockquote>ᴘʟᴇᴀꜱᴇ ᴍᴀɴᴜᴀʟʟʏ ᴀᴅᴅ @{client.username if client.username else client.mention} "
+                    f"<blockquote>❌ ꜰᴀɪʟᴇᴅ ᴛᴏ ᴊᴏɪɴ ᴀꜱꜱɪꜱᴛᴀɴᴛ ᴛᴏ ᴄʜᴀɴɴᴇʟ!\n\n"
+                    f"ᴘʟᴇᴀꜱᴇ ᴍᴀɴᴜᴀʟʟʏ ᴀᴅᴅ @{client.username if client.username else client.mention} "
                     f"ᴛᴏ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀꜱ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ.\n\n"
-                    f"**Error:** {error_str}</blockquote>"
+                    f"Error: {error_str}</blockquote>"
                 )
 
     # Select emoji for this play session
@@ -312,18 +312,18 @@ async def play_hndlr(
         if "bot" in error_msg.lower() or "sign in" in error_msg.lower():
             await safe_edit(
                 sent,
-                "❌ **YouTube bot detection triggered.**\n\n"
-                "**Solution:**\n"
+                "<blockquote>❌ YouTube bot detection triggered.\n\n"
+                "Solution:\n"
                 "• Update YouTube cookies in `HasiiMusic/cookies/` folder\n"
                 "• Wait a few minutes before trying again\n"
                 "• Try /radio for uninterrupted music\n\n"
-                f"**Support:** {config.SUPPORT_CHAT}"
+                f"Support: {config.SUPPORT_CHAT}</blockquote>"
             )
         else:
             await safe_edit(
                 sent,
-                f"❌ **Playback error:**\n{error_msg}\n\n"
-                f"**Support:** {config.SUPPORT_CHAT}"
+                f"<blockquote>❌ Playback error:\n{error_msg}\n\n"
+                f"Support: {config.SUPPORT_CHAT}</blockquote>"
                 
                 
                 
