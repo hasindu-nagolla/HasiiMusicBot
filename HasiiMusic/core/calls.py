@@ -126,9 +126,13 @@ class TgCall(PyTgCalls):
         message: Message | None,
         media: Media | Track,
         seek_time: int = 0,
+        thumbnail_chat_id: int = None,
     ) -> None:
         client = await db.get_assistant(chat_id)
         _lang = await lang.get_lang(chat_id)
+        # If thumbnail_chat_id is provided (cplay mode), use it for sending thumbnail
+        # Otherwise use chat_id (normal mode)
+        thumb_target_chat = thumbnail_chat_id if thumbnail_chat_id else chat_id
         # Generate thumbnail only if THUMB_GEN is enabled, otherwise use default
         if config.THUMB_GEN and isinstance(media, Track):
             _thumb = await thumb.generate(media)
@@ -323,9 +327,9 @@ class TgCall(PyTgCalls):
                     except Exception:
                         pass
                 
-                # Send new photo message
+                # Send new photo message to the appropriate chat (group for cplay, channel for normal)
                 sent_photo = await self._send_photo_with_retry(
-                    chat_id=chat_id,
+                    chat_id=thumb_target_chat,
                     photo=_thumb,
                     caption=text,
                     reply_markup=keyboard,

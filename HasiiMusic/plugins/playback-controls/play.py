@@ -88,6 +88,7 @@ async def play_hndlr(
 ) -> None:
     # Handle channel play mode
     chat_id = m.chat.id
+    message_chat_id = m.chat.id  # Store original group chat ID for thumbnail
     if cplay:
         channel_id = await db.get_cmode(m.chat.id)
         if channel_id is None:
@@ -250,7 +251,7 @@ async def play_hndlr(
             )
 
     try:
-        await tune.play_media(chat_id=chat_id, message=sent, media=file)
+        await tune.play_media(chat_id=chat_id, message=sent, media=file, thumbnail_chat_id=message_chat_id)
         # React with emoji on successful play
         try:
             emoji = m.lang["play_emoji"]
