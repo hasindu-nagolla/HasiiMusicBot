@@ -21,6 +21,12 @@ from HasiiMusic.helpers import buttons, can_manage_vc
 @lang.language()
 @can_manage_vc
 async def _pause(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     if not await db.get_call(m.chat.id):
         return await m.reply_text(m.lang["not_playing"])
 

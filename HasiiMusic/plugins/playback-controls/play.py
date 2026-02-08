@@ -86,6 +86,12 @@ async def play_hndlr(
     url: str = None,
     cplay: bool = False,
 ) -> None:
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     # Handle channel play mode
     chat_id = m.chat.id
     message_chat_id = m.chat.id  # Store original group chat ID for thumbnail

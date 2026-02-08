@@ -22,6 +22,12 @@ from HasiiMusic.helpers import can_manage_vc
 @lang.language()
 @can_manage_vc
 async def _shuffle(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     items = queue.get_all(m.chat.id)
     
     if not items or len(items) <= 1:

@@ -23,6 +23,12 @@ from HasiiMusic.helpers import can_manage_vc
 @lang.language()
 @can_manage_vc
 async def _loop(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     current_loop = await db.get_loop(m.chat.id)
     
     # Check if user specified a mode

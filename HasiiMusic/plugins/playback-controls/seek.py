@@ -24,6 +24,12 @@ from HasiiMusic.helpers import can_manage_vc
 @lang.language()
 @can_manage_vc
 async def _seek(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     if len(m.command) < 2:
         return await m.reply_text(m.lang["play_seek_usage"].format(m.command[0]))
 

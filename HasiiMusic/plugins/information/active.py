@@ -18,6 +18,12 @@ from HasiiMusic import app, db, lang, queue
 @app.on_message(filters.command(["ac", "activevc"]) & app.sudo_filter)
 @lang.language()
 async def _activevc(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     if not db.active_calls:
         return await m.reply_text(m.lang["vc_empty"])
 

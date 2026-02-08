@@ -27,6 +27,12 @@ from HasiiMusic.helpers import buttons
 @app.on_message(filters.command(["alive", "ping"]) & ~app.bl_users)
 @lang.language()
 async def _ping(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     start = time.time()
     sent = await m.reply_text(m.lang["pinging"])
 

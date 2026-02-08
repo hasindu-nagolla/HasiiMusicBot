@@ -36,6 +36,12 @@ from HasiiMusic.plugins import all_modules
 @app.on_message(filters.command(["stats"]) & ~app.bl_users)
 @lang.language()
 async def _stats(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     # Check if user is sudo
     if m.from_user.id not in app.sudoers:
         return
