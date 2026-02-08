@@ -27,6 +27,12 @@ from HasiiMusic import app, db, lang
 @lang.language()
 async def _blacklist_chat(_, m: types.Message):
     """Add chat to blacklist."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     if len(m.command) < 2:
         return await m.reply_text(
             "<blockquote><b>ᴜꜱᴀɢᴇ:</b>\n"
@@ -58,6 +64,12 @@ async def _blacklist_chat(_, m: types.Message):
 @lang.language()
 async def _whitelist_chat(_, m: types.Message):
     """Remove chat from blacklist."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     if len(m.command) < 2:
         return await m.reply_text(
             "<blockquote><b>ᴜꜱᴀɢᴇ:</b>\n"
@@ -91,6 +103,12 @@ async def _whitelist_chat(_, m: types.Message):
 @lang.language()
 async def _blacklisted_chats(_, m: types.Message):
     """Show all blacklisted chats."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     sent = await m.reply_text("📋 Fetching blacklisted chats...")
     
     blacklisted = await db.get_blacklisted(chat=True)
@@ -120,6 +138,11 @@ async def _blacklisted_chats(_, m: types.Message):
 @lang.language()
 async def _block_user(_, m: types.Message):
     """Block a user from using the bot."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
     
     # Extract user from command or reply
     user_id = None
@@ -165,6 +188,11 @@ async def _block_user(_, m: types.Message):
 @lang.language()
 async def _unblock_user(_, m: types.Message):
     """Unblock a user."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
     
     # Extract user from command or reply
     user_id = None
@@ -206,6 +234,12 @@ async def _unblock_user(_, m: types.Message):
 @lang.language()
 async def _blocked_users(_, m: types.Message):
     """Show all blocked users."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     sent = await m.reply_text("📋 Fetching blocked users...")
     
     blacklisted = await db.get_blacklisted()

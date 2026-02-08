@@ -35,6 +35,12 @@ from HasiiMusic.helpers import format_exception, meval
 @app.on_edited_message(filters.command(["eval", "exec"]) & filters.user(app.owner))
 @lang.language()
 async def eval_handler(_, message: types.Message):
+    # Auto-delete command message
+    try:
+        await message.delete()
+    except Exception:
+        pass
+    
     if len(message.command) < 2:
         return await message.reply_text(message.lang["eval_inp"])
 

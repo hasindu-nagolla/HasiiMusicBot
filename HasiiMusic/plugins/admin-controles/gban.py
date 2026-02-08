@@ -21,6 +21,11 @@ from HasiiMusic import app, db, lang, userbot
 @lang.language()
 async def _gban(_, m: types.Message):
     """Globally ban a user from all groups."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
     
     # Extract user from command or reply
     user_id = None
@@ -101,6 +106,11 @@ async def _gban(_, m: types.Message):
 @lang.language()
 async def _ungban(_, m: types.Message):
     """Remove user from global ban list."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
     
     # Extract user from command or reply
     user_id = None
@@ -147,6 +157,11 @@ async def _ungban(_, m: types.Message):
 @lang.language()
 async def _gbanlist(_, m: types.Message):
     """Show list of globally banned users."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
     
     sent = await m.reply_text("📋 Fetching global ban list...")
     

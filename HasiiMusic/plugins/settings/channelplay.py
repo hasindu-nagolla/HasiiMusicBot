@@ -25,6 +25,12 @@ from HasiiMusic import app, config, db
 @app.on_message(filters.command(["channelplay"]) & filters.group & ~app.bl_users)
 async def channelplay_command(_, m: Message):
     """Enable or disable channel play mode."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     # Check if from_user exists (not sent by channel/anonymous admin)
     if not m.from_user:
         return await m.reply_text("❌ ᴛʜɪꜱ ᴄᴏᴍᴍᴀɴᴅ ᴄᴀɴɴᴏᴛ ʙᴇ ᴜꜱᴇᴅ ʙʏ ᴄʜᴀɴɴᴇʟꜱ ᴏʀ ᴀɴᴏɴʏᴍᴏᴜꜱ ᴀᴅᴍɪɴꜱ.")

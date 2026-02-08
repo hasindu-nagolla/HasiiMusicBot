@@ -25,6 +25,12 @@ from HasiiMusic.helpers import admin_check, is_admin, utils
 @lang.language()
 @admin_check
 async def _auth(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     user = await utils.extract_user(m)
     if not user:
         return await m.reply_text(m.lang["user_not_found"])
@@ -46,6 +52,12 @@ rel_hist = {}
 @app.on_message(filters.command(["admincache", "reload"]) & filters.group & ~app.bl_users)
 @lang.language()
 async def _admincache(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     # Check if message is from anonymous admin
     if not m.from_user:
         return

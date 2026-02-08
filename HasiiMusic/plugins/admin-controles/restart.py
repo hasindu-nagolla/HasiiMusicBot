@@ -25,6 +25,12 @@ from HasiiMusic import app, db, lang, stop
 @app.on_message(filters.command(["logs"]) & app.sudo_filter)
 @lang.language()
 async def _logs(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     sent = await m.reply_text(m.lang["log_fetch"])
     if not os.path.exists("log.txt"):
         return await sent.edit_text(m.lang["log_not_found"])
@@ -39,6 +45,12 @@ async def _logs(_, m: types.Message):
 @app.on_message(filters.command(["logger"]) & app.sudo_filter)
 @lang.language()
 async def _logger(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     if len(m.command) < 2:
         return await m.reply_text(m.lang["logger_usage"].format(m.command[0]))
     if m.command[1] not in ("on", "off"):
@@ -55,6 +67,12 @@ async def _logger(_, m: types.Message):
 @app.on_message(filters.command(["restart"]) & app.sudo_filter)
 @lang.language()
 async def _restart(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     sent = await m.reply_text(m.lang["restarting"])
 
     for directory in ["cache", "downloads"]:
@@ -73,6 +91,12 @@ async def _update(_, m: types.Message):
     """
     Update bot from git repository and restart.
     """
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     sent = await m.reply_text(
         "<blockquote><b>🔄 Updating...</b></blockquote>\n\n"
         "<blockquote>Pulling latest changes from repository...</blockquote>"

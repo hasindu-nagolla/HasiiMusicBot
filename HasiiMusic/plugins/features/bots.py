@@ -8,6 +8,11 @@ from HasiiMusic import app
 @app.on_message(filters.command("bots") & filters.group)
 async def list_bots(client, message: Message):
     """List all bots in the current group"""
+    # Auto-delete command message
+    try:
+        await message.delete()
+    except Exception:
+        pass
     
     try:
         bot_list = []

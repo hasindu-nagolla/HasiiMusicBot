@@ -48,6 +48,12 @@ async def broadcast_message(_, message: types.Message) -> None:
     Returns:
         None
     """
+    # Auto-delete command message
+    try:
+        await message.delete()
+    except Exception:
+        pass
+    
     global broadcasting
 
     # Check if another broadcast is already running
@@ -118,6 +124,12 @@ async def stop_broadcast(_, message: types.Message) -> None:
 
     Returns:
         None
+    """
+    # Auto-delete command message
+    try:
+        await message.delete()
+    except Exception:
+        pass
     """
     global broadcasting
 

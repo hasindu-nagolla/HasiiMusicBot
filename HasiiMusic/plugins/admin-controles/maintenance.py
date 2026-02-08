@@ -20,6 +20,11 @@ from HasiiMusic import app, db, lang
 @lang.language()
 async def _maintenance(_, m: types.Message):
     """Toggle or check maintenance mode status."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
     
     # If no argument, show current status
     if len(m.command) < 2:

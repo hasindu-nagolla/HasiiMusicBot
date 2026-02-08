@@ -21,6 +21,12 @@ from HasiiMusic.helpers import utils
 @app.on_message(filters.command(["addsudo", "delsudo", "rmsudo"]) & app.sudo_filter)
 @lang.language()
 async def _sudo(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     user = await utils.extract_user(m)
     if not user:
         return await m.reply_text(m.lang["user_not_found"])
@@ -50,6 +56,12 @@ o_mention = None
 @app.on_message(filters.command(["listsudo", "sudolist"]) & app.sudo_filter)
 @lang.language()
 async def _listsudo(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     sent = await m.reply_text(m.lang["sudo_fetching"])
 
     # Always fetch fresh owner info with ID

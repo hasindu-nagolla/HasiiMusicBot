@@ -8,6 +8,11 @@ from HasiiMusic import app
 @app.on_message(filters.command(["groupdata", "chatinfo", "groupinfo"]) & filters.group)
 async def group_data_handler(client: Client, message: Message):
     """Display comprehensive information about the current group"""
+    # Auto-delete command message
+    try:
+        await message.delete()
+    except Exception:
+        pass
     
     chat = message.chat
     chat_id = chat.id

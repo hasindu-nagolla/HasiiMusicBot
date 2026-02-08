@@ -23,6 +23,12 @@ async def _leave(_, m: types.Message):
     Command handler for /leave
     Makes both bot and assistant leave the current chat.
     """
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     chat_id = m.chat.id
     chat_name = m.chat.title or "this chat"
 
@@ -65,6 +71,12 @@ async def _leaveall(_, m: types.Message):
     Command handler for /leaveall
     Makes all assistants leave all inactive groups (not in active calls).
     """
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     sent = await m.reply_text(
         f"<blockquote><b>🔄 Processing...</b></blockquote>\n\n"
         f"<blockquote>Making assistants leave all inactive groups...</blockquote>"

@@ -18,6 +18,12 @@ from HasiiMusic.helpers import buttons, utils
 @lang.language()
 async def _help(_, m: types.Message):
     """Handle /help command in private chats - shows help menu with image."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     try:
         await m.reply_photo(
             photo=config.START_IMG,  # Use same image as start command
@@ -45,6 +51,13 @@ async def start(_, message: types.Message):
     - Adds new users to database
     - Sends log to logger group for new users
     """
+    # Auto-delete command message in group chats
+    if message.chat.type != enums.ChatType.PRIVATE:
+        try:
+            await message.delete()
+        except Exception:
+            pass
+    
     # Skip if message from channel or anonymous admin
     if not message.from_user:
         return
@@ -104,6 +117,12 @@ async def settings(_, message: types.Message):
     - Current language
     - Options to change settings
     """
+    # Auto-delete command message
+    try:
+        await message.delete()
+    except Exception:
+        pass
+    
     admin_only = await db.get_play_mode(message.chat.id)  # Get play mode setting
     _language = "en"
     await message.reply_text(
