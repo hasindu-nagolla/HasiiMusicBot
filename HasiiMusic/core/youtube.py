@@ -273,8 +273,18 @@ class YouTube:
             return stream_url if stream_url else url
 
         # Download audio file
-        ext = "webm"
-        filename = f"downloads/{video_id}.{ext}"
+        # Don't hardcode extension - let yt-dlp choose best available audio format
+        # Will use outtmpl pattern to get actual extension
+        filename_pattern = f"downloads/{video_id}"
+        
+        # Check if any audio file with this video_id already exists
+        import glob
+        existing_files = glob.glob(f"{filename_pattern}.*")
+        if existing_files:
+            # Filter out .part files
+            existing_files = [f for f in existing_files if not f.endswith('.part')]
+            if existing_files:
+                return existing_files[0]  # Return first match
         
         # Ensure downloads directory exists with write permissions
         downloads_dir = Path("downloads")
@@ -285,9 +295,6 @@ class YouTube:
             except Exception as e:
                 logger.error(f"❌ Cannot create downloads directory: {e}")
                 return None
-
-        if Path(filename).exists():
-            return filename
 
         # **PERFORMANCE FIX**: Use semaphore to limit concurrent downloads
         # Prevents bandwidth saturation when 15-20 groups download simultaneously
@@ -315,50 +322,61 @@ class YouTube:
                 "ignoreerrors": True,
             }
 
-            # High-quality audio: Opus codec in WebM container for best quality
+            # Audio-only: Prefer Opus codec (best quality) but accept any audio format
+            # Don't force WebM container - let YouTube provide whatever's available
             ydl_opts = {
                 **base_opts,
-                "format": "bestaudio[ext=webm][acodec=opus]/bestaudio[acodec=opus]/bestaudio",
+                "format": "bestaudio[acodec=opus]/bestaudio/best",
                 "postprocessors": [],  # No post-processing to preserve original quality
             }
 
             def _download():
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     try:
-                        ydl.download([url])
-                        # Check if file was actually downloaded (handle .part rename issues)
-                        if not Path(filename).exists():
-                            # Wait for filesystem operations to complete
-                            import time
-                            import glob
-                            time.sleep(3.0)  # Longer wait for slower filesystems
-                            if Path(filename).exists():
-                                return filename
-                            
-                            # Try to find .part file and rename it
-                            part_file = Path(f"{filename}.part")
-                            if part_file.exists():
-                                try:
-                                    import shutil
-                                    shutil.move(str(part_file), filename)
-                                    logger.info(f"✅ Renamed {part_file} to {filename}")
-                                    return filename
-                                except Exception as rename_ex:
-                                    logger.error(f"❌ Failed to rename .part file: {rename_ex}")
-                                    return None
-                            
-                            # Try to find any variant of the file (different extension)
-                            video_id_pattern = str(Path(filename).stem)
-                            possible_files = glob.glob(f"downloads/{video_id_pattern}.*")
-                            if possible_files:
-                                # Use the first match
-                                found_file = possible_files[0]
-                                logger.info(f"✅ Found alternative file: {found_file}")
-                                return found_file
-                            
-                            logger.warning(f"⚠️ Download completed but file not found: {filename}")
+                        # Extract info to get actual extension downloaded
+                        info = ydl.extract_info(url, download=True)
+                        if not info:
+                            logger.error(f"❌ Failed to extract info for {video_id}")
                             return None
-                        return filename
+                        
+                        # Get actual extension from downloaded file
+                        actual_ext = info.get('ext', 'webm')
+                        actual_filename = f"downloads/{video_id}.{actual_ext}"
+                        
+                        # Check if file exists
+                        if Path(actual_filename).exists():
+                            logger.info(f"✅ Downloaded: {actual_filename} ({actual_ext} format)")
+                            return actual_filename
+                        
+                        # Wait for filesystem operations to complete
+                        import time
+                        import glob
+                        time.sleep(2.0)
+                        
+                        if Path(actual_filename).exists():
+                            return actual_filename
+                        
+                        # Try to find .part file and rename it
+                        part_file = Path(f"{actual_filename}.part")
+                        if part_file.exists():
+                            try:
+                                import shutil
+                                shutil.move(str(part_file), actual_filename)
+                                logger.info(f"✅ Renamed .part file to {actual_filename}")
+                                return actual_filename
+                            except Exception as rename_ex:
+                                logger.error(f"❌ Failed to rename .part file: {rename_ex}")
+                        
+                        # Try to find any variant of the file (different extension)
+                        possible_files = glob.glob(f"downloads/{video_id}.*")
+                        possible_files = [f for f in possible_files if not f.endswith('.part')]
+                        if possible_files:
+                            found_file = possible_files[0]
+                            logger.info(f"✅ Found alternative: {found_file}")
+                            return found_file
+                        
+                        logger.error(f"❌ Download completed but file not found: {actual_filename}")
+                        return None
                     except yt_dlp.utils.ExtractorError as ex:
                         error_msg = str(ex)
                         if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
