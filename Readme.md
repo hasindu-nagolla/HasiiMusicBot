@@ -15,7 +15,7 @@
 ## ✨ Features
 
 - 🎵 **High Quality Music Streaming** - Crystal clear audio with STUDIO quality
-- 📻 **Live Radio Streaming** - 50+ international and local radio stations
+- 📻 **Live Radio Streaming** - 50+ international and local radio stations (Request)
 - 🎧 **YouTube Support** - Play music from YouTube links or search
 - 📝 **Queue System** - Manage multiple songs in queue
 - ⚡ **Fast & Reliable** - Built with Pyrogram and PyTgCalls
