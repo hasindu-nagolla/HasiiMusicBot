@@ -130,7 +130,15 @@ class Inline:
 
 
     def ping_markup(self, text: str) -> types.InlineKeyboardMarkup:
-        return self.ikm([[self.ikb(text=text, url=config.SUPPORT_CHAT)]])
+        return self.ikm([
+            [
+                self.ikb(text="📢 Channel", url=config.SUPPORT_CHANNEL),
+                self.ikb(text="🆘 Support", url=config.SUPPORT_CHAT),
+            ],
+            [
+                self.ikb(text="➕ Add Me to Your Group", url=f"https://t.me/{app.username}?startgroup=true"),
+            ]
+        ])
 
     def play_queued(
         self, chat_id: int, item_id: str, _text: str
