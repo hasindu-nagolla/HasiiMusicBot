@@ -345,7 +345,6 @@ class YouTube:
                         
                         # Check if file exists
                         if Path(actual_filename).exists():
-                            logger.info(f"✅ Downloaded: {actual_filename} ({actual_ext} format)")
                             return actual_filename
                         
                         # Wait for filesystem operations to complete
@@ -362,7 +361,6 @@ class YouTube:
                             try:
                                 import shutil
                                 shutil.move(str(part_file), actual_filename)
-                                logger.info(f"✅ Renamed .part file to {actual_filename}")
                                 return actual_filename
                             except Exception as rename_ex:
                                 logger.error(f"❌ Failed to rename .part file: {rename_ex}")
@@ -372,7 +370,6 @@ class YouTube:
                         possible_files = [f for f in possible_files if not f.endswith('.part')]
                         if possible_files:
                             found_file = possible_files[0]
-                            logger.info(f"✅ Found alternative: {found_file}")
                             return found_file
                         
                         logger.error(f"❌ Download completed but file not found: {actual_filename}")
