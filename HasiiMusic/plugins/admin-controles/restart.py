@@ -40,8 +40,8 @@ async def _logs(_, m: types.Message):
         with open("log.txt", "r", encoding="utf-8") as f:
             content = f.read()
         
-        # Find the last occurrence of bot start marker
-        start_marker = "🎉 Bot started successfully! Ready to play music! 🎵"
+        # Find the last occurrence of bot start marker (first log line of startup sequence)
+        start_marker = "📁 Cache directories updated."
         last_start_index = content.rfind(start_marker)
         
         if last_start_index != -1:
