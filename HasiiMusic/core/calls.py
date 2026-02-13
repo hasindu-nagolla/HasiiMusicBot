@@ -94,6 +94,10 @@ class TgCall(PyTgCalls):
     async def stop(self, chat_id: int) -> None:
         client = await db.get_assistant(chat_id)
         
+        # Get current message before clearing queue
+        current_media = queue.get_current(chat_id)
+        current_message_id = current_media.message_id if current_media and hasattr(current_media, 'message_id') else None
+        
         # Cancel any active preload tasks when stopping
         try:
             await preload.cancel_preload(chat_id)
@@ -125,6 +129,24 @@ class TgCall(PyTgCalls):
                 "call already disconnected"
             ]):
                 logger.warning(f"Error leaving call for {chat_id}: {e}")
+        
+        # Schedule deletion of current playing message after 10 seconds
+        if current_message_id and current_message_id != 0:
+            async def delayed_delete():
+                try:
+                    await asyncio.sleep(10)
+                    # Determine target chat for message deletion (handle channel play)
+                    channel_play = await db.get_channelplay(chat_id)
+                    target_chat = channel_play[0] if channel_play else chat_id
+                    await app.delete_messages(
+                        chat_id=target_chat,
+                        message_ids=current_message_id,
+                        revoke=True,
+                    )
+                except Exception as e:
+                    logger.debug(f"Could not delete stopped message {current_message_id} in {chat_id}: {e}")
+            
+            asyncio.create_task(delayed_delete())
 
     async def play_media(
         self,
@@ -568,9 +590,26 @@ class TgCall(PyTgCalls):
                             await db.rm_chat(chat_id)
                         return
                 
+                # Get the old message_id before moving to next track
+                old_media = queue.get_current(chat_id)
+                old_message_id = old_media.message_id if old_media and hasattr(old_media, 'message_id') else None
+                
                 media = queue.get_next(chat_id)
                 
-                # If queue loop and no more tracks, start from beginning
+                # Schedule deletion of old message after 10 seconds
+                if old_message_id and old_message_id != 0:
+                    async def delayed_delete():
+                        try:
+                            await asyncio.sleep(10)
+                            await app.delete_messages(
+                                chat_id=target_chat,
+                                message_ids=old_message_id,
+                                revoke=True,
+                            )
+                        except Exception as e:
+                            logger.debug(f"Could not delete old message {old_message_id} in {target_chat}: {e}")
+                    
+                    asyncio.create_task(delayed_delete())
                 if not media and loop_mode == 10:
                     all_items = queue.get_all(chat_id)
                     if all_items:
@@ -590,17 +629,6 @@ class TgCall(PyTgCalls):
                             await db.rm_chat(chat_id)
                         return
                 
-                try:
-                    if media and media.message_id:
-                        await app.delete_messages(
-                            chat_id=chat_id,
-                            message_ids=media.message_id,
-                            revoke=True,
-                        )
-                        media.message_id = 0
-                except Exception as e:
-                    logger.debug(f"Could not delete previous message in {chat_id}: {e}")
-
                 if not media:
                     # Check if AUTO_END is enabled
                     if config.AUTO_END:
