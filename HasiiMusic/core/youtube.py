@@ -331,84 +331,95 @@ class YouTube:
             }
 
             def _download():
-                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    try:
-                        # Extract info to get actual extension downloaded
-                        info = ydl.extract_info(url, download=True)
-                        if not info:
-                            logger.error(f"❌ Failed to extract info for {video_id}")
-                            return None
-                        
-                        # Get actual extension from downloaded file
-                        actual_ext = info.get('ext', 'webm')
-                        actual_filename = f"downloads/{video_id}.{actual_ext}"
-                        
-                        # Check if file exists
-                        if Path(actual_filename).exists():
+                ydl_instance = None
+                try:
+                    ydl_instance = yt_dlp.YoutubeDL(ydl_opts)
+                    # Extract info to get actual extension downloaded
+                    info = ydl_instance.extract_info(url, download=True)
+                    if not info:
+                        logger.error(f"❌ Failed to extract info for {video_id}")
+                        return None
+                    
+                    # Get actual extension from downloaded file
+                    actual_ext = info.get('ext', 'webm')
+                    actual_filename = f"downloads/{video_id}.{actual_ext}"
+                    
+                    # Check if file exists
+                    if Path(actual_filename).exists():
+                        return actual_filename
+                    
+                    # Wait for filesystem operations to complete
+                    import time
+                    import glob
+                    time.sleep(2.0)
+                    
+                    if Path(actual_filename).exists():
+                        return actual_filename
+                    
+                    # Try to find .part file and rename it
+                    part_file = Path(f"{actual_filename}.part")
+                    if part_file.exists():
+                        try:
+                            import shutil
+                            shutil.move(str(part_file), actual_filename)
                             return actual_filename
-                        
-                        # Wait for filesystem operations to complete
-                        import time
-                        import glob
-                        time.sleep(2.0)
-                        
-                        if Path(actual_filename).exists():
-                            return actual_filename
-                        
-                        # Try to find .part file and rename it
-                        part_file = Path(f"{actual_filename}.part")
-                        if part_file.exists():
+                        except Exception as rename_ex:
+                            logger.error(f"❌ Failed to rename .part file: {rename_ex}")
+                    
+                    # Try to find any variant of the file (different extension)
+                    possible_files = glob.glob(f"downloads/{video_id}.*")
+                    possible_files = [f for f in possible_files if not f.endswith('.part')]
+                    if possible_files:
+                        found_file = possible_files[0]
+                        return found_file
+                    
+                    logger.error(f"❌ Download completed but file not found: {actual_filename}")
+                    return None
+                except yt_dlp.utils.ExtractorError as ex:
+                    error_msg = str(ex)
+                    if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
+                        logger.warning(
+                            f"⚠️ YouTube bot detection for {video_id}. This is temporary.")
+                    elif "not available" in error_msg.lower():
+                        logger.error(
+                            "❌ Video not available: May be region-blocked or private.")
+                    elif "age" in error_msg.lower():
+                        logger.error(
+                            "❌ Age-restricted video: Cookies required.")
+                    else:
+                        logger.error("❌ YouTube extraction failed: %s", ex)
+                    return None
+                except yt_dlp.utils.DownloadError as ex:
+                    error_msg = str(ex)
+                    if "416" in error_msg or "Requested range not satisfiable" in error_msg:
+                        # HTTP 416 - file partially downloaded, delete and retry won't help
+                        logger.warning(f"⚠️ Range error for {video_id}, skipping")
+                    elif "failed to load cookies" in error_msg.lower() or "netscape format" in error_msg.lower():
+                        logger.warning(
+                            "⚠️ Failed to load cookies for {video_id}: {error_msg}")
+                        # Remove corrupted cookie from list and filesystem
+                        if cookie:
+                            cookie_name = os.path.basename(cookie)
+                            if cookie_name in self.cookies:
+                                self.cookies.remove(cookie_name)
                             try:
-                                import shutil
-                                shutil.move(str(part_file), actual_filename)
-                                return actual_filename
-                            except Exception as rename_ex:
-                                logger.error(f"❌ Failed to rename .part file: {rename_ex}")
-                        
-                        # Try to find any variant of the file (different extension)
-                        possible_files = glob.glob(f"downloads/{video_id}.*")
-                        possible_files = [f for f in possible_files if not f.endswith('.part')]
-                        if possible_files:
-                            found_file = possible_files[0]
-                            return found_file
-                        
-                        logger.error(f"❌ Download completed but file not found: {actual_filename}")
-                        return None
-                    except yt_dlp.utils.ExtractorError as ex:
-                        error_msg = str(ex)
-                        if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
-                            logger.warning(
-                                f"⚠️ YouTube bot detection for {video_id}. This is temporary.")
-                        elif "not available" in error_msg.lower():
-                            logger.error(
-                                "❌ Video not available: May be region-blocked or private.")
-                        elif "age" in error_msg.lower():
-                            logger.error(
-                                "❌ Age-restricted video: Cookies required.")
-                        else:
-                            logger.error("❌ YouTube extraction failed: %s", ex)
-                        return None
-                    except yt_dlp.utils.DownloadError as ex:
-                        error_msg = str(ex)
-                        if "416" in error_msg or "Requested range not satisfiable" in error_msg:
-                            # HTTP 416 - file partially downloaded, delete and retry won't help
-                            logger.warning(f"⚠️ Range error for {video_id}, skipping")
-                        elif "failed to load cookies" in error_msg.lower() or "netscape format" in error_msg.lower():
-                            logger.error(
-                                "❌ Corrupted cookie file detected, removing: %s", cookie)
-                            # Remove corrupted cookie from list and filesystem
-                            if cookie and cookie in self.cookies:
-                                self.cookies.remove(cookie)
-                            try:
-                                os.remove(f"HasiiMusic/cookies/{cookie}")
-                            except:
-                                pass
-                        else:
-                            logger.warning(f"⚠️ Download error for {video_id}: {ex}")
-                        return None
-                    except Exception as ex:
-                        logger.warning(f"⚠️ Unexpected download error for {video_id}: {ex}")
-                        return None
+                                if os.path.exists(cookie):
+                                    os.remove(cookie)
+                            except Exception as e:
+                                logger.debug(f"Failed to remove corrupted cookie: {e}")
+                    else:
+                        logger.warning(f"⚠️ Download error for {video_id}: {ex}")
+                    return None
+                except Exception as ex:
+                    logger.warning(f"⚠️ Unexpected download error for {video_id}: {ex}")
+                    return None
+                finally:
+                    # CRITICAL: Explicitly close yt-dlp to release file handles
+                    if ydl_instance:
+                        try:
+                            ydl_instance.close()
+                        except Exception:
+                            pass
 
             # Run blocking download in thread pool to avoid blocking event loop
             return await asyncio.get_event_loop().run_in_executor(None, _download)

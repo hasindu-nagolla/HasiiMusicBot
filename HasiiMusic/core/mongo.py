@@ -50,9 +50,9 @@ class MongoDB:
             serverSelectionTimeoutMS=12500,
             connectTimeoutMS=20000,
             socketTimeoutMS=20000,
-            maxPoolSize=50,
-            minPoolSize=10,
-            maxIdleTimeMS=45000,
+            maxPoolSize=20,  # Reduced from 50 to prevent too many open connections
+            minPoolSize=5,   # Reduced from 10 to prevent too many open connections
+            maxIdleTimeMS=30000,  # Reduced from 45000 - close idle connections faster
             waitQueueTimeoutMS=10000,
             retryWrites=True,
             retryReads=True
