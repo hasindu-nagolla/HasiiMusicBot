@@ -1,7 +1,7 @@
 # ==============================================================================
 # requirements.txt - Python Dependencies
 # ==============================================================================
-# This file lists all Python packages required for HasiiMusicBot.
+# This file lists all Python packages required for ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼.
 # Updated from source: AnonymousX1025/AnonXMusic
 # 
 # Installation:

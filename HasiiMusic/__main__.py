@@ -1,5 +1,5 @@
 # ==============================================================================
-# __main__.py - Main Entry Point for HasiiMusicBot
+# __main__.py - Main Entry Point for ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼
 # ==============================================================================
 # This is the main file that starts the bot. It performs the following:
 # 1. Connects to the database

@@ -1,4 +1,4 @@
-# 📁 HasiiMusicBot Project Structure
+# 📁 ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼ Project Structure
 
 This document provides a comprehensive overview of the project structure, explaining the purpose of each folder and key files.
 

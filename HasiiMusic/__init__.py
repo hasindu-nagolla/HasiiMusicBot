@@ -1,5 +1,5 @@
 """
-HasiiMusicBot - Advanced Telegram Music Bot
+˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼ - Advanced Telegram Music Bot
 
 This is the main initialization module that sets up logging, configuration,
 and all core components required for the bot to function.

@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="https://files.catbox.moe/gjgg7e.png" alt="Hasii Music Bot" width="400"/>
+  <img src="https://files.catbox.moe/gjgg7e.png" alt="˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼" width="400"/>
   
-  # 🎵 Hasii Music Bot
+  # 🎵 ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼
   
   <p><b>A Powerful Telegram Music Player Bot</b></p>
   
@@ -166,6 +166,6 @@ Special thanks to [AnonymousX1025](https://github.com/AnonymousX1025) for the or
   
   ### Made with ❤️ by Hasindu Nagolla
   
-  **© 2025 Hasii Music Bot. All rights reserved.**
+  **© 2025 ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼. All rights reserved.**
   
 </div>

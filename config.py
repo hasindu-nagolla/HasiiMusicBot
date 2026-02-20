@@ -14,7 +14,7 @@
 # ==============================================================================
 
 """
-Configuration module for HasiiMusicBot.
+Configuration module for ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼.
 
 This module loads and validates all environment variables required for the bot to function.
 It provides a centralized Config class that manages all configuration settings.

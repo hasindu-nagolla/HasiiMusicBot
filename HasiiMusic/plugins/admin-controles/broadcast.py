@@ -1,5 +1,5 @@
 """
-Broadcast plugin for HasiiMusicBot.
+Broadcast plugin for ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼.
 
 This plugin allows sudo users to broadcast messages to all groups and users
 where the bot is active. It supports various options like sending to users only,
