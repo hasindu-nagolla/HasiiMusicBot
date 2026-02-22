@@ -137,8 +137,13 @@ class YouTube:
                 cached_result.message_id = m_id
                 return cached_result
 
-        _search = VideosSearch(query, limit=1)
-        results = await _search.next()
+        try:
+            _search = VideosSearch(query, limit=1)
+            results = await _search.next()
+        except Exception as e:
+            logger.warning(f"⚠️ YouTube search failed for '{query}': {e}")
+            return None
+
         if results and results["result"]:
             data = results["result"][0]
             duration = data.get("duration")
