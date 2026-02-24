@@ -29,4 +29,4 @@ pytgcrypto~=1.2.11
 py-tgcalls~=2.2.8
 py-yt-search~=0.5.5
 python-dotenv~=1.2.1
-yt-dlp[default]>=2026.2.04
+yt-dlp[default]>=2026.2.21

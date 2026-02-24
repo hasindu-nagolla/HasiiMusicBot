@@ -293,6 +293,15 @@ class TgCall(PyTgCalls):
                             continue
                         else:
                             raise
+                    elif isinstance(e, AttributeError) and "'NoneType'" in str(e):
+                        # PyTgCalls failed to resolve assistant peer (join_as is None)
+                        # This is transient - retry usually fixes it
+                        if attempt < max_retries - 1:
+                            logger.warning(f"⚠️ Assistant peer not resolved for {chat_id}, retrying... (attempt {attempt + 1}/{max_retries})")
+                            await asyncio.sleep(retry_delay)
+                            continue
+                        else:
+                            raise
                     else:
                         # Different error, don't retry
                         raise
