@@ -13,11 +13,14 @@
 # ==============================================================================
 
 import asyncio
+import logging
 from pyrogram import filters, types
 from pyrogram.errors import ChatSendPlainForbidden
 
 from HasiiMusic import tune, app, db, lang
 from HasiiMusic.helpers import can_manage_vc
+
+logger = logging.getLogger(__name__)
 
 
 @app.on_message(filters.command(["end", "stop"]) & filters.group & ~app.bl_users)
@@ -43,7 +46,14 @@ async def _stop(_, m: types.Message):
             return
 
     await tune.stop(m.chat.id)
-    sent_msg = await m.reply_text(m.lang["play_stopped"].format(m.from_user.mention))
+    try:
+        sent_msg = await m.reply_text(m.lang["play_stopped"].format(m.from_user.mention))
+    except ChatSendPlainForbidden:
+        logger.warning("Cannot send plain text in this chat, stream stopped silently.")
+        return
+    except Exception as e:
+        logger.error(f"Failed to send stop confirmation: {e}")
+        return
     
     # Auto-delete after 5 seconds
     await asyncio.sleep(5)

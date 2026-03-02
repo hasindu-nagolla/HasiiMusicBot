@@ -16,12 +16,15 @@
 
 from pyrogram import filters
 from pyrogram import types
-from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden
+from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden, ChatSendPlainForbidden
 
 from HasiiMusic import tune, app, config, db, lang, queue, tg, yt
 from HasiiMusic.helpers import buttons, utils
 from HasiiMusic.helpers._play import checkUB
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def safe_edit(message, text, **kwargs):
@@ -52,6 +55,28 @@ async def safe_edit(message, text, **kwargs):
     except Exception:
         # Other errors - log but don't crash
         return False
+
+
+async def safe_reply(message, text, **kwargs):
+    """
+    Safely send a reply message with proper error handling for media-only chats.
+    
+    Args:
+        message: The message object to reply to
+        text: Text content to send
+        **kwargs: Additional arguments for reply_text
+        
+    Returns:
+        The sent message object if successful, None otherwise
+    """
+    try:
+        return await message.reply_text(text, **kwargs)
+    except ChatSendPlainForbidden:
+        logger.warning(f"Cannot send plain text in chat {message.chat.id} (media-only mode)")
+        return None
+    except Exception as e:
+        logger.error(f"Failed to send reply: {e}")
+        return None
 
 
 def playlist_to_queue(chat_id: int, tracks: list) -> str:
@@ -98,7 +123,7 @@ async def play_hndlr(
     if cplay:
         channel_id = await db.get_cmode(m.chat.id)
         if channel_id is None:
-            return await m.reply_text(
+            return await safe_reply(m,
                 "<blockquote>❌ Channel play is not enabled.\n\n"
                 "To enable for linked channel:\n"
                 "`/channelplay linked`\n\n"
@@ -110,7 +135,7 @@ async def play_hndlr(
             chat_id = channel_id
         except:
             await db.set_cmode(m.chat.id, None)
-            return await m.reply_text(
+            return await safe_reply(m,
                 "<blockquote>❌ ꜰᴀɪʟᴇᴅ ᴛᴏ ɢᴇᴛ ᴄʜᴀɴɴᴇʟ.\n\n"
                 "ᴍᴀᴋᴇ ꜱᴜʀᴇ ɪ'ᴍ ᴀᴅᴍɪɴ ɪɴ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀɴᴅ ᴄʜᴀɴɴᴇʟ ᴘʟᴀʏ ɪꜱ ꜱᴇᴛ ᴄᴏʀʀᴇᴄᴛʟʏ.</blockquote>"
             )
@@ -133,14 +158,14 @@ async def play_hndlr(
                         if not invite_link:
                             invite_link = await app.export_chat_invite_link(channel_id)
                     except Exception:
-                        return await m.reply_text(
+                        return await safe_reply(m,
                             f"<blockquote>❌ ᴀꜱꜱɪꜱᴛᴀɴᴛ ɴᴏᴛ ɪɴ ᴄʜᴀɴɴᴇʟ!\n\n"
                             f"ᴘʟᴇᴀꜱᴇ ᴀᴅᴅ @{client.username if client.username else client.mention} "
                             f"ᴛᴏ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀꜱ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ.</blockquote>"
                         )
                 
                 # Show joining message
-                join_msg = await m.reply_text(
+                join_msg = await safe_reply(m,
                     f"<blockquote>🔄 ᴊᴏɪɴɪɴɢ ᴀꜱꜱɪꜱᴛᴀɴᴛ ᴛᴏ ᴄʜᴀɴɴᴇʟ...</blockquote>"
                 )
                 
@@ -156,7 +181,7 @@ async def play_hndlr(
                     
             except Exception as e:
                 error_str = str(e)
-                return await m.reply_text(
+                return await safe_reply(m,
                     f"<blockquote>❌ ꜰᴀɪʟᴇᴅ ᴛᴏ ᴊᴏɪɴ ᴀꜱꜱɪꜱᴛᴀɴᴛ ᴛᴏ ᴄʜᴀɴɴᴇʟ!\n\n"
                     f"ᴘʟᴇᴀꜱᴇ ᴍᴀɴᴜᴀʟʟʏ ᴀᴅᴅ @{client.username if client.username else client.mention} "
                     f"ᴛᴏ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀꜱ ᴀᴅᴍɪɴ ᴡɪᴛʜ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ.\n\n"
@@ -167,11 +192,11 @@ async def play_hndlr(
     play_emoji = m.lang["play_emoji"]
     
     try:
-        sent = await m.reply_text(m.lang["play_searching"].format(play_emoji))
+        sent = await safe_reply(m, m.lang["play_searching"].format(play_emoji))
     except FloodWait as e:
         await asyncio.sleep(e.value)
         try:
-            sent = await m.reply_text(m.lang["play_searching"].format(play_emoji))
+            sent = await safe_reply(m, m.lang["play_searching"].format(play_emoji))
         except FloodWait as e2:
             # If still flood wait, wait longer and give up gracefully
             await asyncio.sleep(e2.value)

@@ -36,7 +36,10 @@ def admin_check(func):
         # Helper function to send reply (works for messages and callbacks)
         async def reply(text):
             if isinstance(update, types.Message):
-                return await update.reply_text(text)
+                try:
+                    return await update.reply_text(text)
+                except ChatSendPlainForbidden:
+                    return
             else:
                 return await update.answer(text, show_alert=True)
 
