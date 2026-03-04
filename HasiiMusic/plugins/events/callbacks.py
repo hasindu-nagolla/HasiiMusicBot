@@ -420,7 +420,6 @@ async def _help(_, query: types.CallbackQuery):
         "seek": query.lang["help_seek"],
         "shuffle": query.lang["help_shuffle"],
         "ping": query.lang["help_ping"],
-        "games": query.lang["help_games"],
         "stats": query.lang["help_stats"],
         "sudo": query.lang["help_sudo"],
         "maintenance": query.lang["help_maintenance"],

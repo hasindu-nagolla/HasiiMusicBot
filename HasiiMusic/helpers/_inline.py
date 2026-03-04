@@ -120,9 +120,6 @@ class Inline:
                     self.ikb(text="ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ", callback_data="help_maintenance"),
                 ],
                 [
-                    self.ikb(text="ɢᴀᴍᴇꜱ", callback_data="help_games"),
-                ],
-                [
                     self.ikb(text="ʙᴀᴄᴋ", callback_data="start"),
                 ]
             ]
