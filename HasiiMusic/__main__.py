@@ -41,13 +41,6 @@ async def main():
             except Exception as e:
                 logger.error(f"Failed to load plugin {module}: {e}", exc_info=True)
         logger.info(f"🔌 Loaded {len(all_modules)} plugin modules.")
-        
-        # Step 5.5: Start tournament timer monitor
-        try:
-            from HasiiMusic.helpers._tournament import start_timer_monitor
-            await start_timer_monitor()
-        except Exception as e:
-            logger.error(f"Failed to start tournament timer: {e}")
 
         # Step 6: Download YouTube cookies if URLs are provided (for age-restricted videos)
         if config.COOKIES_URL:

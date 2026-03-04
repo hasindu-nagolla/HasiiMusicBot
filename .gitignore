@@ -22,12 +22,6 @@ anony/cookies/*.txt
 .vscode
 HasiiMusic/plugins/playback-controls/radio.py
 
-# Game Features - Private
-HasiiMusic/plugins/features/tournament_player.py
-HasiiMusic/plugins/features/tournament_admin.py
-HasiiMusic/plugins/misc/dicegame.py
-HasiiMusic/plugins/events/tournament_callbacks.py
-HasiiMusic/helpers/_tournament.py
 
 # Documentation - Private
 SETUP_TOURNAMENT.md
