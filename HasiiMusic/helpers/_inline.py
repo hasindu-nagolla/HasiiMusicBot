@@ -30,8 +30,19 @@ class Inline:
         status: str = None,
         timer: str = None,
         remove: bool = False,
+        webapp_url: str = None,
     ) -> types.InlineKeyboardMarkup:
         keyboard = []
+
+        # WebApp "Open Player" button at the top (if URL is provided)
+        if webapp_url:
+            keyboard.append(
+                [self.ikb(
+                    text="🎵 ᴏᴘᴇɴ ᴘʟᴀʏᴇʀ",
+                    web_app=types.WebAppInfo(url=webapp_url),
+                )]
+            )
+
         if status:
             keyboard.append(
                 [self.ikb(

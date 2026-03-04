@@ -13,6 +13,7 @@
 
 import asyncio
 import logging
+from urllib.parse import quote_plus
 from ntgcalls import ConnectionNotFound, TelegramServerError
 from pyrogram import enums, errors
 from pyrogram.errors import MessageIdInvalid
@@ -345,9 +346,9 @@ class TgCall(PyTgCalls):
                         total_time = time_module.strftime(
                             '%M:%S', time_module.gmtime(duration))
                     timer_text = f"{played_time} {timer_bar} {total_time}"
-                    keyboard = buttons.controls(chat_id, timer=timer_text)
+                    keyboard = buttons.controls(chat_id, timer=timer_text, webapp_url=_build_webapp_url(media, chat_id))
                 else:
-                    keyboard = buttons.controls(chat_id)
+                    keyboard = buttons.controls(chat_id, webapp_url=_build_webapp_url(media, chat_id))
                 
                 if message:
                     try:
