@@ -71,14 +71,16 @@ All bot commands and event handlers, organized by category.
 
 #### 📁 admin-controles/ - Administrator Commands
 
-| File           | Commands              | Description                                |
-| -------------- | --------------------- | ------------------------------------------ |
-| `autoleave.py` | `/autoleave`          | Configure auto-leave settings for assistants |
-| `broadcast.py` | `/broadcast`          | Send messages to all bot users/chats       |
-| `eval.py`      | `/eval`, `/sh`        | Execute Python/shell commands (owner only) |
-| `leave.py`     | `/leave`, `/leaveall` | Make assistants leave groups               |
-| `restart.py`   | `/restart`, `/update` | Restart/update the bot                     |
-| `sudoers.py`   | `/addsudo`, `/rmsudo` | Manage sudo users                          |
+| File              | Commands              | Description                                  |
+| ----------------- | --------------------- | -------------------------------------------- |
+| `autoleave.py`    | `/autoleave`          | Configure auto-leave settings for assistants |
+| `broadcast.py`    | `/broadcast`          | Send messages to all bot users/chats         |
+| `eval.py`         | `/eval`, `/sh`        | Execute Python/shell commands (owner only)   |
+| `gban.py`         | `/gban`, `/ungban`    | Globally ban/unban users across all chats    |
+| `leave.py`        | `/leave`, `/leaveall` | Make assistants leave groups                 |
+| `maintenance.py`  | `/maintenance`        | Toggle bot maintenance mode                  |
+| `restart.py`      | `/restart`, `/update` | Restart/update the bot                       |
+| `sudoers.py`      | `/addsudo`, `/rmsudo` | Manage sudo users                            |
 
 **Purpose:** Commands restricted to bot owner and sudo users for administration.
 
@@ -162,9 +164,9 @@ All bot commands and event handlers, organized by category.
 
 #### 📁 misc/ - Miscellaneous Features
 
-| File          | Commands         | Description             |
-| ------------- | ---------------- | ----------------------- |
-| `dicegame.py` | `/dice`, `/dart` | Fun dice and dart games |
+| File          | Commands                                                   | Description             |
+| ------------- | ---------------------------------------------------------- | ----------------------- |
+| `dicegame.py` | `/dice`, `/dart`, `/basket`, `/jackpot`, `/ball`, `/football` | Fun dice and dart games |
 
 **Purpose:** Fun entertainment features.
 
@@ -205,10 +207,9 @@ Utility functions used throughout the bot.
 
 Bot message strings in JSON format.
 
-| File        | Description       |
-| ----------- | ----------------- |
-| `en.json`   | English messages  |
-| `README.md` | Format guide      |
+| File      | Description      |
+| --------- | ---------------- |
+| `en.json` | English messages |
 
 **Format:** JSON key-value pairs
 
@@ -400,9 +401,7 @@ HasiiMusicBot/
     │   └── Raleway-Bold.ttf      # Font file
     │
     ├── 🌍 locales/               # Translations
-    │   ├── README.md             # Translation guide
-    │   ├── en.json               # English
-    │   └── si.json               # Sinhala
+    │   └── en.json               # English
     │
     └── 🍪 cookies/               # YouTube cookies
         └── README.md             # Cookie instructions
@@ -552,4 +551,4 @@ When adding new features:
 
 ---
 
-**Last Updated:** February 6, 2026
+**Last Updated:** March 4, 2026

@@ -101,8 +101,8 @@ bash start
 
 - `/pause` - Pause current stream
 - `/resume` - Resume paused stream
-- `/skip` - Skip current track
-- `/stop` - Stop playing and clear queue
+- `/skip` - Skip current track (also `/next`)
+- `/stop` - Stop playing and clear queue (also `/end`)
 - `/seek` - Seek to specific timestamp
 - `/reload` - Reload admin cache
 
@@ -112,6 +112,9 @@ bash start
 - `/broadcast` - Broadcast message to all chats
 - `/addsudo` - Add sudo user
 - `/rmsudo` - Remove sudo user
+- `/gban` - Globally ban a user across all chats
+- `/ungban` - Remove global ban
+- `/maintenance` - Toggle maintenance mode
 - `/restart` - Restart the bot
 - `/logs` - Get bot logs
 
@@ -127,7 +130,7 @@ The bot streams audio at **STUDIO** quality (highest available) with:
 - **Format**: WebM container for audio downloads
 - **Sample Rate**: 48kHz
 - **Channels**: Stereo
-- **Optimization**: 16 concurrent downloads, 1MB chunks
+- **Optimization**: Max 5 concurrent downloads, 1MB chunks
 
 ### Customization
 
