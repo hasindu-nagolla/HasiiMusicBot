@@ -13,7 +13,7 @@
 
 import logging
 from pyrogram import filters, types
-from pyrogram.errors import ChatSendPlainForbidden
+from pyrogram.errors import ChatSendPlainForbidden, ChatWriteForbidden
 
 from HasiiMusic import tune, app, db, lang
 from HasiiMusic.helpers import buttons, can_manage_vc
@@ -34,13 +34,13 @@ async def _resume(_, m: types.Message):
     if not await db.get_call(m.chat.id):
         try:
             return await m.reply_text(m.lang["not_playing"])
-        except ChatSendPlainForbidden:
+        except (ChatSendPlainForbidden, ChatWriteForbidden):
             return
 
     if await db.playing(m.chat.id):
         try:
             return await m.reply_text(m.lang["play_not_paused"])
-        except ChatSendPlainForbidden:
+        except (ChatSendPlainForbidden, ChatWriteForbidden):
             return
 
     await tune.resume(m.chat.id)
@@ -49,5 +49,5 @@ async def _resume(_, m: types.Message):
             text=m.lang["play_resumed"].format(m.from_user.mention),
             reply_markup=buttons.controls(m.chat.id),
         )
-    except ChatSendPlainForbidden:
-        logger.warning("Cannot send plain text in media-only chat")
+    except (ChatSendPlainForbidden, ChatWriteForbidden):
+        logger.warning("Cannot send text in media-only chat")

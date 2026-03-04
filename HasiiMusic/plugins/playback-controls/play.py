@@ -16,7 +16,7 @@
 
 from pyrogram import filters
 from pyrogram import types
-from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden, ChatSendPlainForbidden
+from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden, ChatSendPlainForbidden, ChatWriteForbidden
 
 from HasiiMusic import tune, app, config, db, lang, queue, tg, yt
 from HasiiMusic.helpers import buttons, utils
@@ -71,8 +71,8 @@ async def safe_reply(message, text, **kwargs):
     """
     try:
         return await message.reply_text(text, **kwargs)
-    except ChatSendPlainForbidden:
-        logger.warning(f"Cannot send plain text in chat {message.chat.id} (media-only mode)")
+    except (ChatSendPlainForbidden, ChatWriteForbidden):
+        logger.warning(f"Cannot send text in chat {message.chat.id} (chat write forbidden)")
         return None
     except Exception as e:
         logger.error(f"Failed to send reply: {e}")

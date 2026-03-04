@@ -15,7 +15,7 @@
 import asyncio
 import logging
 from pyrogram import filters, types
-from pyrogram.errors import ChatSendPlainForbidden
+from pyrogram.errors import ChatSendPlainForbidden, ChatWriteForbidden
 
 from HasiiMusic import tune, app, db, lang
 from HasiiMusic.helpers import can_manage_vc
@@ -36,13 +36,13 @@ async def _skip(_, m: types.Message):
     if not await db.get_call(m.chat.id):
         try:
             return await m.reply_text(m.lang["not_playing"])
-        except ChatSendPlainForbidden:
+        except (ChatSendPlainForbidden, ChatWriteForbidden):
             return
 
     await tune.play_next(m.chat.id)
     try:
         sent_msg = await m.reply_text(m.lang["play_skipped"].format(m.from_user.mention))
-    except ChatSendPlainForbidden:
+    except (ChatSendPlainForbidden, ChatWriteForbidden):
         logger.warning("Cannot send plain text in media-only chat")
         return
     

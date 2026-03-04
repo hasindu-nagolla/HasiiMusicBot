@@ -12,8 +12,21 @@
 
 import asyncio
 import importlib
+import sys
 
 from pyrogram import idle
+
+# Raise the file descriptor limit on Linux to avoid "[Errno 24] Too many open files"
+# when serving many groups concurrently (each audio stream + ffmpeg probe opens FDs).
+if sys.platform != "win32":
+    try:
+        import resource
+        _soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+        _target = min(65536, _hard)
+        if _soft < _target:
+            resource.setrlimit(resource.RLIMIT_NOFILE, (_target, _hard))
+    except Exception:
+        pass
 
 from HasiiMusic import (tune, app, config, db,
                    logger, stop, userbot, yt)

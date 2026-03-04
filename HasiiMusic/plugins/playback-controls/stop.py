@@ -15,7 +15,7 @@
 import asyncio
 import logging
 from pyrogram import filters, types
-from pyrogram.errors import ChatSendPlainForbidden
+from pyrogram.errors import ChatSendPlainForbidden, ChatWriteForbidden
 
 from HasiiMusic import tune, app, db, lang
 from HasiiMusic.helpers import can_manage_vc
@@ -38,8 +38,8 @@ async def _stop(_, m: types.Message):
     if not await db.get_call(m.chat.id):
         try:
             return await m.reply_text(m.lang["not_playing"])
-        except ChatSendPlainForbidden:
-            logger.warning("Cannot send plain text in this chat, skipping reply.")
+        except (ChatSendPlainForbidden, ChatWriteForbidden):
+            logger.warning("Cannot send text in this chat, skipping reply.")
             return
         except Exception as e:
             logger.error(f"Failed to send reply: {e}")
@@ -48,8 +48,8 @@ async def _stop(_, m: types.Message):
     await tune.stop(m.chat.id)
     try:
         sent_msg = await m.reply_text(m.lang["play_stopped"].format(m.from_user.mention))
-    except ChatSendPlainForbidden:
-        logger.warning("Cannot send plain text in this chat, stream stopped silently.")
+    except (ChatSendPlainForbidden, ChatWriteForbidden):
+        logger.warning("Cannot send text in this chat, stream stopped silently.")
         return
     except Exception as e:
         logger.error(f"Failed to send stop confirmation: {e}")

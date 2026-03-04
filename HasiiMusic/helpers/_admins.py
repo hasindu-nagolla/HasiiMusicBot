@@ -12,7 +12,7 @@
 from functools import wraps
 
 from pyrogram import StopPropagation, enums, types
-from pyrogram.errors import ChatSendPlainForbidden
+from pyrogram.errors import ChatSendPlainForbidden, ChatWriteForbidden
 
 from HasiiMusic import app, db
 
@@ -38,7 +38,7 @@ def admin_check(func):
             if isinstance(update, types.Message):
                 try:
                     return await update.reply_text(text)
-                except ChatSendPlainForbidden:
+                except (ChatSendPlainForbidden, ChatWriteForbidden):
                     return
             else:
                 return await update.answer(text, show_alert=True)
@@ -66,7 +66,7 @@ def admin_check(func):
         if user_id not in admins:
             try:
                 return await reply(update.lang["user_no_perms"])
-            except ChatSendPlainForbidden:
+            except (ChatSendPlainForbidden, ChatWriteForbidden):
                 return
 
         # User is admin, allow execution
@@ -120,7 +120,7 @@ def can_manage_vc(func):
         if isinstance(update, types.Message):
             try:
                 return await update.reply_text(update.lang["user_no_perms"])
-            except ChatSendPlainForbidden:
+            except (ChatSendPlainForbidden, ChatWriteForbidden):
                 return
         else:
             return await update.answer(update.lang["user_no_perms"], show_alert=True)
