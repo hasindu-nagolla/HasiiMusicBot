@@ -16,9 +16,9 @@
 # Only sudo users can use this command.
 # ==============================================================================
 
-# Copyright (c) 2025 AnonymousX1025
+# Copyright (c) 2025 Hasindu Nagolla
 # Licensed under the MIT License.
-# This file is part of AnonXMusic
+# This file is part of ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼
 
 
 import os
