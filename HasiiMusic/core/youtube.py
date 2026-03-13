@@ -60,6 +60,26 @@ class YouTube:
             return None
         return f"HasiiMusic/cookies/{random.choice(self.cookies)}"
 
+    def _is_bot_check_error(self, error_msg: str) -> bool:
+        msg = (error_msg or "").lower()
+        return (
+            "sign in to confirm" in msg
+            or "not a bot" in msg
+            or "page needs to be reloaded" in msg
+        )
+
+    def _remove_cookie(self, cookie_path: Optional[str]) -> None:
+        if not cookie_path:
+            return
+        cookie_name = os.path.basename(cookie_path)
+        if cookie_name in self.cookies:
+            self.cookies.remove(cookie_name)
+        try:
+            if os.path.exists(cookie_path):
+                os.remove(cookie_path)
+        except Exception:
+            pass
+
     async def save_cookies(self, urls: list[str]) -> None:
         logger.info("🍪 Saving cookies from urls...")
         saved_count = 0
@@ -128,7 +148,7 @@ class YouTube:
     async def search(self, query: str, m_id: int) -> Track | None:
         # Check cache first (10-minute TTL)
         cache_key = query
-        current_time = asyncio.get_event_loop().time()
+        current_time = asyncio.get_running_loop().time()
 
         if cache_key in self.search_cache:
             cached_result, cache_timestamp = self.search_cache[cache_key]
@@ -234,6 +254,8 @@ class YouTube:
                 "no_warnings": True,
                 "cookiefile": cookie,
                 "format": "bestaudio/best",
+                "extractor_retries": 5,
+                "sleep_interval_requests": 1,
                 # Use android client to bypass YouTube bot detection on server IPs
                 "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
             }
@@ -245,9 +267,10 @@ class YouTube:
                         return info.get("url") or info.get("manifest_url")
                     except yt_dlp.utils.ExtractorError as ex:
                         error_msg = str(ex)
-                        if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
+                        if self._is_bot_check_error(error_msg) or "bot" in error_msg.lower():
                             logger.error(
-                                "YouTube bot detection triggered. Please update cookies.")
+                                "YouTube bot-check triggered for live stream. Rotating cookie.")
+                            self._remove_cookie(cookie)
                         elif "not available" in error_msg.lower():
                             logger.error(
                                 "Video format not available or region-blocked.")
@@ -260,13 +283,10 @@ class YouTube:
                         if "failed to load cookies" in error_msg.lower() or "netscape format" in error_msg.lower():
                             logger.error(
                                 "❌ Corrupted cookie file detected for live stream, removing: %s", cookie)
-                            # Remove corrupted cookie
-                            if cookie and cookie in self.cookies:
-                                self.cookies.remove(cookie)
-                            try:
-                                os.remove(f"HasiiMusic/cookies/{cookie}")
-                            except:
-                                pass
+                            self._remove_cookie(cookie)
+                        elif self._is_bot_check_error(error_msg):
+                            logger.error("YouTube bot-check triggered for live stream. Rotating cookie.")
+                            self._remove_cookie(cookie)
                         else:
                             logger.error(
                                 "Unexpected error during live stream extraction: %s", ex)
@@ -315,7 +335,6 @@ class YouTube:
                 "no_warnings": True,
                 "overwrites": False,
                 "nocheckcertificate": True,
-                "cookiefile": cookie,
                 "continuedl": True,
                 "noprogress": True,
                 # **PERFORMANCE FIX**: Reduced to 4 fragments for maximum stability
@@ -326,7 +345,8 @@ class YouTube:
                 "socket_timeout": 30,  # Increased from 15s (prevents timeout on slow networks)
                 "retries": 2,  # Increased from 1 (better reliability)
                 "fragment_retries": 2,  # Increased from 1 (handle network hiccups)
-                "ignoreerrors": True,
+                "extractor_retries": 5,
+                "sleep_interval_requests": 1,
                 # Use android client to bypass YouTube bot detection on server IPs.
                 # Android client does not require PO tokens and works from datacenter IPs.
                 "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
@@ -341,10 +361,22 @@ class YouTube:
                 "postprocessors": [],
             }
 
-            def _download():
+            ydl_opts_no_cookie = {
+                **ydl_opts,
+            }
+            ydl_opts_cookie = {
+                **ydl_opts,
+                "cookiefile": cookie,
+            }
+
+            last_error_kind = None
+
+            def _download(ydl_runtime_opts):
+                nonlocal last_error_kind
                 ydl_instance = None
                 try:
-                    ydl_instance = yt_dlp.YoutubeDL(ydl_opts)
+                    last_error_kind = None
+                    ydl_instance = yt_dlp.YoutubeDL(ydl_runtime_opts)
                     # Extract info to get actual extension downloaded
                     info = ydl_instance.extract_info(url, download=True)
                     if not info:
@@ -388,40 +420,43 @@ class YouTube:
                     return None
                 except yt_dlp.utils.ExtractorError as ex:
                     error_msg = str(ex)
-                    if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
+                    if self._is_bot_check_error(error_msg) or "bot" in error_msg.lower():
+                        last_error_kind = "bot"
                         logger.warning(
-                            f"⚠️ YouTube bot detection for {video_id}. This is temporary.")
+                            f"⚠️ YouTube bot-check for {video_id}.")
                     elif "not available" in error_msg.lower():
+                        last_error_kind = "availability"
                         logger.error(
                             "❌ Video not available: May be region-blocked or private.")
                     elif "age" in error_msg.lower():
+                        last_error_kind = "age"
                         logger.error(
                             "❌ Age-restricted video: Cookies required.")
                     else:
+                        last_error_kind = "extractor"
                         logger.error("❌ YouTube extraction failed: %s", ex)
                     return None
                 except yt_dlp.utils.DownloadError as ex:
                     error_msg = str(ex)
                     if "416" in error_msg or "Requested range not satisfiable" in error_msg:
+                        last_error_kind = "range"
                         # HTTP 416 - file partially downloaded, delete and retry won't help
                         logger.warning(f"⚠️ Range error for {video_id}, skipping")
                     elif "failed to load cookies" in error_msg.lower() or "netscape format" in error_msg.lower():
-                        logger.warning(
-                            "⚠️ Failed to load cookies for {video_id}: {error_msg}")
+                        last_error_kind = "cookie"
+                        logger.warning(f"⚠️ Failed to load cookies for {video_id}: {error_msg}")
                         # Remove corrupted cookie from list and filesystem
-                        if cookie:
-                            cookie_name = os.path.basename(cookie)
-                            if cookie_name in self.cookies:
-                                self.cookies.remove(cookie_name)
-                            try:
-                                if os.path.exists(cookie):
-                                    os.remove(cookie)
-                            except Exception as e:
-                                logger.debug(f"Failed to remove corrupted cookie: {e}")
+                        self._remove_cookie(ydl_runtime_opts.get("cookiefile"))
+                    elif self._is_bot_check_error(error_msg):
+                        last_error_kind = "bot"
+                        logger.warning(f"⚠️ Bot-check for {video_id}: {error_msg}")
+                        self._remove_cookie(ydl_runtime_opts.get("cookiefile"))
                     else:
+                        last_error_kind = "download"
                         logger.warning(f"⚠️ Download error for {video_id}: {ex}")
                     return None
                 except Exception as ex:
+                    last_error_kind = "unexpected"
                     logger.warning(f"⚠️ Unexpected download error for {video_id}: {ex}")
                     return None
                 finally:
@@ -432,5 +467,25 @@ class YouTube:
                         except Exception:
                             pass
 
-            # Run blocking download in thread pool to avoid blocking event loop
-            return await asyncio.get_event_loop().run_in_executor(None, _download)
+            # Attempt 1: with cookie (needed for age-restricted/private videos)
+            primary_opts = ydl_opts_cookie if cookie else ydl_opts_no_cookie
+            result = await asyncio.to_thread(_download, primary_opts)
+            if result:
+                return result
+
+            # Bot-check mitigation from yt-dlp wiki: rotate/avoid stale cookies
+            if last_error_kind in {"bot", "cookie"}:
+                fresh_cookie = self.get_cookies()
+                if fresh_cookie and fresh_cookie != cookie:
+                    logger.info(f"🔄 Retrying {video_id} with rotated cookie...")
+                    rotated_opts = {**ydl_opts_cookie, "cookiefile": fresh_cookie}
+                    result = await asyncio.to_thread(_download, rotated_opts)
+                    if result:
+                        return result
+
+                logger.info(f"🧪 Retrying {video_id} without cookies...")
+                result = await asyncio.to_thread(_download, ydl_opts_no_cookie)
+                if result:
+                    return result
+
+            return None
