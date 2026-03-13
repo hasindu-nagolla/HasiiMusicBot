@@ -234,6 +234,8 @@ class YouTube:
                 "no_warnings": True,
                 "cookiefile": cookie,
                 "format": "bestaudio/best",
+                # Use android client to bypass YouTube bot detection on server IPs
+                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
             }
 
             def _extract_url():
@@ -325,14 +327,18 @@ class YouTube:
                 "retries": 2,  # Increased from 1 (better reliability)
                 "fragment_retries": 2,  # Increased from 1 (handle network hiccups)
                 "ignoreerrors": True,
+                # Use android client to bypass YouTube bot detection on server IPs.
+                # Android client does not require PO tokens and works from datacenter IPs.
+                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
             }
 
-            # Audio-only: Prefer Opus codec (best quality) but accept any audio format
-            # Don't force WebM container - let YouTube provide whatever's available
+            # Format chain works with both desktop AND mobile cookies:
+            # - Mobile cookies only expose m4a/mp4 (no opus/webm)
+            # - Desktop cookies expose opus/webm as well
             ydl_opts = {
                 **base_opts,
-                "format": "bestaudio[acodec=opus]/bestaudio/best",
-                "postprocessors": [],  # No post-processing to preserve original quality
+                "format": "bestaudio[ext=m4a]/bestaudio[acodec=opus]/bestaudio/best",
+                "postprocessors": [],
             }
 
             def _download():
