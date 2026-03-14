@@ -7,6 +7,7 @@
 # Commands:
 # - /auth <user> - Grant playback control permissions to user
 # - /unauth <user> - Revoke playback control permissions from user
+# - /authlist - Show the authorized users in the current chat
 # - /admincache - Reload admin list cache for current chat
 # - /reload - Same as /admincache
 #
@@ -44,6 +45,22 @@ async def _auth(_, m: types.Message):
     else:
         await db.rm_auth(m.chat.id, user.id)
         await m.reply_text(m.lang["auth_removed"].format(user.mention))
+
+
+@app.on_message(filters.command(["authlist"]) & filters.group & ~app.bl_users)
+@lang.language()
+@admin_check
+async def _authlist(_, m: types.Message):
+    """Display the authorized users for the chat."""
+    auth_users = await db._get_auth(m.chat.id)
+    if not auth_users:
+        return await m.reply_text(m.lang["auth_empty"])
+
+    auth_txt = m.lang["auth_list"].format(m.chat.title)
+    for idx, user_id in enumerate(sorted(auth_users), start=1):
+        auth_txt += f"\n{idx}. <a href=\"tg://user?id={user_id}\">{user_id}</a>"
+
+    await m.reply_text(auth_txt)
 
 
 rel_hist = {}
