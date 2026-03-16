@@ -12,8 +12,8 @@
 # ==============================================================================
 
 import re
-from pyrogram import enums, types
-from HasiiMusic import app
+from pyrogram import enums, errors, types
+from HasiiMusic import app, config
 
 
 class Utilities:
@@ -105,3 +105,55 @@ class Utilities:
                 m.from_user.mention,
             ),
         )
+
+    async def safe_text(
+        self,
+        message: types.Message,
+        text: str,
+        *,
+        reply_markup=None,
+        quote: bool | None = True,
+    ) -> types.Message | None:
+        """Send text but gracefully fallback to media-only chats."""
+        if not message:
+            return None
+        try:
+            return await message.reply_text(
+                text=text,
+                reply_markup=reply_markup,
+                quote=quote,
+            )
+        except (errors.ChatSendPlainForbidden, errors.ChatWriteForbidden):
+            fallback_photo = getattr(config, "START_IMG", None)
+            if not fallback_photo:
+                return None
+            try:
+                return await message.reply_photo(
+                    photo=fallback_photo,
+                    caption=text,
+                    reply_markup=reply_markup,
+                    quote=quote,
+                )
+            except errors.RPCError:
+                return None
+        except errors.RPCError:
+            return None
+
+    async def safe_edit(
+        self,
+        message: types.Message | None,
+        text: str,
+        *,
+        reply_markup=None,
+    ) -> bool:
+        """Edit text or caption safely depending on message type."""
+        if not message:
+            return False
+        try:
+            if message.text is not None:
+                await message.edit_text(text=text, reply_markup=reply_markup)
+            else:
+                await message.edit_caption(caption=text, reply_markup=reply_markup)
+            return True
+        except errors.RPCError:
+            return False
