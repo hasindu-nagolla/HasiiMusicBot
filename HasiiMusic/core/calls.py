@@ -83,13 +83,36 @@ class TgCall(PyTgCalls):
 
     async def pause(self, chat_id: int) -> bool:
         client = await db.get_assistant(chat_id)
-        await db.playing(chat_id, paused=True)
-        return await client.pause(chat_id)
+        try:
+            await client.pause(chat_id)
+            await db.playing(chat_id, paused=True)
+            return True
+        except (ConnectionNotFound, exceptions.NotInCallError):
+            await db.playing(chat_id, paused=False)
+            await db.remove_call(chat_id)
+            queue.clear(chat_id)
+            logger.warning(f"Pause requested but assistant not in call for {chat_id}, syncing state")
+            return False
+        except Exception as e:
+            await db.playing(chat_id, paused=False)
+            logger.error(f"Pause failed for {chat_id}: {e}")
+            return False
 
     async def resume(self, chat_id: int) -> bool:
         client = await db.get_assistant(chat_id)
-        await db.playing(chat_id, paused=False)
-        return await client.resume(chat_id)
+        try:
+            await client.resume(chat_id)
+            await db.playing(chat_id, paused=False)
+            return True
+        except (ConnectionNotFound, exceptions.NotInCallError):
+            await db.playing(chat_id, paused=False)
+            await db.remove_call(chat_id)
+            queue.clear(chat_id)
+            logger.warning(f"Resume requested but assistant not in call for {chat_id}, syncing state")
+            return False
+        except Exception as e:
+            logger.error(f"Resume failed for {chat_id}: {e}")
+            return False
 
     async def stop(self, chat_id: int) -> None:
         client = await db.get_assistant(chat_id)

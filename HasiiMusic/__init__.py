@@ -11,6 +11,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 from typing import List
 
+from pyrogram.errors import ChannelInvalid
+
 # Configure logging
 logging.basicConfig(
     format="[%(asctime)s - %(levelname)s] - %(name)s: %(message)s",
@@ -30,6 +32,17 @@ logging.getLogger("pyrogram").setLevel(logging.ERROR)
 logging.getLogger("pytgcalls").setLevel(logging.ERROR)
 
 logger = logging.getLogger("HasiiMusic")
+
+
+def _asyncio_exception_handler(loop: asyncio.AbstractEventLoop, context: dict) -> None:
+    exc = context.get("exception")
+    if isinstance(exc, ChannelInvalid):
+        logger.warning("Ignoring CHANNEL_INVALID update (channel probably removed).")
+        return
+    loop.default_exception_handler(context)
+
+
+asyncio.get_event_loop().set_exception_handler(_asyncio_exception_handler)
 
 # Version
 __version__ = "3.0.1"

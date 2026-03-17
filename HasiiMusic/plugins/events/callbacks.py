@@ -131,7 +131,8 @@ async def _controls(_, query: types.CallbackQuery):
             return await query.answer(
                 query.lang["play_already_paused"], show_alert=True
             )
-        await tune.pause(chat_id)
+        if not await tune.pause(chat_id):
+            return await query.answer(query.lang["not_playing"], show_alert=True)
         if qaction:
             return await query.edit_message_reply_markup(
                 reply_markup=buttons.queue_markup(
@@ -144,7 +145,8 @@ async def _controls(_, query: types.CallbackQuery):
         status = query.lang["playing"]
         if await db.playing(chat_id):
             return await query.answer(query.lang["play_not_paused"], show_alert=True)
-        await tune.resume(chat_id)
+        if not await tune.resume(chat_id):
+            return await query.answer(query.lang["not_playing"], show_alert=True)
         if qaction:
             return await query.edit_message_reply_markup(
                 reply_markup=buttons.queue_markup(

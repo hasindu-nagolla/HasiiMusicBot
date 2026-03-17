@@ -11,6 +11,8 @@
 
 import os
 import re
+import glob
+import time
 import yt_dlp
 import random
 import asyncio
@@ -46,6 +48,19 @@ class YouTube:
         # **PERFORMANCE FIX**: Limit concurrent downloads to prevent bandwidth saturation
         # With 15-20 groups, unlimited concurrent downloads cause 320+ connections
         self._download_semaphore = asyncio.Semaphore(5)  # Max 5 simultaneous downloads
+
+    def _locate_download_file(self, video_id: str) -> Optional[str]:
+        """Locate any completed download file for a video id."""
+        pattern = f"downloads/{video_id}*"
+        candidates = [
+            path for path in glob.glob(pattern)
+            if not path.endswith((".part", ".ytdl", ".info.json", ".temp"))
+        ]
+        for path in sorted(candidates):
+            if os.path.isdir(path):
+                continue
+            return path
+        return None
 
     def get_cookies(self):
         if not self.checked:
@@ -305,7 +320,6 @@ class YouTube:
         filename_pattern = f"downloads/{video_id}"
         
         # Check if any audio file with this video_id already exists
-        import glob
         existing_files = glob.glob(f"{filename_pattern}.*")
         if existing_files:
             # Filter out .part files
@@ -383,40 +397,11 @@ class YouTube:
                         logger.error(f"❌ Failed to extract info for {video_id}")
                         return None
                     
-                    # Get actual extension from downloaded file
-                    actual_ext = info.get('ext', 'webm')
-                    actual_filename = f"downloads/{video_id}.{actual_ext}"
-                    
-                    # Check if file exists
-                    if Path(actual_filename).exists():
-                        return actual_filename
-                    
-                    # Wait for filesystem operations to complete
-                    import time
-                    import glob
-                    time.sleep(2.0)
-                    
-                    if Path(actual_filename).exists():
-                        return actual_filename
-                    
-                    # Try to find .part file and rename it
-                    part_file = Path(f"{actual_filename}.part")
-                    if part_file.exists():
-                        try:
-                            import shutil
-                            shutil.move(str(part_file), actual_filename)
-                            return actual_filename
-                        except Exception as rename_ex:
-                            logger.error(f"❌ Failed to rename .part file: {rename_ex}")
-                    
-                    # Try to find any variant of the file (different extension)
-                    possible_files = glob.glob(f"downloads/{video_id}.*")
-                    possible_files = [f for f in possible_files if not f.endswith('.part')]
-                    if possible_files:
-                        found_file = possible_files[0]
-                        return found_file
-                    
-                    logger.error(f"❌ Download completed but file not found: {actual_filename}")
+                    time.sleep(0.5)
+                    located = self._locate_download_file(video_id)
+                    if located:
+                        return located
+                    logger.error(f"❌ Download completed but file not found for: {video_id}")
                     return None
                 except yt_dlp.utils.ExtractorError as ex:
                     error_msg = str(ex)
@@ -438,6 +423,12 @@ class YouTube:
                     return None
                 except yt_dlp.utils.DownloadError as ex:
                     error_msg = str(ex)
+                    recovered = self._locate_download_file(video_id)
+                    if "unable to rename file" in error_msg.lower() and recovered:
+                        logger.warning(
+                            f"⚠️ Renaming failed for {video_id}, using recovered file {Path(recovered).name}"
+                        )
+                        return recovered
                     if "416" in error_msg or "Requested range not satisfiable" in error_msg:
                         last_error_kind = "range"
                         # HTTP 416 - file partially downloaded, delete and retry won't help
@@ -454,6 +445,11 @@ class YouTube:
                     else:
                         last_error_kind = "download"
                         logger.warning(f"⚠️ Download error for {video_id}: {ex}")
+                        if recovered:
+                            logger.warning(
+                                f"⚠️ Using recovered file for {video_id} despite download error"
+                            )
+                            return recovered
                     return None
                 except Exception as ex:
                     last_error_kind = "unexpected"
