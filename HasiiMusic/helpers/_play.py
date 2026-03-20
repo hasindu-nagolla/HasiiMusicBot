@@ -57,7 +57,7 @@ def checkUB(play):
         cplay = command.startswith("c")
 
         video_requested = command.startswith("v") or command.startswith("cv")
-        if video_requested and not config.VIDEO_PLAY:
+        if video_requested and not await db.get_vplay_enabled():
             await safe_reply(m.lang["play_video_disabled"])
             return
         video = video_requested
