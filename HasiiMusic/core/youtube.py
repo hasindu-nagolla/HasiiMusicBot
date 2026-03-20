@@ -58,12 +58,20 @@ class YouTube:
             if not path.endswith((".part", ".ytdl", ".info.json", ".temp"))
         ])
 
-        # Prefer actual video containers when video playback was requested
+        video_exts = {".mp4", ".mkv", ".webm", ".mov"}
+        audio_exts = {".m4a", ".webm", ".opus", ".mp3", ".ogg", ".wav", ".flac"}
+
         if video:
             for path in candidates:
                 if os.path.isdir(path):
                     continue
-                if Path(path).suffix.lower() in {".mp4", ".mkv", ".webm"}:
+                if Path(path).suffix.lower() in video_exts:
+                    return path
+        else:
+            for path in candidates:
+                if os.path.isdir(path):
+                    continue
+                if Path(path).suffix.lower() in audio_exts:
                     return path
 
         for path in candidates:
@@ -337,12 +345,17 @@ class YouTube:
         if video:
             video_candidates = [
                 f for f in existing_files
-                if Path(f).suffix.lower() in {".mp4", ".mkv", ".webm"}
+                if Path(f).suffix.lower() in {".mp4", ".mkv", ".webm", ".mov"}
             ]
             if video_candidates:
                 return video_candidates[0]
-        elif existing_files:
-            return existing_files[0]
+        else:
+            audio_candidates = [
+                f for f in existing_files
+                if Path(f).suffix.lower() in {".m4a", ".webm", ".opus", ".mp3", ".ogg", ".wav", ".flac"}
+            ]
+            if audio_candidates:
+                return audio_candidates[0]
         
         # Ensure downloads directory exists with write permissions
         downloads_dir = Path("downloads")
