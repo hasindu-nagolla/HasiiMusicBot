@@ -49,14 +49,23 @@ class YouTube:
         # With 15-20 groups, unlimited concurrent downloads cause 320+ connections
         self._download_semaphore = asyncio.Semaphore(5)  # Max 5 simultaneous downloads
 
-    def _locate_download_file(self, video_id: str) -> Optional[str]:
+    def _locate_download_file(self, video_id: str, video: bool = False) -> Optional[str]:
         """Locate any completed download file for a video id."""
         pattern = f"downloads/{video_id}*"
-        candidates = [
+        candidates = sorted([
             path for path in glob.glob(pattern)
             if not path.endswith((".part", ".ytdl", ".info.json", ".temp"))
-        ]
-        for path in sorted(candidates):
+        ])
+
+        # Prefer actual video containers when video playback was requested
+        if video:
+            for path in candidates:
+                if os.path.isdir(path):
+                    continue
+                if Path(path).suffix.lower() in {".mp4", ".mkv", ".webm"}:
+                    return path
+
+        for path in candidates:
             if os.path.isdir(path):
                 continue
             return path
@@ -258,7 +267,7 @@ class YouTube:
             # Re-raise other exceptions
             raise
 
-    async def download(self, video_id: str, is_live: bool = False) -> Optional[str]:
+    async def download(self, video_id: str, is_live: bool = False, video: bool = False) -> Optional[str]:
         url = self.base + video_id
 
         # For live streams, extract the direct stream URL using yt-dlp with cookies
@@ -314,18 +323,25 @@ class YouTube:
             stream_url = await asyncio.to_thread(_extract_url)
             return stream_url if stream_url else url
 
-        # Download audio file
-        # Don't hardcode extension - let yt-dlp choose best available audio format
+        # Download audio/video file
+        # Don't hardcode extension - let yt-dlp choose best available format
         # Will use outtmpl pattern to get actual extension
         filename_pattern = f"downloads/{video_id}"
         
-        # Check if any audio file with this video_id already exists
-        existing_files = glob.glob(f"{filename_pattern}.*")
-        if existing_files:
-            # Filter out .part files
-            existing_files = [f for f in existing_files if not f.endswith('.part')]
-            if existing_files:
-                return existing_files[0]  # Return first match
+        # Check if any completed file for this video_id already exists
+        existing_files = [
+            f for f in glob.glob(f"{filename_pattern}.*")
+            if not f.endswith('.part')
+        ]
+        if video:
+            video_candidates = [
+                f for f in existing_files
+                if Path(f).suffix.lower() in {".mp4", ".mkv", ".webm"}
+            ]
+            if video_candidates:
+                return video_candidates[0]
+        elif existing_files:
+            return existing_files[0]
         
         # Ensure downloads directory exists with write permissions
         downloads_dir = Path("downloads")
@@ -366,14 +382,28 @@ class YouTube:
                 "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
             }
 
-            # Format chain works with both desktop AND mobile cookies:
-            # - Mobile cookies only expose m4a/mp4 (no opus/webm)
-            # - Desktop cookies expose opus/webm as well
-            ydl_opts = {
-                **base_opts,
-                "format": "bestaudio[ext=m4a]/bestaudio[acodec=opus]/bestaudio/best",
-                "postprocessors": [],
-            }
+            if video:
+                # Video mode: download best video/audio combo and merge to mp4 (<=720p)
+                ydl_opts = {
+                    **base_opts,
+                    "format": "bestvideo[ext=mp4][height<=720]+bestaudio[ext=m4a]/"
+                               "bestvideo[height<=720]+bestaudio/"
+                               "bestvideo+bestaudio/best",
+                    "merge_output_format": "mp4",
+                    "postprocessors": [
+                        {
+                            "key": "FFmpegVideoConvertor",
+                            "preferedformat": "mp4",
+                        }
+                    ],
+                }
+            else:
+                # Audio mode: favor m4a/opus for best compatibility
+                ydl_opts = {
+                    **base_opts,
+                    "format": "bestaudio[ext=m4a]/bestaudio[acodec=opus]/bestaudio/best",
+                    "postprocessors": [],
+                }
 
             ydl_opts_no_cookie = {
                 **ydl_opts,
@@ -398,7 +428,7 @@ class YouTube:
                         return None
                     
                     time.sleep(0.5)
-                    located = self._locate_download_file(video_id)
+                    located = self._locate_download_file(video_id, video=video)
                     if located:
                         return located
                     logger.error(f"❌ Download completed but file not found for: {video_id}")
@@ -423,7 +453,7 @@ class YouTube:
                     return None
                 except yt_dlp.utils.DownloadError as ex:
                     error_msg = str(ex)
-                    recovered = self._locate_download_file(video_id)
+                    recovered = self._locate_download_file(video_id, video=video)
                     if "unable to rename file" in error_msg.lower() and recovered:
                         logger.warning(
                             f"⚠️ Renaming failed for {video_id}, using recovered file {Path(recovered).name}"

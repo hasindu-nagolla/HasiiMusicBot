@@ -67,7 +67,10 @@ class PreloadManager:
             
             # Download the track
             if not media.file_path:
-                media.file_path = await yt.download(media.id)
+                media.file_path = await yt.download(
+                    media.id,
+                    video=getattr(media, "video", False),
+                )
                 self._preloaded[chat_id] = media.id
                 logger.debug(f"Preload complete for chat {chat_id}: {media.title}")
             else:

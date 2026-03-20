@@ -121,7 +121,10 @@ async def update_timer(length=10):
     async def _preload_next(chat_id, next_media):
         """Pre-download next song without blocking timer updates."""
         try:
-            next_media.file_path = await yt.download(next_media.id)
+            next_media.file_path = await yt.download(
+                next_media.id,
+                video=getattr(next_media, "video", False),
+            )
         except Exception as e:
             print(f"Preload error for chat {chat_id}: {e}")
 

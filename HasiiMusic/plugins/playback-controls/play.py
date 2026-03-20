@@ -338,7 +338,11 @@ async def play_hndlr(
             return
 
     if not file.file_path:
-        file.file_path = await yt.download(file.id, is_live=file.is_live)
+        file.file_path = await yt.download(
+            file.id,
+            is_live=file.is_live,
+            video=getattr(file, "video", False),
+        )
         if not file.file_path:
             await safe_edit(
                 sent,

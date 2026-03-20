@@ -255,11 +255,18 @@ class TgCall(PyTgCalls):
             # - sync ext: External sync (reduces A/V desync)
             ffmpeg_params = "-probesize 10M -analyzeduration 5M -rtbufsize 5M -fflags +genpts+igndts -sync ext"
 
+        is_video = getattr(media, "video", False)
+        video_flags = (
+            types.MediaStream.Flags.AUTO_DETECT
+            if is_video
+            else types.MediaStream.Flags.IGNORE
+        )
+
         stream = types.MediaStream(
             media_path=media.file_path,
             audio_parameters=types.AudioQuality.STUDIO,
             audio_flags=types.MediaStream.Flags.REQUIRED,
-            video_flags=types.MediaStream.Flags.IGNORE,
+            video_flags=video_flags,
             ffmpeg_parameters=ffmpeg_params,
         )
 
@@ -573,7 +580,11 @@ class TgCall(PyTgCalls):
                             if not first_track.file_path:
                                 is_live = getattr(
                                     first_track, 'is_live', False)
-                                first_track.file_path = await yt.download(first_track.id, is_live=is_live)
+                                first_track.file_path = await yt.download(
+                                    first_track.id,
+                                    is_live=is_live,
+                                    video=getattr(first_track, 'video', False),
+                                )
                             first_track.message_id = msg.id
                             await self.play_media(chat_id, msg, first_track, message_chat_id=message_chat_id)
                         except errors.ChannelPrivate:
@@ -641,7 +652,11 @@ class TgCall(PyTgCalls):
 
                 if not media.file_path:
                     is_live = getattr(media, 'is_live', False)
-                    media.file_path = await yt.download(media.id, is_live=is_live)
+                    media.file_path = await yt.download(
+                        media.id,
+                        is_live=is_live,
+                        video=getattr(media, 'video', False),
+                    )
                     if not media.file_path:
                         await self.stop(chat_id)
                         if msg:
