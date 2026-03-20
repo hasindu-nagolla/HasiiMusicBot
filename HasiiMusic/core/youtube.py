@@ -362,6 +362,15 @@ class YouTube:
             ]
             if audio_candidates:
                 return audio_candidates[0]
+
+            # VPS caches are often dominated by mp4 due to prior /vplay usage.
+            # Reuse those files for /play (audio-only mode) to avoid redundant redownloads.
+            container_fallbacks = [
+                f for f in existing_files
+                if Path(f).suffix.lower() in {".mp4", ".mkv", ".mov"}
+            ]
+            if container_fallbacks:
+                return container_fallbacks[0]
         
         # Ensure downloads directory exists with write permissions
         downloads_dir = Path("downloads")
