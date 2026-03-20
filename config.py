@@ -95,6 +95,8 @@ class Config:
         self.THUMB_GEN: bool = self._str_to_bool(getenv("THUMB_GEN", "True"))
         # Enable/disable video playback commands (/vplay)
         self.VIDEO_PLAY: bool = self._str_to_bool(getenv("VIDEO_PLAY", "False"))
+        # Maximum video height (in pixels) when downloading /vplay media
+        self.VIDEO_MAX_HEIGHT: int = self._parse_video_height()
 
         # ============ YOUTUBE COOKIES ============
         # Parse space-separated cookie URLs for age-restricted content
@@ -116,6 +118,22 @@ class Config:
         # ============ MODERATION ============
         # List of usernames to exclude from admin mentions
         self.EXCLUDED_USERNAMES: List[str] = getenv("EXCLUDED_USERNAMES", "").split()
+
+    def _parse_video_height(self) -> int:
+        """Clamp configured video height to a safe HD range."""
+        default_height = 1080
+        raw_value = getenv("VIDEO_MAX_HEIGHT", str(default_height))
+        try:
+            height = int(raw_value)
+        except (TypeError, ValueError):
+            return default_height
+
+        # Allow disabling the cap by setting to 0 or negative (interpreted as unlimited)
+        if height <= 0:
+            return 0
+
+        # Clamp between 480p and 2160p to avoid unrealistic requests
+        return max(480, min(height, 2160))
 
     def _parse_excluded_chats(self) -> List[int]:
         """

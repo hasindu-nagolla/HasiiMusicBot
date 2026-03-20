@@ -22,7 +22,7 @@ from typing import Optional, Union
 
 from pyrogram import enums, types
 from py_yt import Playlist, VideosSearch
-from HasiiMusic import logger
+from HasiiMusic import config, logger
 from HasiiMusic.helpers import Track, utils
 
 
@@ -48,6 +48,7 @@ class YouTube:
         # **PERFORMANCE FIX**: Limit concurrent downloads to prevent bandwidth saturation
         # With 15-20 groups, unlimited concurrent downloads cause 320+ connections
         self._download_semaphore = asyncio.Semaphore(5)  # Max 5 simultaneous downloads
+        self._max_video_height = getattr(config, "VIDEO_MAX_HEIGHT", 1080)
 
     def _locate_download_file(self, video_id: str, video: bool = False) -> Optional[str]:
         """Locate any completed download file for a video id."""
@@ -383,12 +384,18 @@ class YouTube:
             }
 
             if video:
-                # Video mode: download best video/audio combo and merge to mp4 (<=720p)
+                # Video mode: download best video/audio combo up to configured height
+                height_filter = ""
+                if self._max_video_height and self._max_video_height > 0:
+                    height_filter = f"[height<={self._max_video_height}]"
+                format_chain = (
+                    f"bestvideo[ext=mp4]{height_filter}+bestaudio[ext=m4a]/"
+                    f"bestvideo{height_filter}+bestaudio/"
+                    "bestvideo+bestaudio/best"
+                )
                 ydl_opts = {
                     **base_opts,
-                    "format": "bestvideo[ext=mp4][height<=720]+bestaudio[ext=m4a]/"
-                               "bestvideo[height<=720]+bestaudio/"
-                               "bestvideo+bestaudio/best",
+                    "format": format_chain,
                     "merge_output_format": "mp4",
                     "postprocessors": [
                         {
