@@ -17,6 +17,7 @@ import yt_dlp
 import random
 import asyncio
 import aiohttp
+from dataclasses import replace
 from pathlib import Path
 from typing import Optional, Union
 
@@ -186,9 +187,14 @@ class YouTube:
         if cache_key in self.search_cache:
             cached_result, cache_timestamp = self.search_cache[cache_key]
             if current_time - cache_timestamp < 600:  # 10 minutes
-                # Return cached result with new message_id
-                cached_result.message_id = m_id
-                return cached_result
+                # Return a fresh copy so downstream mutations don't leak back into cache
+                fresh = replace(cached_result)
+                fresh.message_id = m_id
+                fresh.file_path = None
+                fresh.user = None
+                fresh.time = 0
+                fresh.video = False
+                return fresh
 
         try:
             _search = VideosSearch(query, limit=1)
@@ -224,7 +230,7 @@ class YouTube:
                                  key=lambda k: self.search_cache[k][1])
                 del self.search_cache[oldest_key]
 
-            return track
+            return replace(track)
         return None
 
     async def playlist(self, limit: int, user: str, url: str) -> list[Track]:
