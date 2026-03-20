@@ -24,6 +24,7 @@ class Media:
     time: int = 0
     user: str = None
     is_live: bool = False
+    video: bool = False
 
 
 @dataclass
@@ -41,3 +42,4 @@ class Track:
     user: str = None
     view_count: str = None
     is_live: bool = False
+    video: bool = False

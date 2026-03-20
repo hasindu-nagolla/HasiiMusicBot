@@ -50,10 +50,17 @@ def checkUB(play):
             await safe_reply(m.lang["play_queue_full"].format(config.QUEUE_LIMIT))
             return
 
-        force = m.command[0].endswith("force") or (
+        command = m.command[0].lower()
+        force = command.endswith("force") or (
             len(m.command) > 1 and "-f" in m.command[1]
         )
-        cplay = m.command[0][0] == "c"
+        cplay = command.startswith("c")
+
+        video_requested = command.startswith("v") or command.startswith("cv")
+        if video_requested and not config.VIDEO_PLAY:
+            await safe_reply(m.lang["play_video_disabled"])
+            return
+        video = video_requested
         
         url = yt.url(m)
         # Only validate URL if not replying to media (Telegram files have t.me URLs)
@@ -217,6 +224,6 @@ def checkUB(play):
         except:
             pass
 
-        return await play(_, m, force, url, cplay)
+        return await play(_, m, force, url, cplay, video)
 
     return wrapper

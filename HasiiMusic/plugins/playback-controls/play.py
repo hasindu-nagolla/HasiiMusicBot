@@ -3,8 +3,11 @@
 # ==============================================================================
 # This is the core plugin that handles all play-related commands:
 # - /play <query> - Play audio from YouTube search or URL
+# - /vplay <query> - Play video in the voice chat (when enabled)
 # - /playforce - Force play (skip queue and play immediately)
+# - /vplayforce - Force video playback (skip queue)
 # - /cplay - Play in connected channel
+# - /cvplay - Play video in connected channel (when enabled)
 # 
 # Supports:
 # - YouTube search queries
@@ -98,7 +101,18 @@ def playlist_to_queue(chat_id: int, tracks: list) -> str:
     return text
 
 @app.on_message(
-    filters.command(["play", "playforce", "cplay", "cplayforce"])
+    filters.command(
+        [
+            "play",
+            "playforce",
+            "cplay",
+            "cplayforce",
+            "vplay",
+            "vplayforce",
+            "cvplay",
+            "cvplayforce",
+        ]
+    )
     & filters.group
     & ~app.bl_users
 )
@@ -110,6 +124,7 @@ async def play_hndlr(
     force: bool = False,
     url: str = None,
     cplay: bool = False,
+    video: bool = False,
 ) -> None:
     # Auto-delete command message
     try:
@@ -261,6 +276,11 @@ async def play_hndlr(
 
     if not file:
         return
+
+    file.video = getattr(file, "video", False) or video
+    if file.video:
+        for track in tracks:
+            track.video = True
 
     # Skip duration check for live streams
     if not file.is_live and file.duration_sec > config.DURATION_LIMIT:

@@ -93,6 +93,8 @@ class Config:
         self.AUTO_LEAVE: bool = self._str_to_bool(getenv("AUTO_LEAVE", "False"))
         # Enable/disable thumbnail generation (set False to use default thumb)
         self.THUMB_GEN: bool = self._str_to_bool(getenv("THUMB_GEN", "True"))
+        # Enable/disable video playback commands (/vplay)
+        self.VIDEO_PLAY: bool = self._str_to_bool(getenv("VIDEO_PLAY", "False"))
 
         # ============ YOUTUBE COOKIES ============
         # Parse space-separated cookie URLs for age-restricted content
