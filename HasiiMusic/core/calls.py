@@ -621,35 +621,6 @@ class TgCall(PyTgCalls):
                     return await self.stop(chat_id)
 
                 _lang = await lang.get_lang(chat_id)
-                try:
-                    msg = await app.send_message(chat_id=target_chat, text=_lang["play_next"])
-                except errors.FloodWait as fw:
-                    logger.warning(
-                        f"FloodWait in play_next for {chat_id}: waiting {fw.value}s")
-                    await asyncio.sleep(fw.value + 1)
-                    try:
-                        msg = await app.send_message(chat_id=target_chat, text=_lang["play_next"])
-                    except errors.ChannelPrivate:
-                        logger.warning(
-                            f"Bot removed from {chat_id}, cleaning up")
-                        await self.leave_call(chat_id)
-                        await db.rm_chat(chat_id)
-                        return
-                    except Exception as e:
-                        logger.error(
-                            f"Failed to send play_next message after FloodWait for {chat_id}: {e}")
-                        # Continue without message - don't let this stop playback
-                        msg = None
-                except errors.ChannelPrivate:
-                    logger.warning(f"Bot removed from {chat_id}, cleaning up")
-                    await self.leave_call(chat_id)
-                    await db.rm_chat(chat_id)
-                    return
-                except Exception as e:
-                    logger.error(
-                        f"Failed to send play_next message for {chat_id}: {e}")
-                    msg = None
-
                 if not media.file_path:
                     is_live = getattr(media, 'is_live', False)
                     media.file_path = await yt.download(
@@ -668,6 +639,24 @@ class TgCall(PyTgCalls):
                             except Exception:
                                 pass
                         return
+
+                msg = None
+                try:
+                    msg = await app.send_message(chat_id=target_chat, text=_lang["play_next"])
+                except errors.FloodWait as fw:
+                    # Do not block playback on UI flood waits; continue without message.
+                    logger.warning(
+                        f"FloodWait in play_next for {chat_id}: skipping status message ({fw.value}s)")
+                    msg = None
+                except errors.ChannelPrivate:
+                    logger.warning(f"Bot removed from {chat_id}, cleaning up")
+                    await self.leave_call(chat_id)
+                    await db.rm_chat(chat_id)
+                    return
+                except Exception as e:
+                    logger.error(
+                        f"Failed to send play_next message for {chat_id}: {e}")
+                    msg = None
 
                 media.message_id = msg.id if msg else 0
                 if msg:

@@ -91,10 +91,6 @@ preload = PreloadManager()
 from HasiiMusic.helpers import Queue
 queue = Queue()
 
-# Initialize preload manager for next-track downloading
-from HasiiMusic.helpers._preload import PreloadManager
-preload = PreloadManager()
-
 # Initialize call handler
 from HasiiMusic.core.calls import TgCall
 tune = TgCall()
