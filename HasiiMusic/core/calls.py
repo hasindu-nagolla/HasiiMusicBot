@@ -621,6 +621,7 @@ class TgCall(PyTgCalls):
                     return await self.stop(chat_id)
 
                 _lang = await lang.get_lang(chat_id)
+                msg = None
                 if not media.file_path:
                     is_live = getattr(media, 'is_live', False)
                     media.file_path = await yt.download(
@@ -640,7 +641,6 @@ class TgCall(PyTgCalls):
                                 pass
                         return
 
-                msg = None
                 try:
                     msg = await app.send_message(chat_id=target_chat, text=_lang["play_next"])
                 except errors.FloodWait as fw:
