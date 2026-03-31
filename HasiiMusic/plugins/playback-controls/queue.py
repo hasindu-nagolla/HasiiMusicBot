@@ -2,11 +2,11 @@
 # queue.py - Queue Display Command
 # ==============================================================================
 # This plugin displays the current queue and now playing information.
-# 
+#
 # Commands:
 # - /queue - Show current queue
 # - /playing - Same as /queue
-# 
+#
 # Displays:
 # - Currently playing track with thumbnail
 # - Track title, duration, user who requested
@@ -23,6 +23,12 @@ from HasiiMusic.helpers import Track, buttons, thumb
 @app.on_message(filters.command(["queue", "playing"]) & filters.group & ~app.bl_users)
 @lang.language()
 async def _queue_func(_, m: types.Message):
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
     if not await db.get_call(m.chat.id):
         return await m.reply_text(m.lang["not_playing"])
 

@@ -69,6 +69,10 @@ class Queue:
     def get_queue(self, chat_id: int) -> list[MediaItem]:
         """Return the full queue including the currently playing item."""
         return list(self.queues[chat_id])
+    
+    def get_all(self, chat_id: int) -> list[MediaItem]:
+        """Alias for get_queue() - return the full queue including currently playing item."""
+        return self.get_queue(chat_id)
 
     def remove_current(self, chat_id: int) -> None:
         """Remove the currently playing item only (if exists)."""
@@ -78,3 +82,34 @@ class Queue:
     def clear(self, chat_id: int) -> None:
         """Clear the entire queue."""
         self.queues[chat_id].clear()
+
+    def peek_next(self, chat_id: int, count: int = 2) -> list[MediaItem]:
+        """
+        Return next N upcoming tracks without removing them from queue.
+        
+        Args:
+            chat_id: The chat ID to peek queue for
+            count: Number of upcoming tracks to return (default: 2)
+            
+        Returns:
+            List of upcoming MediaItem objects (excluding currently playing track)
+        """
+        if not self.queues[chat_id] or len(self.queues[chat_id]) <= 1:
+            return []
+        
+        # Convert deque to list and skip first item (currently playing)
+        queue_list = list(self.queues[chat_id])
+        return queue_list[1:min(len(queue_list), count + 1)]
+    
+    @staticmethod
+    def is_downloaded(item: MediaItem) -> bool:
+        """
+        Check if a track has already been downloaded.
+        
+        Args:
+            item: MediaItem or Track object to check
+            
+        Returns:
+            True if file_path exists and is not empty, False otherwise
+        """
+        return bool(getattr(item, 'file_path', None))

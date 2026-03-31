@@ -13,7 +13,7 @@
 from pyrogram import types
 
 from HasiiMusic import app, config, lang
-from HasiiMusic.core.lang import lang_codes
+
 
 
 class Inline:
@@ -44,18 +44,39 @@ class Inline:
             )
 
         if not remove:
+            # Seek buttons row
+            keyboard.append(
+                [
+                    self.ikb(
+                        text="« 30", callback_data=f"controls seek_back_30 {chat_id}"),
+                    self.ikb(
+                        text="« 10", callback_data=f"controls seek_back_10 {chat_id}"),
+                    self.ikb(
+                        text="10 »", callback_data=f"controls seek_forward_10 {chat_id}"),
+                    self.ikb(
+                        text="30 »", callback_data=f"controls seek_forward_30 {chat_id}"),
+                ]
+            )
+            # Main control buttons row
             keyboard.append(
                 [
                     self.ikb(
                         text="▷", callback_data=f"controls resume {chat_id}"),
                     self.ikb(
-                        text="∣ ∣", callback_data=f"controls pause {chat_id}"),
+                        text="II", callback_data=f"controls pause {chat_id}"),
                     self.ikb(
-                        text="⟳", callback_data=f"controls replay {chat_id}"),
+                        text="↻", callback_data=f"controls replay {chat_id}"),
                     self.ikb(
-                        text=">>", callback_data=f"controls skip {chat_id}"),
+                        text="‣‣I", callback_data=f"controls skip {chat_id}"),
                     self.ikb(
-                        text="▣", callback_data=f"controls stop {chat_id}"),
+                        text="▢", callback_data=f"controls stop {chat_id}"),
+                ]
+            )
+            # Delete button as full-width button at bottom
+            keyboard.append(
+                [
+                    self.ikb(
+                        text="ᴅᴇʟᴇᴛᴇ", callback_data=f"controls close {chat_id}"),
                 ]
             )
         return self.ikm(keyboard)
@@ -63,45 +84,58 @@ class Inline:
     def help_markup(
         self, _lang: dict, back: bool = False
     ) -> types.InlineKeyboardMarkup:
+        """Create help menu with categorized buttons."""
         if back:
             rows = [
                 [
-                    self.ikb(text=_lang["back"], callback_data="help back"),
-                    self.ikb(text=_lang["close"], callback_data="help close"),
+                    self.ikb(text="ʙᴀᴄᴋ", callback_data="help_main"),
                 ]
             ]
         else:
-            cbs = ["admins", "auth", "blist", "lang",
-                   "ping", "play", "queue", "stats", "sudo"]
-            buttons = [
-                self.ikb(text=_lang[f"help_{i}"], callback_data=f"help {cb}")
-                for i, cb in enumerate(cbs)
+            # Help menu with categorized buttons (3 per row)
+            rows = [
+                [
+                    self.ikb(text="ᴀᴅᴍɪɴꜱ", callback_data="help_admins"),
+                    self.ikb(text="ᴀᴜᴛʜ", callback_data="help_auth"),
+                    self.ikb(text="ʙʀᴏᴀᴅᴄᴀꜱᴛ", callback_data="help_broadcast"),
+                ],
+                [
+                    self.ikb(text="ʙʟ-ᴄʜᴀᴛ", callback_data="help_blchat"),
+                    self.ikb(text="ʙʟ-ᴜꜱᴇʀ", callback_data="help_bluser"),
+                    self.ikb(text="ɢ-ʙᴀɴ", callback_data="help_gban"),
+                ],
+                [
+                    self.ikb(text="ʟᴏᴏᴘ", callback_data="help_loop"),
+                    self.ikb(text="ᴘʟᴀʏ", callback_data="help_play"),
+                    self.ikb(text="ǫᴜᴇᴜᴇ", callback_data="help_queue"),
+                ],
+                [
+                    self.ikb(text="ꜱᴇᴇᴋ", callback_data="help_seek"),
+                    self.ikb(text="ꜱʜᴜꜰꜰʟᴇ", callback_data="help_shuffle"),
+                    self.ikb(text="ᴘɪɴɢ", callback_data="help_ping"),
+                ],
+                [
+                    self.ikb(text="ꜱᴛᴀᴛꜱ", callback_data="help_stats"),
+                    self.ikb(text="ꜱᴜᴅᴏ", callback_data="help_sudo"),
+                    self.ikb(text="ᴍᴀɪɴᴛᴇɴᴀɴᴄᴇ", callback_data="help_maintenance"),
+                ],
+                [
+                    self.ikb(text="ʙᴀᴄᴋ", callback_data="start"),
+                ]
             ]
-            rows = [buttons[i: i + 3] for i in range(0, len(buttons), 3)]
-
         return self.ikm(rows)
 
-    def lang_markup(self, _lang: str) -> types.InlineKeyboardMarkup:
-        langs = lang.get_languages()
-
-        # Map language codes to flags
-        flags = {
-            "en": "🇬🇧",
-            "si": "🇱🇰"
-        }
-
-        buttons = [
-            self.ikb(
-                text=f"{flags.get(code, '')} {name} {'✔️' if code == _lang else ''}",
-                callback_data=f"lang_change {code}",
-            )
-            for code, name in langs.items()
-        ]
-        rows = [buttons[i: i + 2] for i in range(0, len(buttons), 2)]
-        return self.ikm(rows)
 
     def ping_markup(self, text: str) -> types.InlineKeyboardMarkup:
-        return self.ikm([[self.ikb(text=text, url=config.SUPPORT_CHAT)]])
+        return self.ikm([
+            [
+                self.ikb(text="📢 Channel", url=config.SUPPORT_CHANNEL),
+                self.ikb(text="🆘 Support", url=config.SUPPORT_CHAT),
+            ],
+            [
+                self.ikb(text="➕ Add Me to Your Group", url=f"https://t.me/{app.username}?startgroup=true"),
+            ]
+        ])
 
     def play_queued(
         self, chat_id: int, item_id: str, _text: str
@@ -117,6 +151,10 @@ class Inline:
                         text=">>", callback_data=f"controls skip {chat_id}"),
                     self.ikb(
                         text="▣", callback_data=f"controls stop {chat_id}"),
+                ],
+                [
+                    self.ikb(
+                        text="ᴅᴇʟᴇᴛᴇ", callback_data=f"controls close {chat_id}"),
                 ]
             ]
         )
@@ -142,14 +180,6 @@ class Inline:
                     ),
                     self.ikb(text=admin_only, callback_data="playmode"),
                 ],
-                [
-                    self.ikb(
-                        text=lang["language"] + " ➜",
-                        callback_data=f"controls status {chat_id}",
-                    ),
-                    self.ikb(text=lang_codes[language],
-                             callback_data="language"),
-                ],
             ]
         )
 
@@ -174,21 +204,18 @@ class Inline:
                 [
                     self.ikb(
                         text=lang["source"],
-                        url="https://github.com/hasindu-nagolla/HasiiMusicBot",
+                        url="https://hasiimusic.hasindunagolla.live/",
                     )
                 ]
             ]
-        else:
-            rows += [[self.ikb(text=lang["language"],
-                               callback_data="language")]]
         return self.ikm(rows)
 
     def yt_key(self, link: str) -> types.InlineKeyboardMarkup:
         return self.ikm(
             [
                 [
-                    self.ikb(text="Copy Link", copy_text=link),
-                    self.ikb(text="Open in YouTube", url=link),
+                    self.ikb(text="ᴄᴏᴘʏ ʟɪɴᴋ", copy_text=link),
+                    self.ikb(text="ᴏᴘᴇɴ ɪɴ ʏᴏᴜᴛᴜʙᴇ", url=link),
                 ],
             ]
         )

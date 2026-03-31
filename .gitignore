@@ -1,23 +1,44 @@
 # ==============================================================================
-# .gitignore - Git Ignore Rules
+# Git Ignore Rules
 # ==============================================================================
-# Prevents sensitive and generated files from being committed to git.
-# 
-# Security: .env, *.session files contain sensitive credentials
-# Generated: cache/, downloads/, __pycache__/ are auto-generated
-# Logs: log.txt contains runtime logs
+# Prevent sensitive, generated, and local-only files from being committed.
 # ==============================================================================
 
+# Environment / Secrets
 .env
-.cache
-log.txt
-.DS_Store
-venv/
-cache/
-downloads/
-__pycache__/
-anony/cookies/*.txt
 *.session
 *.session-journal
-.vscode
+HasiiMusic/cookies/*.txt
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Python Cache / Build Artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.cache
+
+# Runtime Data / Generated Files
+cache/
+downloads/
+log.txt
+
+# Editor / IDE
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Private / Local Documentation
+IMPLEMENTATION_COMPLETE.md
+COMPARISON.md
+CHECKLIST.md
+
+# Project-Specific Ignored Files
 HasiiMusic/plugins/playback-controls/radio.py
+ffmpeg

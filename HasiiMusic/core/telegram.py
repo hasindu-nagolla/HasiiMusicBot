@@ -22,24 +22,26 @@ from HasiiMusic.helpers import Media, buttons, utils
 class Telegram:
     def __init__(self):
         """Initialize the Telegram download handler."""
-        self.active = []  # List of currently downloading file IDs (prevent duplicates)
+        self.active = [
+        ]  # List of currently downloading file IDs (prevent duplicates)
         self.events = {}  # Dictionary of download events for cancellation
-        self.last_edit = {}  # Track last progress update time (for rate limiting)
+        # Track last progress update time (for rate limiting)
+        self.last_edit = {}
         self.active_tasks = {}  # Active download tasks for cancellation
         self.sleep = 5  # Minimum seconds between progress updates
 
     def get_media(self, msg: types.Message) -> bool:
         """Check if message contains downloadable media."""
-        return any([msg.audio, msg.document, msg.voice])
+        return any([msg.audio, msg.document, msg.voice, msg.video])
 
     async def download(self, msg: types.Message, sent: types.Message) -> Media | None:
         """
         Download media from a Telegram message with progress tracking.
-        
+
         Args:
             msg: The message containing the media
             sent: The status message to update with progress
-            
+
         Returns:
             Media object if successful, None if failed or cancelled
         """
@@ -50,11 +52,16 @@ class Telegram:
         start_time = time.time()  # Track download start time
 
         # Extract media information from message
-        media = msg.audio or msg.voice or msg.document
-        file_id = getattr(media, "file_unique_id", None)  # Unique file identifier
-        file_ext = getattr(media, "file_name", "").split(".")[-1]  # File extension
+        media = msg.audio or msg.voice or msg.video or msg.document
+        # Detect if this is a video file
+        is_video = bool(msg.video) or (msg.document and getattr(msg.document, "mime_type", "").startswith("video/"))
+        # Unique file identifier
+        file_id = getattr(media, "file_unique_id", None)
+        file_ext = getattr(media, "file_name", "").split(
+            ".")[-1]  # File extension
         file_size = getattr(media, "file_size", 0)  # File size in bytes
-        file_title = getattr(media, "title", "Telegram File") or "Telegram File"  # Media title
+        file_title = getattr(
+            media, "title", "Telegram File") or "Telegram File"  # Media title
         duration = getattr(media, "duration", 0)  # Duration in seconds
 
         # Validate duration limit (configured in config.py)
@@ -111,15 +118,21 @@ class Telegram:
                         round(time.time() - start_time, 2))
                 )
 
+            # Format duration with hours support
+            if duration >= 3600:
+                duration_str = time.strftime("%H:%M:%S", time.gmtime(duration))
+            else:
+                duration_str = time.strftime("%M:%S", time.gmtime(duration))
+
             return Media(
                 id=file_id,
-                duration=time.strftime("%M:%S", time.gmtime(duration)),
+                duration=duration_str,
                 duration_sec=duration,
                 file_path=file_path,
                 message_id=sent.id,
                 url=msg.link,
                 title=file_title[:25],
-                video=False,  # Audio only
+                video=is_video,
             )
         except asyncio.CancelledError:
             return await sent.stop_propagation()

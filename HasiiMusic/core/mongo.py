@@ -8,7 +8,7 @@
 # - blacklist: Blacklisted users/chats
 # - calls: Active voice call sessions
 # - cache: Admin list cache
-# 
+#
 # Features:
 # - Async MongoDB operations for better performance
 # - Connection pooling for efficiency
@@ -18,10 +18,26 @@
 
 from random import randint
 from time import time
+import asyncio
+import logging
 
 from pymongo import AsyncMongoClient
 
 from HasiiMusic import config, logger, userbot
+
+
+# Suppress non-critical MongoDB background task errors
+class MongoBackgroundFilter(logging.Filter):
+    def filter(self, record):
+        # Suppress AutoReconnect and _OperationCancelled background errors (these are handled internally)
+        msg = record.getMessage()
+        return not (
+            'MongoClient background task encountered an error' in msg or
+            ('AutoReconnect' in msg and 'background task' in msg) or
+            ('_OperationCancelled' in msg and 'background task' in msg)
+        )
+
+logging.getLogger('pymongo.client').addFilter(MongoBackgroundFilter())
 
 
 class MongoDB:
@@ -32,9 +48,14 @@ class MongoDB:
         self.mongo = AsyncMongoClient(
             config.MONGO_URL,
             serverSelectionTimeoutMS=12500,
-            maxPoolSize=50,  # Increase connection pool
-            minPoolSize=10,
-            maxIdleTimeMS=30000
+            connectTimeoutMS=20000,
+            socketTimeoutMS=20000,
+            maxPoolSize=20,  # Reduced from 50 to prevent too many open connections
+            minPoolSize=5,   # Reduced from 10 to prevent too many open connections
+            maxIdleTimeMS=30000,  # Reduced from 45000 - close idle connections faster
+            waitQueueTimeoutMS=10000,
+            retryWrites=True,
+            retryReads=True
         )
         self.db = self.mongo.HasiiTune
 
@@ -45,6 +66,9 @@ class MongoDB:
         self.notified = []
         self.cache = self.db.cache
         self.logger = False
+        self.maintenance = False  # Maintenance mode status
+        self.gbanned_users = []  # Globally banned users
+        self.vplay_enabled = config.VIDEO_PLAY
 
         self.assistant = {}
         self.assistantdb = self.db.assistant
@@ -65,26 +89,37 @@ class MongoDB:
         self.usersdb = self.db.users
 
     async def connect(self) -> None:
-        """Check if we can connect to the database.
+        """Check if we can connect to the database with exponential backoff retry logic.
 
         Raises:
-            SystemExit: If the connection to the database fails.
+            SystemExit: If the connection to the database fails after retries.
         """
-        try:
-            start = time()
-            await self.mongo.admin.command("ping")
-            logger.info(
-                f"✅ Database connection successful. ({time() - start:.2f}s)")
-            
-            # Create indexes for faster queries
-            await self.authdb.create_index("_id")
-            await self.langdb.create_index("_id")
-            await self.cache.create_index("_id")
-            
-            await self.load_cache()
-        except Exception as e:
-            raise SystemExit(
-                f"Database connection failed: {type(e).__name__}") from e
+        max_retries = 3
+        retry_delay = 5  # Initial delay in seconds
+        
+        for attempt in range(1, max_retries + 1):
+            try:
+                start = time()
+                await self.mongo.admin.command("ping")
+                logger.info(
+                    f"✅ Database connection successful. ({time() - start:.2f}s)")
+
+                # Create indexes for faster queries
+                await self.authdb.create_index("_id")
+                await self.langdb.create_index("_id")
+                await self.cache.create_index("_id")
+
+                await self.load_cache()
+                return  # Success, exit the function
+            except Exception as e:
+                if attempt < max_retries:
+                    # Exponential backoff: 5s, 10s, 20s
+                    wait_time = retry_delay * (2 ** (attempt - 1))
+                    logger.warning(f"Database connection attempt {attempt}/{max_retries} failed: {type(e).__name__}. Retrying in {wait_time}s...")
+                    await asyncio.sleep(wait_time)
+                else:
+                    raise SystemExit(
+                        f"Database connection failed after {max_retries} attempts: {type(e).__name__}") from e
 
     async def close(self) -> None:
         """Close the connection to the database."""
@@ -109,11 +144,12 @@ class MongoDB:
     async def get_admins(self, chat_id: int, reload: bool = False) -> list[int]:
         from HasiiMusic.helpers._admins import reload_admins
 
-        # Cache admin list for 5 minutes to reduce API calls
+        # **PERFORMANCE FIX**: Increased cache from 5 to 15 minutes
+        # Reduces MongoDB queries during peak load (15-20 concurrent streams)
         current_time = time()
         cache_age = current_time - self.admin_cache_time.get(chat_id, 0)
-        
-        if chat_id not in self.admin_list or reload or cache_age > 300:
+
+        if chat_id not in self.admin_list or reload or cache_age > 900:  # 15 minutes
             self.admin_list[chat_id] = await reload_admins(chat_id)
             self.admin_cache_time[chat_id] = current_time
         return self.admin_list[chat_id]
@@ -163,14 +199,33 @@ class MongoDB:
             num = doc["num"] if doc else await self.set_assistant(chat_id)
             self.assistant[chat_id] = num
 
+        # Check if assigned assistant is out of range (e.g., assistant was removed)
+        if self.assistant[chat_id] > len(userbot.clients):
+            # Reassign to a valid assistant
+            num = await self.set_assistant(chat_id)
+            self.assistant[chat_id] = num
+
         return tune.clients[self.assistant[chat_id] - 1]
 
     async def get_client(self, chat_id: int):
         if chat_id not in self.assistant:
             await self.get_assistant(chat_id)
-        return {1: userbot.one, 2: userbot.two, 3: userbot.three}.get(
-            self.assistant[chat_id]
-        )
+        
+        # Check if assigned assistant is out of range
+        if self.assistant[chat_id] > len(userbot.clients):
+            # Reassign to a valid assistant
+            await self.set_assistant(chat_id)
+        
+        # Get available clients dynamically based on what's actually running
+        available_clients = {}
+        if hasattr(userbot, 'one') and userbot.one in userbot.clients:
+            available_clients[1] = userbot.one
+        if hasattr(userbot, 'two') and userbot.two in userbot.clients:
+            available_clients[2] = userbot.two
+        if hasattr(userbot, 'three') and userbot.three in userbot.clients:
+            available_clients[3] = userbot.three
+        
+        return available_clients.get(self.assistant[chat_id])
 
     # BLACKLIST METHODS
     async def add_blacklist(self, chat_id: int) -> None:
@@ -238,6 +293,76 @@ class MongoDB:
             self.lang[chat_id] = doc["lang"] if doc else "en"
         return self.lang[chat_id]
 
+    # MAINTENANCE MODE METHODS
+    async def set_maintenance(self, status: bool) -> None:
+        """Enable or disable maintenance mode."""
+        await self.cache.update_one(
+            {"_id": "maintenance"},
+            {"$set": {"status": status}},
+            upsert=True,
+        )
+        self.maintenance = status
+
+    async def get_maintenance(self) -> bool:
+        """Check if maintenance mode is enabled."""
+        if not hasattr(self, 'maintenance'):
+            doc = await self.cache.find_one({"_id": "maintenance"})
+            self.maintenance = doc.get("status", False) if doc else False
+        return self.maintenance
+
+    # VPLAY TOGGLE METHODS
+    async def get_vplay_enabled(self) -> bool:
+        """Check if /vplay commands are enabled."""
+        if hasattr(self, "vplay_enabled"):
+            return self.vplay_enabled
+
+        doc = await self.cache.find_one({"_id": "vplay_toggle"})
+        self.vplay_enabled = doc.get("enabled", config.VIDEO_PLAY) if doc else config.VIDEO_PLAY
+        return self.vplay_enabled
+
+    async def set_vplay_enabled(self, enabled: bool) -> None:
+        """Enable or disable /vplay commands globally."""
+        self.vplay_enabled = enabled
+        await self.cache.update_one(
+            {"_id": "vplay_toggle"},
+            {"$set": {"enabled": enabled}},
+            upsert=True,
+        )
+
+    # GLOBAL BAN METHODS
+    async def add_gban(self, user_id: int) -> None:
+        """Add user to global ban list."""
+        await self.cache.update_one(
+            {"_id": "gbanned_users"},
+            {"$addToSet": {"user_ids": user_id}},
+            upsert=True,
+        )
+        if not hasattr(self, 'gbanned_users'):
+            self.gbanned_users = []
+        if user_id not in self.gbanned_users:
+            self.gbanned_users.append(user_id)
+
+    async def del_gban(self, user_id: int) -> None:
+        """Remove user from global ban list."""
+        await self.cache.update_one(
+            {"_id": "gbanned_users"},
+            {"$pull": {"user_ids": user_id}},
+        )
+        if hasattr(self, 'gbanned_users') and user_id in self.gbanned_users:
+            self.gbanned_users.remove(user_id)
+
+    async def get_gbanned(self) -> list[int]:
+        """Get list of globally banned users."""
+        if not hasattr(self, 'gbanned_users'):
+            doc = await self.cache.find_one({"_id": "gbanned_users"})
+            self.gbanned_users = doc.get("user_ids", []) if doc else []
+        return self.gbanned_users
+    
+    async def is_gbanned(self, user_id: int) -> bool:
+        """Check if user is globally banned."""
+        gbanned = await self.get_gbanned()
+        return user_id in gbanned
+
     # LOGGER METHODS
     async def is_logger(self) -> bool:
         return self.logger
@@ -270,6 +395,52 @@ class MongoDB:
             await self.cache.update_one(
                 {"_id": f"cplay_{chat_id}"},
                 {"$set": {"channel_id": channel_id}},
+                upsert=True,
+            )
+    
+    async def get_group_for_channel(self, channel_id: int) -> int | None:
+        """Reverse lookup: Find which group has this channel set for channel play.
+        
+        When audio streams to a channel, we need to know which group initiated it
+        so we can send control messages to the group instead of the channel.
+        """
+        doc = await self.cache.find_one({"channel_id": channel_id})
+        if doc and doc.get("_id", "").startswith("cplay_"):
+            group_id_str = doc["_id"].replace("cplay_", "")
+            try:
+                return int(group_id_str)
+            except ValueError:
+                return None
+        return None
+
+    # AUTO LEAVE METHODS
+    async def get_autoleave(self, chat_id: int) -> bool:
+        """Get auto-leave status for a chat. Default is False."""
+        doc = await self.cache.find_one({"_id": f"autoleave_{chat_id}"})
+        return doc.get("enabled", False) if doc else False
+
+    async def set_autoleave(self, chat_id: int, enabled: bool) -> None:
+        """Enable or disable auto-leave for a chat."""
+        await self.cache.update_one(
+            {"_id": f"autoleave_{chat_id}"},
+            {"$set": {"enabled": enabled}},
+            upsert=True,
+        )
+
+    # LOOP MODE METHODS
+    async def get_loop(self, chat_id: int) -> int:
+        """Get loop mode for a chat. 0=off, 1=single, 10=queue"""
+        doc = await self.cache.find_one({"_id": f"loop_{chat_id}"})
+        return doc.get("mode", 0) if doc else 0
+
+    async def set_loop(self, chat_id: int, mode: int) -> None:
+        """Set loop mode for a chat."""
+        if mode == 0:
+            await self.cache.delete_one({"_id": f"loop_{chat_id}"})
+        else:
+            await self.cache.update_one(
+                {"_id": f"loop_{chat_id}"},
+                {"$set": {"mode": mode}},
                 upsert=True,
             )
 
@@ -324,58 +495,113 @@ class MongoDB:
         return self.users
 
     async def migrate_coll(self) -> None:
+        """Migrate old collection structure (ObjectId) to new structure (int)."""
         from bson import ObjectId
-        logger.info("Migrating users and chats from old collections...")
+        logger.info("🔄 Migrating users and chats from old collections...")
 
         musers, mchats, done = [], [], []
-        ulist = [user async for user in self.db.tgusersdb.find()]
-        ulist.extend([user async for user in self.usersdb.find()])
+        
+        # Collect all users from both old and new collections
+        try:
+            ulist = [user async for user in self.db.tgusersdb.find()]
+        except Exception:
+            ulist = []
+        
+        try:
+            ulist.extend([user async for user in self.usersdb.find()])
+        except Exception:
+            pass
 
+        # Process users
         for user in ulist:
-            if isinstance(user.get("_id"), ObjectId):
-                user_id = int(user["user_id"])
-                if user_id in done:
-                    continue
-                done.append(user_id)
-                musers.append(user)
-            else:
-                user_id = int(user["_id"])
-                if user_id in done:
-                    continue
-                done.append(user_id)
-                musers.append({"_id": user_id})
-        await self.usersdb.drop()
-        await self.db.tgusersdb.drop()
+            try:
+                if isinstance(user.get("_id"), ObjectId):
+                    user_id = int(user.get("user_id", 0))
+                    if user_id and user_id not in done:
+                        done.append(user_id)
+                        musers.append({"_id": user_id})
+                else:
+                    user_id = int(user["_id"])
+                    if user_id not in done:
+                        done.append(user_id)
+                        musers.append({"_id": user_id})
+            except (ValueError, KeyError) as e:
+                logger.debug(f"Skipping invalid user entry: {e}")
+                continue
+        
+        # Drop old collections and insert migrated users
+        try:
+            await self.usersdb.drop()
+        except Exception:
+            pass
+        try:
+            await self.db.tgusersdb.drop()
+        except Exception:
+            pass
         if musers:
-            await self.usersdb.insert_many(musers)
+            try:
+                await self.usersdb.insert_many(musers, ordered=False)
+            except Exception as e:
+                logger.debug(f"User migration bulk insert error (may be duplicate keys): {e}")
 
-        async for chat in self.chatsdb.find():
-            if isinstance(chat.get("_id"), ObjectId):
-                chat_id = int(chat["chat_id"])
-                if chat_id in mchats:
+        # Process chats
+        done.clear()
+        try:
+            async for chat in self.chatsdb.find():
+                try:
+                    if isinstance(chat.get("_id"), ObjectId):
+                        chat_id = int(chat.get("chat_id", 0))
+                        if chat_id and chat_id not in done:
+                            done.append(chat_id)
+                            mchats.append({"_id": chat_id})
+                    else:
+                        chat_id = int(chat["_id"])
+                        if chat_id not in done:
+                            done.append(chat_id)
+                            mchats.append({"_id": chat_id})
+                except (ValueError, KeyError) as e:
+                    logger.debug(f"Skipping invalid chat entry: {e}")
                     continue
-                done.append(chat_id)
-                mchats.append(chat)
-            else:
-                chat_id = int(chat["_id"])
-                if chat_id in done:
-                    continue
-                done.append(chat_id)
-                mchats.append({"_id": chat_id})
-        await self.chatsdb.drop()
+        except Exception as e:
+            logger.debug(f"Error reading chats collection: {e}")
+        
+        # Drop old collection and insert migrated chats
+        try:
+            await self.chatsdb.drop()
+        except Exception:
+            pass
         if mchats:
-            await self.chatsdb.insert_many(mchats)
+            try:
+                await self.chatsdb.insert_many(mchats, ordered=False)
+            except Exception as e:
+                logger.debug(f"Chat migration bulk insert error (may be duplicate keys): {e}")
 
-        await self.cache.insert_one({"_id": "migrated"})
-        logger.info("Migration completed.")
+        # Mark migration as complete
+        await self.cache.update_one(
+            {"_id": "migrated"},
+            {"$set": {"status": True, "timestamp": time()}},
+            upsert=True
+        )
+        logger.info("✅ Migration completed successfully.")
 
     async def load_cache(self) -> None:
+        """Preload cache data from database for faster access."""
+        # Check if migration needed
         doc = await self.cache.find_one({"_id": "migrated"})
         if not doc:
             await self.migrate_coll()
 
+        # Preload all cache data
+        logger.info("📦 Loading database cache...")
+        
+        # Load chats, users, blacklists, and logger status
         await self.get_chats()
         await self.get_users()
-        await self.get_blacklisted(True)
+        await self.get_blacklisted(chat=True)  # Load blacklisted chats
         await self.get_logger()
-        logger.info("Database cache loaded.")
+        await self.get_vplay_enabled()
+        
+        # Preload sudoers list
+        await self.get_sudoers()
+        
+        logger.info(f"✅ Cache loaded: {len(self.chats)} chats, {len(self.users)} users, {len(self.blacklisted)} blacklisted.")

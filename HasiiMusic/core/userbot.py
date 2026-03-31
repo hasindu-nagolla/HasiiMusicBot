@@ -15,21 +15,23 @@ class Userbot(Client):
     def __init__(self):
         """
         Initialize userbot with multiple assistant clients.
-        
+
         Creates up to 3 assistant clients based on available session strings.
         Each assistant can independently join voice chats and stream music.
         More assistants = ability to serve more groups simultaneously.
         """
         self.clients = []  # List to store all active assistant clients
-        
+
         # Map of client names to their session string config keys
         clients = {"one": "SESSION1", "two": "SESSION2", "three": "SESSION3"}
-        
+
         # Create a Pyrogram client for each configured session
         for key, string_key in clients.items():
-            name = f"HasiiTuneUB{key[-1]}"  # Unique name: HasiiTuneUB1, HasiiTuneUB2, etc.
-            session = getattr(config, string_key)  # Get session string from config
-            
+            # Unique name: HasiiTuneUB1, HasiiTuneUB2, etc.
+            name = f"HasiiTuneUB{key[-1]}"
+            # Get session string from config
+            session = getattr(config, string_key)
+
             # Create and attach the client as an attribute (self.one, self.two, self.three)
             setattr(
                 self,
@@ -61,18 +63,27 @@ class Userbot(Client):
             await client.start()
         except Exception as e:
             logger.error(f"❌ Assistant {num} failed to start: {e}")
+            logger.error(f"   This could be due to:")
+            logger.error(f"   • Invalid session string (STRING_SESSION{num})")
+            logger.error(f"   • Session logged out from another device")
+            logger.error(f"   • Network/connectivity issues")
             return  # Don't raise SystemExit, just skip this assistant
-        
+
         try:
             await client.send_message(config.LOGGER_ID, f"Assistant {num} Started")
         except Exception as e:
-            logger.warning(f"⚠️ Assistant {num} couldn't send message to logger: {e}")
+            logger.warning(
+                f"⚠️ Assistant {num} couldn't send message to logger: {e}")
             # Continue anyway - this is not critical
 
-        client.id = client.me.id if hasattr(client, 'me') and client.me else None
-        client.name = client.me.first_name if hasattr(client, 'me') and client.me else f"Assistant{num}"
-        client.username = client.me.username if hasattr(client, 'me') and client.me else None
-        client.mention = client.me.mention if hasattr(client, 'me') and client.me else client.name
+        client.id = client.me.id if hasattr(
+            client, 'me') and client.me else None
+        client.name = client.me.first_name if hasattr(
+            client, 'me') and client.me else f"Assistant{num}"
+        client.username = client.me.username if hasattr(
+            client, 'me') and client.me else None
+        client.mention = client.me.mention if hasattr(
+            client, 'me') and client.me else client.name
         self.clients.append(client)
         logger.info(f"👤 Assistant {num} started as @{client.username}")
 
@@ -91,10 +102,22 @@ class Userbot(Client):
         """
         Asynchronously stops the assistants.
         """
-        if config.SESSION1:
-            await self.one.stop()
-        if config.SESSION2:
-            await self.two.stop()
-        if config.SESSION3:
-            await self.three.stop()
+        try:
+            if config.SESSION1 and hasattr(self.one, 'is_connected') and self.one.is_connected:
+                await self.one.stop()
+        except Exception as e:
+            logger.warning(f"Error stopping assistant 1: {e}")
+        
+        try:
+            if config.SESSION2 and hasattr(self.two, 'is_connected') and self.two.is_connected:
+                await self.two.stop()
+        except Exception as e:
+            logger.warning(f"Error stopping assistant 2: {e}")
+        
+        try:
+            if config.SESSION3 and hasattr(self.three, 'is_connected') and self.three.is_connected:
+                await self.three.stop()
+        except Exception as e:
+            logger.warning(f"Error stopping assistant 3: {e}")
+        
         logger.info("Assistants stopped.")

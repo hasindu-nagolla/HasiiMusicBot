@@ -12,6 +12,7 @@
 from functools import wraps
 
 from pyrogram import StopPropagation, enums, types
+from pyrogram.errors import ChatSendPlainForbidden, ChatWriteForbidden
 
 from HasiiMusic import app, db
 
@@ -19,11 +20,11 @@ from HasiiMusic import app, db
 def admin_check(func):
     """
     Decorator to check if user is an admin in the chat.
-    
+
     - Allows sudo users (owner) to bypass admin check
     - Checks if user is in the admin list for the chat
     - Returns error message if user is not admin
-    
+
     Usage:
         @admin_check
         async def my_admin_command(_, message):
@@ -35,9 +36,16 @@ def admin_check(func):
         # Helper function to send reply (works for messages and callbacks)
         async def reply(text):
             if isinstance(update, types.Message):
-                return await update.reply_text(text)
+                try:
+                    return await update.reply_text(text)
+                except (ChatSendPlainForbidden, ChatWriteForbidden):
+                    return
             else:
                 return await update.answer(text, show_alert=True)
+
+        # Handle anonymous admins (from_user is None)
+        if not update.from_user:
+            return
 
         # Get chat ID and user ID from update
         chat_id = (
@@ -46,7 +54,7 @@ def admin_check(func):
             else update.message.chat.id
         )
         user_id = update.from_user.id
-        
+
         # Get list of admins from database (cached)
         admins = await db.get_admins(chat_id)
 
@@ -56,7 +64,10 @@ def admin_check(func):
 
         # Check if user is admin
         if user_id not in admins:
-            return await reply(update.lang["user_no_perms"])
+            try:
+                return await reply(update.lang["user_no_perms"])
+            except (ChatSendPlainForbidden, ChatWriteForbidden):
+                return
 
         # User is admin, allow execution
         return await func(_, update, *args, **kwargs)
@@ -67,12 +78,12 @@ def admin_check(func):
 def can_manage_vc(func):
     """
     Decorator to check if user can manage voice chats.
-    
+
     Allows:
     - Sudo users (bot owner)
     - Authorized users (added via /auth command)
     - Group admins with voice chat management permission
-    
+
     Usage:
         @can_manage_vc
         async def my_vc_command(_, message):
@@ -87,6 +98,11 @@ def can_manage_vc(func):
             if isinstance(update, types.Message)
             else update.message.chat.id
         )
+
+        # Skip if no user (channel post or anonymous admin)
+        if not update.from_user:
+            return
+
         user_id = update.from_user.id
 
         # Sudo users can always manage VC
@@ -102,7 +118,10 @@ def can_manage_vc(func):
             return await func(_, update, *args, **kwargs)
 
         if isinstance(update, types.Message):
-            return await update.reply_text(update.lang["user_no_perms"])
+            try:
+                return await update.reply_text(update.lang["user_no_perms"])
+            except (ChatSendPlainForbidden, ChatWriteForbidden):
+                return
         else:
             return await update.answer(update.lang["user_no_perms"], show_alert=True)
 
@@ -134,3 +153,20 @@ async def reload_admins(chat_id: int) -> list[int]:
         return [admin.user.id for admin in admins]
     except:
         return []
+
+
+async def is_admin_callback(query: types.CallbackQuery) -> bool:
+    """Check if callback query sender is admin"""
+    if not query.from_user:
+        return False
+    
+    user_id = query.from_user.id
+    chat_id = query.message.chat.id
+    
+    # Sudo users are always admin
+    if user_id in app.sudoers:
+        return True
+    
+    # Check admin list
+    admins = await db.get_admins(chat_id)
+    return user_id in admins

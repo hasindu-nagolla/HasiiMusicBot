@@ -10,10 +10,12 @@
 # - Social media icons
 # - Responsive text sizing
 # - Image caching for performance
+# - Non-blocking PIL operations (runs in thread executor)
 # ==============================================================================
 
 import os
 import re
+import asyncio
 import aiohttp
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
@@ -69,19 +71,35 @@ class Thumbnail:
     async def save_thumb(self, output_path: str, url: str) -> str:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                open(output_path, "wb").write(await resp.read())
+                with open(output_path, "wb") as f:
+                    f.write(await resp.read())
             return output_path
 
     async def generate(self, song: Track, size=(1280, 720)) -> str:
+        """Generate thumbnail - downloads async, PIL operations in thread pool"""
         try:
             temp = f"cache/temp_{song.id}.jpg"
             output = f"cache/{song.id}_modern.png"
             if os.path.exists(output):
                 return output
 
-            # Download and prepare base image
+            # Download thumbnail (async operation)
             await self.save_thumb(temp, song.thumbnail)
-            base = Image.open(temp).resize(size).convert("RGBA")
+            
+            # **PERFORMANCE FIX**: Run PIL operations in thread executor to avoid blocking event loop
+            # This prevents lag when generating thumbnails for multiple groups simultaneously
+            return await asyncio.get_event_loop().run_in_executor(
+                None, self._generate_sync, temp, output, song, size
+            )
+        except Exception:
+            return config.DEFAULT_THUMB
+
+    def _generate_sync(self, temp: str, output: str, song: Track, size=(1280, 720)) -> str:
+        """Synchronous PIL operations - runs in thread pool"""
+        try:
+            # Prepare base image
+            with Image.open(temp) as temp_img:
+                base = temp_img.resize(size).convert("RGBA")
 
             # Create blurred background
             bg = ImageEnhance.Brightness(base.filter(
@@ -151,12 +169,12 @@ class Thumbnail:
             # Control icons (if available)
             icons_path = "HasiiMusic/helpers/play_icons.png"
             if os.path.isfile(icons_path):
-                ic = Image.open(icons_path).resize(
-                    (ICONS_W, ICONS_H)).convert("RGBA")
-                r, g, b, a = ic.split()
-                black_ic = Image.merge(
-                    "RGBA", (r.point(lambda _: 0), g.point(lambda _: 0), b.point(lambda _: 0), a))
-                bg.paste(black_ic, (ICONS_X, ICONS_Y), black_ic)
+                with Image.open(icons_path) as icons_img:
+                    ic = icons_img.resize((ICONS_W, ICONS_H)).convert("RGBA")
+                    r, g, b, a = ic.split()
+                    black_ic = Image.merge(
+                        "RGBA", (r.point(lambda _: 0), g.point(lambda _: 0), b.point(lambda _: 0), a))
+                    bg.paste(black_ic, (ICONS_X, ICONS_Y), black_ic)
 
             # Save and cleanup
             bg.save(output)

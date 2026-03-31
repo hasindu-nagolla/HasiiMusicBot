@@ -4,7 +4,7 @@
 # This file exports all helper functions and classes for easy importing.
 # Instead of importing from individual files, plugins can simply:
 #   from HasiiMusic.helpers import buttons, thumb, utils, Queue, Track
-# 
+#
 # This makes imports cleaner and provides a single entry point for all helpers.
 # ==============================================================================
 

@@ -1,5 +1,5 @@
 """
-HasiiMusicBot - Advanced Telegram Music Bot
+˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼ - Advanced Telegram Music Bot
 
 This is the main initialization module that sets up logging, configuration,
 and all core components required for the bot to function.
@@ -10,6 +10,8 @@ import time
 import logging
 from logging.handlers import RotatingFileHandler
 from typing import List
+
+from pyrogram.errors import ChannelInvalid
 
 # Configure logging
 logging.basicConfig(
@@ -30,6 +32,17 @@ logging.getLogger("pyrogram").setLevel(logging.ERROR)
 logging.getLogger("pytgcalls").setLevel(logging.ERROR)
 
 logger = logging.getLogger("HasiiMusic")
+
+
+def _asyncio_exception_handler(loop: asyncio.AbstractEventLoop, context: dict) -> None:
+    exc = context.get("exception")
+    if isinstance(exc, ChannelInvalid):
+        logger.warning("Ignoring CHANNEL_INVALID update (channel probably removed).")
+        return
+    loop.default_exception_handler(context)
+
+
+asyncio.get_event_loop().set_exception_handler(_asyncio_exception_handler)
 
 # Version
 __version__ = "3.0.1"
@@ -69,6 +82,10 @@ from HasiiMusic.core.telegram import Telegram
 from HasiiMusic.core.youtube import YouTube
 tg = Telegram()
 yt = YouTube()
+
+# Initialize preload manager for background track downloading
+from HasiiMusic.core.preload import PreloadManager
+preload = PreloadManager()
 
 # Initialize queue manager
 from HasiiMusic.helpers import Queue

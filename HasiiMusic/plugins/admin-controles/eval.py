@@ -2,13 +2,13 @@
 # eval.py - Code Execution Command (Owner Only)
 # ==============================================================================
 # This plugin allows the bot owner to execute Python code and shell commands remotely.
-# 
+#
 # Commands:
 # - /eval <code> - Execute Python code in the bot's context
 # - /exec <code> - Same as /eval (alias)
-# 
+#
 # Security: Only the bot owner (defined in config) can use this command.
-# 
+#
 # Features:
 # - Async code support (can use await)
 # - Access to all bot variables (app, db, userbot, etc.)
@@ -35,6 +35,12 @@ from HasiiMusic.helpers import format_exception, meval
 @app.on_edited_message(filters.command(["eval", "exec"]) & filters.user(app.owner))
 @lang.language()
 async def eval_handler(_, message: types.Message):
+    # Auto-delete command message
+    try:
+        await message.delete()
+    except Exception:
+        pass
+    
     if len(message.command) < 2:
         return await message.reply_text(message.lang["eval_inp"])
 

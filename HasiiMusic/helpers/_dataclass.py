@@ -4,7 +4,7 @@
 # This file defines data structures used throughout the bot:
 # - Media: Represents Telegram audio/video files
 # - Track: Represents YouTube tracks
-# 
+#
 # These dataclasses make it easy to pass media information between functions
 # while maintaining type safety and clear structure.
 # ==============================================================================
@@ -23,8 +23,8 @@ class Media:
     url: str
     time: int = 0
     user: str = None
-    video: bool = False
     is_live: bool = False
+    video: bool = False
 
 
 @dataclass
@@ -41,5 +41,5 @@ class Track:
     thumbnail: str = None
     user: str = None
     view_count: str = None
-    video: bool = False
     is_live: bool = False
+    video: bool = False

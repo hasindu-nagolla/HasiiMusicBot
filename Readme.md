@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="https://files.catbox.moe/und0yt.jpg" alt="Hasii Music Bot" width="400"/>
+  <img src="https://files.catbox.moe/f3i3yi.png" alt="˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼" width="400"/>
   
-  # 🎵 Hasii Music Bot
+  # 🎵 ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼
   
   <p><b>A Powerful Telegram Music Player Bot</b></p>
   
@@ -15,12 +15,11 @@
 ## ✨ Features
 
 - 🎵 **High Quality Music Streaming** - Crystal clear audio with STUDIO quality
-- 📻 **Live Radio Streaming** - 50+ international and local radio stations
+- 📻 **Live Radio Streaming** - 50+ international and local radio stations (Request)
 - 🎧 **YouTube Support** - Play music from YouTube links or search
 - 📝 **Queue System** - Manage multiple songs in queue
 - ⚡ **Fast & Reliable** - Built with Pyrogram and PyTgCalls
 - 🎛 **Admin Controls** - Pause, resume, skip, and stop controls
-- 🌐 **Multi-Language** - Supports English and Sinhala
 - 👥 **User Authorization** - Authorized users can control playback
 - 📊 **Statistics** - Track bot usage and performance
 - 🔄 **Auto-Leave** - Automatically leaves inactive voice chats
@@ -61,32 +60,29 @@ COOKIE_URL=youtube_cookies_url (optional)
 ### Installation
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/hasindu-nagolla/HasiiMusicBot
 cd HasiiMusicBot
 ```
 
 2. **Install dependencies**
+
 ```bash
 pip install -r requirements.txt
 ```
 
 3. **Set up environment variables**
+
 ```bash
 cp sample.env .env
 # Edit .env with your values
 ```
 
 4. **Run the bot**
+
 ```bash
 bash start
-```
-
-### Docker Deployment
-
-```bash
-docker build -t hasii-music-bot .
-docker run -d --env-file .env hasii-music-bot
 ```
 
 ---
@@ -94,26 +90,31 @@ docker run -d --env-file .env hasii-music-bot
 ## 📖 Commands
 
 ### User Commands
+
 - `/play` - Play a song (YouTube URL or search query)
 - `/radio` - Browse and play live radio stations
 - `/queue` - View current queue
 - `/ping` - Check bot status
 - `/help` - Show help menu
-- `/lang` - Change language
 
 ### Admin Commands
+
 - `/pause` - Pause current stream
 - `/resume` - Resume paused stream
-- `/skip` - Skip current track
-- `/stop` - Stop playing and clear queue
+- `/skip` - Skip current track (also `/next`)
+- `/stop` - Stop playing and clear queue (also `/end`)
 - `/seek` - Seek to specific timestamp
 - `/reload` - Reload admin cache
 
 ### Sudo Commands
+
 - `/stats` - View bot statistics
 - `/broadcast` - Broadcast message to all chats
 - `/addsudo` - Add sudo user
 - `/rmsudo` - Remove sudo user
+- `/gban` - Globally ban a user across all chats
+- `/ungban` - Remove global ban
+- `/maintenance` - Toggle maintenance mode
 - `/restart` - Restart the bot
 - `/logs` - Get bot logs
 
@@ -122,14 +123,17 @@ docker run -d --env-file .env hasii-music-bot
 ## 🛠 Configuration
 
 ### Audio Quality Settings
+
 The bot streams audio at **STUDIO** quality (highest available) with:
+
 - **Codec**: Opus (best quality for music)
 - **Format**: WebM container for audio downloads
 - **Sample Rate**: 48kHz
 - **Channels**: Stereo
-- **Optimization**: 16 concurrent downloads, 1MB chunks
+- **Optimization**: Max 5 concurrent downloads, 1MB chunks
 
 ### Customization
+
 - Modify language files in `HasiiMusic/locales/`
 - Customize thumbnails and images in `config.py`
 - Adjust queue limits and duration in `config.py`
@@ -165,6 +169,6 @@ Special thanks to [AnonymousX1025](https://github.com/AnonymousX1025) for the or
   
   ### Made with ❤️ by Hasindu Nagolla
   
-  **© 2025 Hasii Music Bot. All rights reserved.**
+  **© 2025 ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼. All rights reserved.**
   
 </div>

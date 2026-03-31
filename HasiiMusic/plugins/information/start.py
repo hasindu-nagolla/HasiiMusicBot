@@ -8,7 +8,7 @@
 # - New member detection (when bot joins a group)
 # ==============================================================================
 
-from pyrogram import enums, filters, types
+from pyrogram import enums, errors, filters, types
 
 from HasiiMusic import app, config, db, lang
 from HasiiMusic.helpers import buttons, utils
@@ -17,12 +17,27 @@ from HasiiMusic.helpers import buttons, utils
 @app.on_message(filters.command(["help"]) & filters.private & ~app.bl_users)
 @lang.language()
 async def _help(_, m: types.Message):
-    """Handle /help command in private chats - shows help menu."""
-    await m.reply_text(
-        text=m.lang["help_menu"],
-        reply_markup=buttons.help_markup(m.lang),
-        quote=True,
-    )
+    """Handle /help command in private chats - shows help menu with image."""
+    # Auto-delete command message
+    try:
+        await m.delete()
+    except Exception:
+        pass
+    
+    try:
+        await m.reply_photo(
+            photo=config.START_IMG,  # Use same image as start command
+            caption=m.lang["help_menu"],
+            reply_markup=buttons.help_markup(m.lang),
+            quote=True,
+        )
+    except Exception:
+        # Fallback to text if photo fails
+        await m.reply_text(
+            text=m.lang["help_menu"],
+            reply_markup=buttons.help_markup(m.lang),
+            quote=True,
+        )
 
 
 @app.on_message(filters.command(["start"]))
@@ -30,12 +45,23 @@ async def _help(_, m: types.Message):
 async def start(_, message: types.Message):
     """
     Handle /start command - welcome message for users.
-    
+
     - In private chat: Shows welcome message with inline buttons
     - In group chat: Shows short welcome message
     - Adds new users to database
     - Sends log to logger group for new users
     """
+    # Auto-delete command message in group chats
+    if message.chat.type != enums.ChatType.PRIVATE:
+        try:
+            await message.delete()
+        except Exception:
+            pass
+    
+    # Skip if message from channel or anonymous admin
+    if not message.from_user:
+        return
+
     # Check if user is blacklisted
     if message.from_user.id in app.bl_users and message.from_user.id not in db.notified:
         return await message.reply_text(message.lang["bl_user_notify"])
@@ -46,7 +72,7 @@ async def start(_, message: types.Message):
 
     # Determine if chat is private or group
     private = message.chat.type == enums.ChatType.PRIVATE
-    
+
     # Choose appropriate welcome message
     _text = (
         message.lang["start_pm"].format(message.from_user.first_name, app.name)
@@ -55,12 +81,20 @@ async def start(_, message: types.Message):
     )
 
     key = buttons.start_key(message.lang, private)
-    await message.reply_photo(
-        photo=config.START_IMG,
-        caption=_text,
-        reply_markup=key,
-        quote=not private,
-    )
+    try:
+        await message.reply_photo(
+            photo=config.START_IMG,
+            caption=_text,
+            reply_markup=key,
+            quote=not private,
+        )
+    except errors.ChatSendPhotosForbidden:
+        # If photos are not allowed, send text only
+        await message.reply_text(
+            text=_text,
+            reply_markup=key,
+            quote=not private,
+        )
 
     # For private chats, add user to database if new
     if private:
@@ -77,16 +111,23 @@ async def start(_, message: types.Message):
 async def settings(_, message: types.Message):
     """
     Handle /playmode or /settings command - show group settings.
-    
+
     Displays:
     - Play mode (everyone or admin only)
     - Current language
     - Options to change settings
     """
+    # Auto-delete command message
+    try:
+        await message.delete()
+    except Exception:
+        pass
+    
     admin_only = await db.get_play_mode(message.chat.id)  # Get play mode setting
-    _language = await db.get_lang(message.chat.id)  # Get current language
-    await message.reply_text(
-        text=message.lang["start_settings"].format(message.chat.title),
+    _language = "en"
+    await utils.safe_text(
+        message,
+        message.lang["start_settings"].format(message.chat.title),
         reply_markup=buttons.settings_markup(
             message.lang, admin_only, _language, message.chat.id
         ),
@@ -99,7 +140,7 @@ async def settings(_, message: types.Message):
 async def _new_member(_, message: types.Message):
     """
     Handle new member events - detect when bot is added to groups.
-    
+
     - Leaves non-supergroup chats
     - Adds new groups to database
     """

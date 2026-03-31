@@ -2,7 +2,7 @@
 # new_chat.py - New Group Handler
 # ==============================================================================
 # This plugin handles when the bot is added to a new group.
-# 
+#
 # Features:
 # - Send notification to logger channel with group info
 # - Welcome message in the group
@@ -28,23 +28,23 @@ async def new_chat_member(_, message: types.Message):
             # Get chat information
             chat_name = chat.title
             chat_id = chat.id
-            chat_username = f"@{chat.username}" if chat.username else "𝗣𝗿𝗶𝘃𝗮𝘁𝗲 𝗚𝗿𝗼𝘂𝗽"
+            chat_username = f"@{chat.username}" if chat.username else "ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ"
             members_count = await app.get_chat_members_count(chat_id)
 
             # Get the user who added the bot
             added_by = message.from_user
-            added_by_name = added_by.mention if added_by else "𝗨𝗻𝗸𝗻𝗼𝘄𝗻"
+            added_by_name = added_by.mention if added_by else "ᴜɴᴋɴᴏᴡɴ"
 
             # Create the formatted message with blockquote
-            text = f"""<blockquote>🟢 <b>˹𝐇𝐚𝐬𝐢𝐢 ✘ 𝐌𝐮𝐬𝐢𝐜˼ 𝗔𝗱𝗱𝗲𝗱 𝗜𝗻 𝗮 𝗡𝗲𝘄 𝗚𝗿𝗼𝘂𝗽</b></blockquote>
+            text = f"""<blockquote>🟢 <b>˹˹ʜᴀꜱɪɪ ꭙ ᴍᴜꜱɪᴄ˼ ᴀᴅᴅᴇᴅ ɪɴ ᴀ ɴᴇᴡ ɢʀᴏᴜᴘ</b></blockquote>
 
 <blockquote>
-🔖 <b>𝗖𝗵𝗮𝘁 𝗡𝗮𝗺𝗲:</b> {chat_name}
-🆔 <b>𝗖𝗵𝗮𝘁 𝗜𝗗:</b> <code>{chat_id}</code>
-👤 <b>𝗖𝗵𝗮𝘁 𝗨𝘀𝗲𝗿𝗻𝗮𝗺𝗲:</b> {chat_username}
-🔗 <b>𝗖𝗵𝗮𝘁 𝗟𝗶𝗻𝗸:</b> {f"https://t.me/{chat.username}" if chat.username else "𝗖𝗹𝗶𝗰𝗸 𝗛𝗲𝗿𝗲"}
-👥 <b>𝗚𝗿𝗼𝘂𝗽 𝗠𝗲𝗺𝗯𝗲𝗿𝘀:</b> {members_count}
-🤵 <b>𝗔𝗱𝗱𝗲𝗱 𝗕𝘆:</b> {added_by_name}
+🔖 <b>ᴄʜᴀᴛ ɴᴀᴍᴇ:</b> {chat_name}
+🆔 <b>ᴄʜᴀᴛ ɪᴅ:</b> <code>{chat_id}</code>
+👤 <b>ᴄʜᴀᴛ ᴜꜱᴇʀɴᴀᴍᴇ:</b> {chat_username}
+🔗 <b>ᴄʜᴀᴛ ʟɪɴᴋ:</b> {f"https://t.me/{chat.username}" if chat.username else "ᴄʟɪᴄᴋ ʜᴇʀᴇ"}
+👥 <b>ɢʀᴏᴜᴘ ᴍᴇᴍʙᴇʀs:</b> {members_count}
+🤵 <b>ᴀᴅᴅᴇᴅ ʙʏ:</b> {added_by_name}
 </blockquote>
 """
 
@@ -72,21 +72,21 @@ async def left_chat_member(_, message: types.Message):
         # Get chat information
         chat_name = chat.title
         chat_id = chat.id
-        chat_username = f"@{chat.username}" if chat.username else "𝗣𝗿𝗶𝘃𝗮𝘁𝗲 𝗚𝗿𝗼𝘂𝗽"
+        chat_username = f"@{chat.username}" if chat.username else "ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ"
 
         # Get the user who removed the bot
         removed_by = message.from_user
-        removed_by_name = removed_by.mention if removed_by else "𝗨𝗻𝗸𝗻𝗼𝘄𝗻"
+        removed_by_name = removed_by.mention if removed_by else "ᴜɴᴋɴᴏᴡɴ"
 
         # Create the formatted message with blockquote
-        text = f"""<blockquote>🔴 <b>˹𝐇𝐚𝐬𝐢𝐢 ✘ 𝐌𝐮𝐬𝐢𝐜˼ 𝗥𝗲𝗺𝗼𝘃𝗲𝗱 𝗙𝗿𝗼𝗺 𝗮 𝗚𝗿𝗼𝘂𝗽</b></blockquote>
+        text = f"""<blockquote>🔴 <b>˹ʜᴀꜱɪɪ ꭙ ᴍᴜꜱɪᴄ˼ ʀᴇᴍᴏᴠᴇᴅ ꜰʀᴏᴍ ᴀ ɢʀᴏᴜᴘ</b></blockquote>
 
 <blockquote>
-🔖 <b>𝗖𝗵𝗮𝘁 𝗡𝗮𝗺𝗲:</b> {chat_name}
-🆔 <b>𝗖𝗵𝗮𝘁 𝗜𝗗:</b> <code>{chat_id}</code>
-👤 <b>𝗖𝗵𝗮𝘁 𝗨𝘀𝗲𝗿𝗻𝗮𝗺𝗲:</b> {chat_username}
-🔗 <b>𝗖𝗵𝗮𝘁 𝗟𝗶𝗻𝗸:</b> {f"https://t.me/{chat.username}" if chat.username else "𝗖𝗹𝗶𝗰𝗸 𝗛𝗲𝗿𝗲"}
-🚫 <b>𝗥𝗲𝗺𝗼𝘃𝗲𝗱 𝗕𝘆:</b> {removed_by_name}</blockquote>
+🔖 <b>ᴄʜᴀᴛ ɴᴀᴍᴇ:</b> {chat_name}
+🆔 <b>ᴄʜᴀᴛ ɪᴅ:</b> <code>{chat_id}</code>
+👤 <b>ᴄʜᴀᴛ ᴜꜱᴇʀɴᴀᴍᴇ:</b> {chat_username}
+🔗 <b>ᴄʜᴀᴛ ʟɪɴᴋ:</b> {f"https://t.me/{chat.username}" if chat.username else "ᴄʟɪᴄᴋ ʜᴇʀᴇ"}
+🚫 <b>ʀᴇᴍᴏᴠᴇᴅ ʙʏ:</b> {removed_by_name}</blockquote>
 """
 
         try:

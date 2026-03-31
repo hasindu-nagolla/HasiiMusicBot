@@ -2,13 +2,13 @@
 # iquery.py - Inline Query Handler
 # ==============================================================================
 # This plugin handles inline mode queries (@botname <query>).
-# 
+#
 # Features:
 # - Search YouTube videos in inline mode
 # - Display up to 15 results
 # - Show thumbnails, duration, views, channel info
 # - Users can select a video to share in any chat
-# 
+#
 # Usage: @HasiiMusicBot search query
 # ==============================================================================
 
@@ -34,9 +34,11 @@ async def inline_query_handler(_, query: types.InlineQuery):
             title = video.get("title", "Unknown Title").title()
             duration = video.get("duration", "N/A")
             views = video.get("viewCount", {}).get("short", "N/A")
-            thumbnail = video.get("thumbnails", [{}])[0].get("url", "").split("?")[0]
+            thumbnail = video.get("thumbnails", [{}])[
+                0].get("url", "").split("?")[0]
             channel = video.get("channel", {}).get("name", "Unknown Channel")
-            channellink = video.get("channel", {}).get("link", "https://youtube.com")
+            channellink = video.get("channel", {}).get(
+                "link", "https://youtube.com")
             link = video.get("link", "https://youtube.com")
             published = video.get("publishedTime", "N/A")
 

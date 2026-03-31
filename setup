@@ -86,7 +86,7 @@ EOF
 
 
 clear
-pprint "Welcome to the AnonXMusic Installation Setup\n\n" "cmagenta"
+pprint "Welcome to the ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼ Installation Setup\n\n" "cmagenta"
 sleep 1
 
 update
@@ -95,7 +95,7 @@ install_pkg ffmpeg ffmpeg unzip
 install_deno
 install_py
 
-pprint "\nAnonXMusic Installation Completed.\n" "cgreen"
+pprint "\n˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼ Installation Completed.\n" "cgreen"
 sleep 2
 clear
 
