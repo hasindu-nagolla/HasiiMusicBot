@@ -17,7 +17,7 @@ import asyncio
 from functools import wraps
 
 from pyrogram import filters, types
-from pyrogram.errors import FloodWait
+from pyrogram.errors import FloodWait, QueryIdInvalid
 
 from HasiiMusic import tune, app, config, db, lang, logger, queue, tg, yt
 from HasiiMusic.helpers import admin_check, buttons, can_manage_vc
@@ -29,6 +29,8 @@ def safe_callback(func):
     async def wrapper(client, query: types.CallbackQuery):
         try:
             return await func(client, query)
+        except QueryIdInvalid:
+            return
         except Exception as e:
             logger.error(f"Error in callback {func.__name__}: {e}", exc_info=True)
             try:
