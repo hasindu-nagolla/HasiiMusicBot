@@ -110,7 +110,8 @@ async def _restart(_, m: types.Message):
     
     sent = await m.reply_text(m.lang["restarting"])
 
-    for directory in ["cache", "downloads"]:
+    # Keep downloads to allow instant reuse after restart.
+    for directory in ["cache"]:
         shutil.rmtree(directory, ignore_errors=True)
 
     await sent.edit_text(m.lang["restarted"])
@@ -182,7 +183,8 @@ async def _update(_, m: types.Message):
             "<blockquote>Bot will be back online shortly...</blockquote>"
         )
         
-        for directory in ["cache", "downloads"]:
+        # Keep downloads to allow instant reuse after update.
+        for directory in ["cache"]:
             shutil.rmtree(directory, ignore_errors=True)
         
         asyncio.create_task(stop())
