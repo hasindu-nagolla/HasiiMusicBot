@@ -35,10 +35,10 @@ class YouTube:
         self.checked = False  # Whether cookies directory has been checked
         self.warned = False  # Whether missing cookies warning has been shown
 
-        # Regular expression to match YouTube URLs (videos, shorts, playlists)
+        # Regular expression to match YouTube URLs (videos, shorts, live, playlists)
         self.regex = re.compile(
             r"(https?://)?(www\.|m\.|music\.)?"
-            r"(youtube\.com/(watch\?v=|shorts/|playlist\?list=)|youtu\.be/)"
+            r"(youtube\.com/(watch\?v=|shorts/|live/|embed/|playlist\?list=)|youtu\.be/)"
             r"([A-Za-z0-9_-]{11}|PL[A-Za-z0-9_-]+)([&?][^\s]*)?"
         )
 
