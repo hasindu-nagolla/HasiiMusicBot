@@ -273,6 +273,8 @@ class YouTube:
                 "no_warnings": True,
                 "cookiefile": cookie,
                 "format": "bestaudio/best",
+                "noplaylist": True,
+                "socket_timeout": 20,
                 "extractor_retries": 5,
                 "sleep_interval_requests": 1,
                 # Use android client to bypass YouTube bot detection on server IPs
@@ -283,7 +285,19 @@ class YouTube:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     try:
                         info = ydl.extract_info(url, download=False)
-                        return info.get("url") or info.get("manifest_url")
+                        if not info:
+                            return None
+
+                        direct = info.get("url")
+                        if direct:
+                            return direct
+
+                        # Some live extracts provide URLs only inside formats.
+                        for fmt in info.get("formats", []):
+                            if fmt.get("acodec") != "none" and fmt.get("url"):
+                                return fmt["url"]
+
+                        return info.get("manifest_url")
                     except yt_dlp.utils.ExtractorError as ex:
                         error_msg = str(ex)
                         if "not available" in error_msg.lower():
@@ -302,8 +316,13 @@ class YouTube:
                             "Unexpected error during live stream extraction: %s", ex)
                         return None
 
-            stream_url = await asyncio.to_thread(_extract_url)
-            return stream_url if stream_url else url
+            try:
+                stream_url = await asyncio.wait_for(asyncio.to_thread(_extract_url), timeout=35)
+            except asyncio.TimeoutError:
+                logger.error("Live stream URL extraction timed out for %s", video_id)
+                return None
+
+            return stream_url
 
         # Download audio/video file
         # Don't hardcode extension - let yt-dlp choose best available format
