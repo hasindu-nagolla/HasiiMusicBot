@@ -27,5 +27,5 @@ pytgcrypto~=1.2.12
 py-tgcalls~=2.2.11
 py-yt-search~=0.6.1
 python-dotenv~=1.2.2
-yt-dlp[default]>=2026.3.17
+yt-dlp[default] @ git+https://github.com/yt-dlp/yt-dlp.git
 
