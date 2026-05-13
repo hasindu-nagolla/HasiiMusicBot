@@ -18,14 +18,13 @@
 # - yt-dlp: YouTube video/audio downloader
 # ==============================================================================
 
-aiohttp~=3.13.2
-kurigram~=2.2.17
-pillow~=12.0.0
-psutil~=7.2.1
-pymongo~=4.15.5
-pytgcrypto~=1.2.11
-py-tgcalls~=2.2.8
-py-yt-search~=0.5.5
-python-dotenv~=1.2.1
-yt-dlp[default]>=2026.3.17
-
+aiohttp~=3.13.5
+kurigram~=2.2.22
+pillow~=12.2.0
+psutil~=7.2.2
+pymongo~=4.17.0
+pytgcrypto~=1.2.12
+py-tgcalls~=2.2.12
+py-yt-search~=0.6.2
+python-dotenv~=1.2.2
+yt-dlp[default] @ git+https://github.com/yt-dlp/yt-dlp.git
