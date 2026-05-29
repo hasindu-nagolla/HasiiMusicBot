@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  hasii:
+    build: .
+    container_name: hasii_music_bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./HasiiMusic/cookies:/app/HasiiMusic/cookies
+      - ./downloads:/app/downloads
+    command: bash start

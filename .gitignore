@@ -42,3 +42,6 @@ CHECKLIST.md
 # Project-Specific Ignored Files
 HasiiMusic/plugins/playback-controls/radio.py
 ffmpeg
+
+# Study Materials
+study_roadmap.md

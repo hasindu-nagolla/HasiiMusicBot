@@ -85,6 +85,32 @@ cp sample.env .env
 bash start
 ```
 
+### Docker
+
+You can run the bot in Docker. Build the image and run it with your `.env` file mounted.
+
+Build image:
+
+```bash
+docker build -t hasiimusicbot:latest .
+```
+
+Run with `docker run`:
+
+```bash
+docker run -d --restart unless-stopped --env-file .env \
+  -v ./HasiiMusic/cookies:/app/HasiiMusic/cookies \
+  -v ./downloads:/app/downloads \
+  --name hasiimusicbot hasiimusicbot:latest
+```
+
+Or use docker-compose:
+
+```bash
+docker-compose up -d --build
+```
+
+
 ---
 
 ## 📖 Commands
