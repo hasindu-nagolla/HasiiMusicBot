@@ -177,30 +177,66 @@ class YouTube:
                 return fresh
 
         try:
-            _search = VideosSearch(query, limit=1)
-            results = await _search.next()
-        except Exception as e:
-            logger.warning(f"⚠️ YouTube search failed for '{query}': {e}")
-            return None
+            if self.valid(query):
+                def _extract():
+                    cookie = self.get_cookies() if self.checked else None
+                    ydl_opts = {
+                        "quiet": True,
+                        "noplaylist": True,
+                        "extract_flat": "in_playlist",
+                        "cookiefile": cookie
+                    }
+                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                        return ydl.extract_info(query, download=False)
 
-        if results and results["result"]:
-            data = results["result"][0]
-            duration = data.get("duration")
-            is_live = duration is None or duration == "LIVE"
+                data = await asyncio.to_thread(_extract)
+                if not data:
+                    return None
 
-            track = Track(
-                id=data.get("id"),
-                channel_name=data.get("channel", {}).get("name"),
-                duration=duration if not is_live else "LIVE",
-                duration_sec=0 if is_live else utils.to_seconds(duration),
-                message_id=m_id,
-                title=data.get("title")[:25],
-                thumbnail=data.get(
-                    "thumbnails", [{}])[-1].get("url").split("?")[0],
-                url=data.get("link"),
-                view_count=data.get("viewCount", {}).get("short"),
-                is_live=is_live,
-            )
+                duration_sec = data.get("duration")
+                is_live = data.get("is_live", False)
+                if duration_sec is None and is_live:
+                    duration = "LIVE"
+                    duration_sec = 0
+                else:
+                    duration = utils.format_duration(int(duration_sec)) if duration_sec else "0:00"
+
+                track = Track(
+                    id=data.get("id"),
+                    channel_name=data.get("uploader") or data.get("channel", ""),
+                    duration=duration,
+                    duration_sec=int(duration_sec) if duration_sec else 0,
+                    message_id=m_id,
+                    title=(data.get("title") or "")[:25],
+                    thumbnail=data.get("thumbnail") or "",
+                    url=data.get("webpage_url") or query,
+                    view_count=str(data.get("view_count", "")),
+                    is_live=is_live,
+                )
+            else:
+                _search = VideosSearch(query, limit=1)
+                results = await _search.next()
+                
+                if not results or not results.get("result"):
+                    return None
+                    
+                data = results["result"][0]
+                duration = data.get("duration")
+                is_live = duration is None or duration == "LIVE"
+
+                track = Track(
+                    id=data.get("id"),
+                    channel_name=data.get("channel", {}).get("name"),
+                    duration=duration if not is_live else "LIVE",
+                    duration_sec=0 if is_live else utils.to_seconds(duration),
+                    message_id=m_id,
+                    title=data.get("title")[:25],
+                    thumbnail=data.get(
+                        "thumbnails", [{}])[-1].get("url").split("?")[0],
+                    url=data.get("link"),
+                    view_count=data.get("viewCount", {}).get("short"),
+                    is_live=is_live,
+                )
 
             # Cache the result
             self.search_cache[cache_key] = (track, current_time)
@@ -211,7 +247,10 @@ class YouTube:
                 del self.search_cache[oldest_key]
 
             return replace(track)
-        return None
+            
+        except Exception as e:
+            logger.warning(f"⚠️ YouTube search failed for '{query}': {e}")
+            return None
 
     async def playlist(self, limit: int, user: str, url: str) -> list[Track]:
         try:
