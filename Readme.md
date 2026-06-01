@@ -34,6 +34,34 @@
 - Deno & FFmpeg installed on your system
 - Required variables mentioned in sample.env
 
+### Install Prerequisites
+
+For Ubuntu VPS:
+
+```bash
+sudo apt update
+sudo apt install -y python3 python3-pip ffmpeg curl unzip
+curl -fsSL https://deno.land/install.sh | sh
+```
+
+### Verify Prerequisites
+
+Run these commands and confirm they return versions:
+
+```bash
+python3 --version
+deno --version
+ffmpeg -version
+```
+
+Expected:
+
+- Python version should be **3.10+**
+- Deno should print its version information
+- FFmpeg should print full build/version details
+
+If a command is not found, restart your terminal and make sure the tool is added to your system `PATH`.
+
 ### Requirements
 
 - Python 3.12+
