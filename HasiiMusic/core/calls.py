@@ -271,7 +271,7 @@ class TgCall(PyTgCalls):
         )
 
         try:
-            call = await client.get_call(chat_id)
+            call = await db.get_call(chat_id)
             if call:
                 logger.debug(
                     f"Already connected to {chat_id}, leaving before reconnecting...")
