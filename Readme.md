@@ -1,5 +1,13 @@
 <div align="center">
-  <img src="https://files.catbox.moe/f3i3yi.png" alt="˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼" width="400"/>
+  <div>
+  <img src="https://i.ibb.co/cKzySsgr/yy.png" alt="˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼" width="300"/>
+  <img src="https://files.catbox.moe/f3i3yi.png" alt="˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼" width="300"/>
+  </div>
+
+  <div>
+  <img src="https://i.ibb.co/jvJ7Dxzk/aesthetic-anime-girl-golden-minimal-illustration.png" alt="˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼" width="300"/>
+  <img src="https://i.ibb.co/FLvWrxY8/anime-aesthetic-girl-orange-minimal-art.png" alt="˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼" width="300"/>
+  </div>
   
   # 🎵 ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼
   
