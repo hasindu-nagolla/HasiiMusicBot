@@ -4,6 +4,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import MessageNotModified
 from HasiiMusic import app
+from .utils import safe_edit
 
 games = {}
 
@@ -94,18 +95,14 @@ async def chess_callback(client, callback_query):
         if game["p1"] is None:
             game["p1"] = {"id": user_id, "name": callback_query.from_user.first_name, "symbol": "⚪️"}
             await callback_query.answer("You joined as White (⚪️)!")
-            await callback_query.message.edit_text(
-                f"♟️ Chess\n\n⚪️ {game['p1']['name']} is waiting for an opponent...",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🎮 Join Game", callback_data="chs_join")]])
+            await safe_edit(callback_query.message, text=f"♟️ Chess\n\n⚪️ {game['p1']['name']} is waiting for an opponent...", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🎮 Join Game", callback_data="chs_join")]])
             )
             return
             
         game["p2"] = {"id": user_id, "name": callback_query.from_user.first_name, "symbol": "⚫️"}
         game["status"] = "playing"
         
-        await callback_query.message.edit_text(
-            f"♟️ Chess\n\n⚪️ {game['p1']['name']}\n⚫️ {game['p2']['name']}\n\nIt's {game['p1']['name']}'s turn!",
-            reply_markup=get_chess_board(game["board"])
+        await safe_edit(callback_query.message, text=f"♟️ Chess\n\n⚪️ {game['p1']['name']}\n⚫️ {game['p2']['name']}\n\nIt's {game['p1']['name']}'s turn!", reply_markup=get_chess_board(game["board"])
         )
         return
         
@@ -146,7 +143,7 @@ async def chess_callback(client, callback_query):
             return
             
         game["selected_sq"] = pos
-        await callback_query.message.edit_reply_markup(reply_markup=get_chess_board(board, selected_sq=pos))
+        await safe_edit(callback_query.message, reply_markup=get_chess_board(board, selected_sq=pos))
         return
 
     # Step 2: Selecting destination or changing selection
@@ -159,10 +156,10 @@ async def chess_callback(client, callback_query):
         if (is_p1 and is_white_piece) or (is_p2 and not is_white_piece):
             if game["selected_sq"] == pos:
                 game["selected_sq"] = -1
-                await callback_query.message.edit_reply_markup(reply_markup=get_chess_board(board))
+                await safe_edit(callback_query.message, reply_markup=get_chess_board(board))
             else:
                 game["selected_sq"] = pos
-                await callback_query.message.edit_reply_markup(reply_markup=get_chess_board(board, selected_sq=pos))
+                await safe_edit(callback_query.message, reply_markup=get_chess_board(board, selected_sq=pos))
             return
             
     # Try to move
@@ -178,7 +175,7 @@ async def chess_callback(client, callback_query):
     if move not in board.legal_moves:
         await callback_query.answer("Invalid move! Check the rules or see if you're in Check.", show_alert=True)
         game["selected_sq"] = -1
-        await callback_query.message.edit_reply_markup(reply_markup=get_chess_board(board))
+        await safe_edit(callback_query.message, reply_markup=get_chess_board(board))
         return
         
     # Execute move
@@ -189,18 +186,14 @@ async def chess_callback(client, callback_query):
     if board.is_checkmate():
         game["status"] = "finished"
         winner = game["p1"] if board.turn == chess.BLACK else game["p2"]
-        await callback_query.message.edit_text(
-            f"🏆 Checkmate!\n\n{winner['name']} ({winner['symbol']}) won the game!",
-            reply_markup=get_chess_board(board, finished=True)
+        await safe_edit(callback_query.message, text=f"🏆 Checkmate!\n\n{winner['name']} ({winner['symbol']}) won the game!", reply_markup=get_chess_board(board, finished=True)
         )
         del games[game_id]
         return
         
     if board.is_stalemate() or board.is_insufficient_material() or board.is_seventyfive_moves():
         game["status"] = "finished"
-        await callback_query.message.edit_text(
-            f"🤝 Draw!\n\nThe game ended in a draw.",
-            reply_markup=get_chess_board(board, finished=True)
+        await safe_edit(callback_query.message, text=f"🤝 Draw!\n\nThe game ended in a draw.", reply_markup=get_chess_board(board, finished=True)
         )
         del games[game_id]
         return
@@ -210,7 +203,5 @@ async def chess_callback(client, callback_query):
     
     next_player = game["p1"] if board.turn == chess.WHITE else game["p2"]
     
-    await callback_query.message.edit_text(
-        f"♟️ Chess\n\n⚪️ {game['p1']['name']}\n⚫️ {game['p2']['name']}\n\nIt's {next_player['name']}'s turn!{check_text}",
-        reply_markup=get_chess_board(board)
+    await safe_edit(callback_query.message, text=f"♟️ Chess\n\n⚪️ {game['p1']['name']}\n⚫️ {game['p2']['name']}\n\nIt's {next_player['name']}'s turn!{check_text}", reply_markup=get_chess_board(board)
     )

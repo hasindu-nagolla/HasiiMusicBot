@@ -1,6 +1,7 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from HasiiMusic import app
+from .utils import safe_edit
 
 # Memory store for active games per chat
 games = {}
@@ -94,18 +95,14 @@ async def ttt_callback(client, callback_query):
             await callback_query.answer("You joined as Player 1 (❌)!")
             
             # Still waiting for p2
-            await callback_query.message.edit_text(
-                f"🎮 TicTacToe\n\n❌ {game['p1']['name']} is waiting for an opponent...",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🎮 Join Game", callback_data="ttt_join")]])
+            await safe_edit(callback_query.message, text=f"🎮 TicTacToe\n\n❌ {game['p1']['name']} is waiting for an opponent...", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🎮 Join Game", callback_data="ttt_join")]])
             )
             
         # P2 joins
         game["p2"] = {"id": user_id, "name": callback_query.from_user.first_name, "symbol": "⭕"}
         game["status"] = "playing"
         
-        await callback_query.message.edit_text(
-            f"🎮 TicTacToe\n\n❌ {game['p1']['name']}\n⭕ {game['p2']['name']}\n\nIt's {game['p1']['name']}'s turn!",
-            reply_markup=get_board(game["board"])
+        await safe_edit(callback_query.message, text=f"🎮 TicTacToe\n\n❌ {game['p1']['name']}\n⭕ {game['p2']['name']}\n\nIt's {game['p1']['name']}'s turn!", reply_markup=get_board(game["board"])
         )
         return
         
@@ -138,18 +135,14 @@ async def ttt_callback(client, callback_query):
         # Check win/draw
         if check_win(game["board"]):
             game["status"] = "finished"
-            await callback_query.message.edit_text(
-                f"🏆 Game Over!\n\n{game[current_turn_key]['name']} ({game[current_turn_key]['symbol']}) won the game!",
-                reply_markup=get_board(game["board"], finished=True)
+            await safe_edit(callback_query.message, text=f"🏆 Game Over!\n\n{game[current_turn_key]['name']} ({game[current_turn_key]['symbol']}) won the game!", reply_markup=get_board(game["board"], finished=True)
             )
             del games[game_id]
             return
             
         if " " not in game["board"]:
             game["status"] = "finished"
-            await callback_query.message.edit_text(
-                f"🤝 Game Over!\n\nIt's a draw between {game['p1']['name']} and {game['p2']['name']}!",
-                reply_markup=get_board(game["board"], finished=True)
+            await safe_edit(callback_query.message, text=f"🤝 Game Over!\n\nIt's a draw between {game['p1']['name']} and {game['p2']['name']}!", reply_markup=get_board(game["board"], finished=True)
             )
             del games[game_id]
             return
@@ -158,7 +151,5 @@ async def ttt_callback(client, callback_query):
         game["turn"] = "p2" if game["turn"] == "p1" else "p1"
         next_player = game[game["turn"]]
         
-        await callback_query.message.edit_text(
-            f"🎮 TicTacToe\n\n❌ {game['p1']['name']}\n⭕ {game['p2']['name']}\n\nIt's {next_player['name']}'s turn!",
-            reply_markup=get_board(game["board"])
+        await safe_edit(callback_query.message, text=f"🎮 TicTacToe\n\n❌ {game['p1']['name']}\n⭕ {game['p2']['name']}\n\nIt's {next_player['name']}'s turn!", reply_markup=get_board(game["board"])
         )

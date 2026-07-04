@@ -3,6 +3,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import MessageNotModified
 from HasiiMusic import app
+from .utils import safe_edit
 
 games = {}
 
@@ -245,18 +246,14 @@ async def chk_callback(client, callback_query):
         if game["p1"] is None:
             game["p1"] = {"id": user_id, "name": callback_query.from_user.first_name, "symbol": "🔴"}
             await callback_query.answer("You joined as Player 1 (🔴)!")
-            await callback_query.message.edit_text(
-                f"🎮 Checkers\n\n🔴 {game['p1']['name']} is waiting for an opponent...",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🎮 Join Game", callback_data="chk_join")]])
+            await safe_edit(callback_query.message, text=f"🎮 Checkers\n\n🔴 {game['p1']['name']} is waiting for an opponent...", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🎮 Join Game", callback_data="chk_join")]])
             )
             return
             
         game["p2"] = {"id": user_id, "name": callback_query.from_user.first_name, "symbol": "⚪️"}
         game["status"] = "playing"
         
-        await callback_query.message.edit_text(
-            f"🎮 Checkers\n\n🔴 {game['p1']['name']}\n⚪️ {game['p2']['name']}\n\nIt's {game['p1']['name']}'s turn!",
-            reply_markup=get_checkers_board(game["board"])
+        await safe_edit(callback_query.message, text=f"🎮 Checkers\n\n🔴 {game['p1']['name']}\n⚪️ {game['p2']['name']}\n\nIt's {game['p1']['name']}'s turn!", reply_markup=get_checkers_board(game["board"])
         )
         return
         
@@ -304,7 +301,7 @@ async def chk_callback(client, callback_query):
                 return
                 
         game["selected_pos"] = pos
-        await callback_query.message.edit_reply_markup(reply_markup=get_checkers_board(board, selected_pos=pos))
+        await safe_edit(callback_query.message, reply_markup=get_checkers_board(board, selected_pos=pos))
         return
 
     # Step 2: Selecting destination or changing selection
@@ -322,14 +319,14 @@ async def chk_callback(client, callback_query):
             if game["selected_pos"] == pos:
                 # Unselect if clicking the same piece
                 game["selected_pos"] = -1
-                await callback_query.message.edit_reply_markup(reply_markup=get_checkers_board(board))
+                await safe_edit(callback_query.message, reply_markup=get_checkers_board(board))
             else:
                 if has_any_jumps(board, player_num) and not get_jumps_for_piece(board, pos, player_num):
                     await callback_query.answer("You have a mandatory capture! Select a piece that can jump.", show_alert=True)
                     return
                 # Change selection to the new piece
                 game["selected_pos"] = pos
-                await callback_query.message.edit_reply_markup(reply_markup=get_checkers_board(board, selected_pos=pos))
+                await safe_edit(callback_query.message, reply_markup=get_checkers_board(board, selected_pos=pos))
             return
 
     # Try to move
@@ -337,13 +334,13 @@ async def chk_callback(client, callback_query):
     if not valid:
         await callback_query.answer("Invalid move!", show_alert=True)
         game["selected_pos"] = -1 if forced_piece == -1 else forced_piece
-        await callback_query.message.edit_reply_markup(reply_markup=get_checkers_board(board, selected_pos=game["selected_pos"]))
+        await safe_edit(callback_query.message, reply_markup=get_checkers_board(board, selected_pos=game["selected_pos"]))
         return
         
     if forced_piece == -1 and not is_capture and has_any_jumps(board, player_num):
         await callback_query.answer("You must capture an opponent's piece!", show_alert=True)
         game["selected_pos"] = -1
-        await callback_query.message.edit_reply_markup(reply_markup=get_checkers_board(board))
+        await safe_edit(callback_query.message, reply_markup=get_checkers_board(board))
         return
 
     # Execute move
@@ -368,9 +365,7 @@ async def chk_callback(client, callback_query):
     if winner != 0:
         game["status"] = "finished"
         win_player = game["p1"] if winner == 1 else game["p2"]
-        await callback_query.message.edit_text(
-            f"🏆 Game Over!\n\n{win_player['name']} ({win_player['symbol']}) won the Checkers game!",
-            reply_markup=get_checkers_board(board, finished=True)
+        await safe_edit(callback_query.message, text=f"🏆 Game Over!\n\n{win_player['name']} ({win_player['symbol']}) won the Checkers game!", reply_markup=get_checkers_board(board, finished=True)
         )
         del games[game_id]
         return
@@ -381,9 +376,7 @@ async def chk_callback(client, callback_query):
         if further_jumps:
             game["selected_pos"] = pos
             game["must_jump_with"] = pos
-            await callback_query.message.edit_text(
-                f"🎮 Checkers\n\n🔴 {game['p1']['name']}\n⚪️ {game['p2']['name']}\n\nIt's {game[game['turn']]['name']}'s turn! You must jump again.",
-                reply_markup=get_checkers_board(board, selected_pos=pos)
+            await safe_edit(callback_query.message, text=f"🎮 Checkers\n\n🔴 {game['p1']['name']}\n⚪️ {game['p2']['name']}\n\nIt's {game[game['turn']]['name']}'s turn! You must jump again.", reply_markup=get_checkers_board(board, selected_pos=pos)
             )
             return
 
@@ -392,7 +385,5 @@ async def chk_callback(client, callback_query):
     game["turn"] = "p2" if game["turn"] == "p1" else "p1"
     next_player = game[game["turn"]]
     
-    await callback_query.message.edit_text(
-        f"🎮 Checkers\n\n🔴 {game['p1']['name']}\n⚪️ {game['p2']['name']}\n\nIt's {next_player['name']}'s turn!",
-        reply_markup=get_checkers_board(board)
+    await safe_edit(callback_query.message, text=f"🎮 Checkers\n\n🔴 {game['p1']['name']}\n⚪️ {game['p2']['name']}\n\nIt's {next_player['name']}'s turn!", reply_markup=get_checkers_board(board)
     )
