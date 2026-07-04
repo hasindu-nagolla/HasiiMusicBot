@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://i.ibb.co/cKzySsgr/yy.png" alt="Hasii Music" width="280"/>
+<img src="https://i.ibb.co/cKzySsgr/yy.png" alt="Hasii Music" width="400"/>
 
 # 🎵 ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼
 
@@ -11,7 +11,7 @@ An open-source Telegram music bot built with **Python**, **Pyrogram**, **PyTgCal
 <br>
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/hasindu-nagolla/HasiiMusicBot?style=for-the-badge)](https://github.com/hasindu-nagolla/HasiiMusicBot/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/hasindu-nagolla/HasiiMusicBot?style=for-the-badge)](https://github.com/hasindu-nagolla/HasiiMusicBot/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/hasindu-nagolla/HasiiMusicBot?style=for-the-badge)](https://github.com/hasindu-nagolla/HasiiMusicBot/issues)
@@ -67,7 +67,7 @@ Choosing the right Telegram music bot shouldn't mean sacrificing performance, re
 - 🐳 Docker and Docker Compose support
 - ⚙️ Environment-based configuration
 - 📂 Modular and maintainable codebase
-- ❤️ Open-source under the MIT License
+- ❤️ Open-source under the GPL-3.0 License
 
 ---
 
@@ -221,7 +221,7 @@ LOGGER_ID=
 # Assistant Account
 STRING_SESSION=
 
-# Optional
+# Essential
 COOKIE_URL=
 ```
 
@@ -378,25 +378,21 @@ HasiiMusicBot/
 ├── HasiiMusic/
 │   ├── __init__.py
 │   ├── __main__.py
-│   ├── config.py
+│   ├── cookies/
 │   ├── core/
-│   ├── database/
-│   ├── decorators/
 │   ├── helpers/
-│   ├── modules/
-│   ├── plugins/
-│   ├── utils/
-│   └── cookies/
+│   ├── locales/
+│   └── plugins/
 │
-├── downloads/
-├── logs/
+├── config.py
 ├── sample.env
 ├── requirements.txt
 ├── Dockerfile
 ├── docker-compose.yml
+├── setup
 ├── start
 ├── LICENSE
-└── README.md
+└── Readme.md
 ```
 
 ---
@@ -433,10 +429,10 @@ This project would not have been possible without the amazing open-source commun
 
 Special thanks to:
 
-- **AnonymousX1025** — Inspiration for the original project.
-- **Pyrogram** — Telegram MTProto framework.
-- **PyTgCalls** — Telegram voice chat streaming library.
-- **FFmpeg** — Audio processing and transcoding.
+- **[Anony](https://github.com/AnonymousX1025)** — Inspiration for the original project.
+- **[Pyrogram](https://github.com/pyrogram/pyrogram)** — Telegram MTProto framework.
+- **[PyTgCalls](https://github.com/pytgcalls/pytgcalls)** — Telegram voice chat streaming library.
+- **[FFmpeg](https://ffmpeg.org/)** — Audio processing and transcoding.
 
 Thank you to everyone who has contributed through code, bug reports, feature suggestions, testing, and community support.
 
@@ -444,9 +440,9 @@ Thank you to everyone who has contributed through code, bug reports, feature sug
 
 # 📄 License
 
-This project is licensed under the **MIT License**.
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
 
-You are free to use, modify, and distribute this software in accordance with the terms of the license.
+You are free to use, modify, and distribute this software. However, any derivative works must also be open-source and released under the exact same license. 
 
 For more information, see the [LICENSE](LICENSE) file.
 
