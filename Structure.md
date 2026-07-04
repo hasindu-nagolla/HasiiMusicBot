@@ -28,12 +28,21 @@ This document provides a comprehensive overview of the project structure, explai
 - **`setup`** - Initial setup script (install dependencies, configure environment)
 - **`start`** - Bot startup script (runs the bot)
 
+### Docker Files
+
+- **`Dockerfile`** - Docker build instructions
+- **`docker-compose.yml`** - Docker compose configuration
+
 ### Documentation
 
-- **`README.md`** - Project overview, features, and setup instructions
+- **`Readme.md`** - Project overview, features, and setup instructions
 - **`LICENSE`** - Software license (defines usage rights)
-- **`PROJECT_STRUCTURE.md`** - This file! Project organization guide
+- **`Structure.md`** - This file! Project organization guide
 - **`SECURITY.md`** - Security guidelines and best practices
+- **`ARCHITECTURE.md`** - System architecture overview
+- **`CONTRIBUTING.md`** - Contribution guidelines
+- **`CREDITS.md`** - Project credits and acknowledgments
+- **`study_roadmap.md`** - Developer roadmap
 
 ---
 
@@ -313,14 +322,20 @@ HasiiMusicBot/
 │   ├── sample.env                # Environment template
 │   ├── config.py                 # Configuration loader and validator
 │   ├── requirements.txt          # Python dependencies
+│   ├── Dockerfile                # Docker build instructions
+│   ├── docker-compose.yml        # Docker compose configuration
 │   ├── setup                     # Setup script
 │   └── start                     # Bot startup script
 │
 ├── 📚 Documentation
-│   ├── README.md                 # Project overview and setup guide
+│   ├── Readme.md                 # Project overview and setup guide
 │   ├── LICENSE                   # Software license
-│   ├── PROJECT_STRUCTURE.md      # This file
-│   └── SECURITY.md               # Security guidelines
+│   ├── Structure.md              # This file
+│   ├── SECURITY.md               # Security guidelines
+│   ├── ARCHITECTURE.md           # System architecture overview
+│   ├── CONTRIBUTING.md           # Contribution guidelines
+│   ├── CREDITS.md                # Project credits and acknowledgments
+│   └── study_roadmap.md          # Developer roadmap
 │
 └── 📦 HasiiMusic/                # Main application package
     │
