@@ -299,7 +299,9 @@ async def play_hndlr(
     else:
         position = queue.add(chat_id, file)  # Returns 0-based index
 
-        if await db.get_call(chat_id):
+        # If a call is already active OR we are not the first in queue,
+        # we return early and let the background queue processor handle it.
+        if await db.get_call(chat_id) or position > 0:
             # When call is active, position 0 is currently playing
             # So actual waiting position is: position (e.g., 1st waiting = index 1)
             # Display as 1-based for users: index 1 → "1st in queue"
