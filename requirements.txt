@@ -29,3 +29,4 @@ py-yt-search~=0.6.2
 python-dotenv~=1.2.2
 yt-dlp[default] @ git+https://github.com/yt-dlp/yt-dlp.git
 # yt-dlp~=2026.6.9
+chess~=1.10.0
