@@ -10,7 +10,7 @@ If you discover a security vulnerability within this project, please report it i
 
 To report a vulnerability, please contact the project maintainer directly on Telegram:
 
-**Telegram User:** `@Lakzexe`
+**Telegram User:** `@Hasindu_Lakshan`
 
 **In your report, please include:**
 
@@ -130,9 +130,9 @@ We follow responsible disclosure practices. Security researchers who report vuln
 
 ## 📜 License & Liability
 
-This software is provided "as is" under the MIT License. While we strive to maintain security, users are responsible for their own deployments and should follow best practices outlined above.
+This software is provided "as is" under the GNU General Public License v3.0 (GPL-3.0). While we strive to maintain security, users are responsible for their own deployments and should follow best practices outlined above.
 
 ---
 
-**Last Updated:** November 24, 2025  
-**Contact:** [@Lakzexe](https://t.me/Lakzexe) on Telegram
+**Last Updated:** July 4, 2026  
+**Contact:** [@Hasindu_Lakshan](https://t.me/Hasindu_Lakshan) on Telegram

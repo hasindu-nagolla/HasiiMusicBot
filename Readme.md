@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://i.ibb.co/cKzySsgr/yy.png" alt="Hasii Music" width="280"/>
+<img src="https://i.ibb.co/cKzySsgr/yy.png" alt="Hasii Music" width="400"/>
 
 # 🎵 ˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼
 
@@ -221,7 +221,7 @@ LOGGER_ID=
 # Assistant Account
 STRING_SESSION=
 
-# Optional
+# Essential
 COOKIE_URL=
 ```
 
