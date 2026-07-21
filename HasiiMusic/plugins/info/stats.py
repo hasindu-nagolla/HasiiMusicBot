@@ -1,7 +1,7 @@
 # ==============================================================================
 # stats.py - Sudo Stats
 # ==============================================================================
-# Deep dive into bot and system statistics, fetching data from the Ballerina DB.
+# Deep dive into bot and system statistics.
 # ==============================================================================
 
 # Copyright (c) 2025 Hasindu Nagolla
@@ -14,7 +14,6 @@ import platform
 import sys
 
 import psutil
-import aiohttp
 from pyrogram import __version__, filters, types
 from pytgcalls import __version__ as pytgver
 
@@ -54,38 +53,15 @@ async def _stats(_, m: types.Message):
     used_disk = round(disk.used / (1024 ** 3), 2)  # Convert to GB
     total_disk = round(disk.total / (1024 ** 3), 2)
     
-    # Fetch database stats from Ballerina Microservice
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get("http://localhost:9090/db_stats") as resp:
-                if resp.status == 200:
-                    db_stats = await resp.json()
-                else:
-                    print(f"Ballerina API Error: {resp.status}")
-                    db_stats = {}
-    except Exception as e:
-        print(f"Error connecting to Ballerina API: {e}")
-        db_stats = {}
-
-    # Fallback to 0 if Ballerina API is down or missing fields
-    if not db_stats:
-        db_stats = {
-            "blocked_chats": 0,
-            "blocked_users": 0,
-            "sudo_users": 0,
-            "served_chats": 0,
-            "served_users": 0
-        }
-        
     _utext = m.lang["stats_user"].format(
         app.name,
         len(userbot.clients),
         config.AUTO_LEAVE,
-        db_stats.get("blocked_chats", 0),
-        db_stats.get("blocked_users", 0),
-        db_stats.get("sudo_users", 0),
-        db_stats.get("served_chats", 0),
-        db_stats.get("served_users", 0),
+        len(db.blacklisted),
+        len(app.bl_users),
+        len(app.sudoers),
+        len(await db.get_chats()),
+        len(await db.get_users()),
     )
     
     # Add system stats for sudo users
