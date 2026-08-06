@@ -13,7 +13,7 @@
 
 import asyncio
 import logging
-from ntgcalls import ConnectionNotFound, TelegramServerError
+from ntgcalls import ConnectionNotFound, TelegramServerError, TransportParseException
 from pyrogram import enums, errors
 from pyrogram.errors import MessageIdInvalid
 from pyrogram.types import InputMediaPhoto, Message
@@ -28,11 +28,15 @@ from HasiiMusic.helpers import Media, Track, buttons, thumb
 
 class PyTgCallsErrorFilter(logging.Filter):
     def filter(self, record):
+        msg = record.getMessage()
         # Filter out UpdateGroupCall errors
-        if 'UpdateGroupCall' in record.getMessage():
+        if 'UpdateGroupCall' in msg:
             return False
         # Filter out ConnectionNotFound errors (happens when call ends but updates still arrive)
-        if 'Connection with chat id' in record.getMessage() and 'not found' in record.getMessage():
+        if 'Connection with chat id' in msg and 'not found' in msg:
+            return False
+        # Filter out InvalidStateError from pytgcalls clear_call (known library race condition)
+        if 'invalid state' in msg.lower() and 'set_exception' in msg:
             return False
         return True
 
@@ -303,6 +307,19 @@ class TgCall(PyTgCalls):
                             raise
                     else:
                         raise
+                except TransportParseException:
+                    # WebRTC transport negotiation failed - VC may have ended
+                    if attempt < max_retries - 1:
+                        logger.debug(
+                            f"Transport not found for {chat_id}, retrying... (attempt {attempt + 1}/{max_retries})")
+                        try:
+                            await client.leave_call(chat_id, close=False)
+                        except Exception:
+                            pass
+                        await asyncio.sleep(retry_delay + 1)
+                        continue
+                    else:
+                        raise
                 except Exception as e:
                     error_msg = str(e).lower()
                     if "cannot be initialized more than once" in error_msg or "connection" in error_msg:
@@ -432,6 +449,15 @@ class TgCall(PyTgCalls):
                 except Exception:
                     pass
             await self._play_next_impl(chat_id)
+        except TransportParseException:
+            # All retries failed - voice chat likely doesn't exist
+            logger.warning(f"Transport not found for {chat_id} after retries, stopping.")
+            await self._stop_impl(chat_id)
+            if message:
+                try:
+                    await message.edit_text(_lang["error_no_call"])
+                except Exception:
+                    pass
         except (ConnectionNotFound, TelegramServerError):
             await self._stop_impl(chat_id)
             if message:
