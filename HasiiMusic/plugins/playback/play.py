@@ -8,7 +8,7 @@ from pyrogram import filters
 from pyrogram import types
 from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden, ChatSendPlainForbidden, ChatWriteForbidden
 
-from HasiiMusic import tune, app, config, db, lang, queue, tg, yt
+from HasiiMusic import tune, app, config, db, lang, queue, tg, yt, spotify
 from HasiiMusic.helpers import buttons, utils
 from HasiiMusic.helpers._play import checkUB
 import asyncio
@@ -113,7 +113,70 @@ async def play_hndlr(
         file = await tg.download(m.reply_to_message, sent)
 
     elif url:
-        if "playlist" in url:
+        if spotify.valid(url):
+            await safe_edit(sent, "<blockquote>🎧 ꜰᴇᴛᴄʜɪɴɢ ꜱᴘᴏᴛɪꜰʏ ᴛʀᴀᴄᴋ...</blockquote>")
+            
+            # Check if it's a playlist or album
+            if "playlist" in url:
+                spotify_tracks = await spotify.get_playlist(url)
+            elif "album" in url:
+                spotify_tracks = await spotify.get_album(url)
+            else:
+                # Single track
+                query = await spotify.get_track(url)
+                if query:
+                    file = await yt.search(query, sent.id)
+                if not file:
+                    await safe_edit(sent, m.lang["play_not_found"].format(config.SUPPORT_CHAT))
+                    return
+                spotify_tracks = [] # Handled
+            
+            if spotify_tracks:
+                if len(spotify_tracks) == 0:
+                    await safe_edit(sent, "<blockquote>❌ ꜱᴘᴏᴛɪꜰʏ ᴇʀʀᴏʀ: ɴᴏ ᴛʀᴀᴄᴋꜱ ꜰᴏᴜɴᴅ.</blockquote>")
+                    return
+                
+                # Fetch first track for immediate playback
+                query = spotify_tracks.pop(0)
+                file = await yt.search(query, sent.id)
+                
+                if not file:
+                    await safe_edit(sent, m.lang["play_not_found"].format(config.SUPPORT_CHAT))
+                    return
+                    
+                # Queue remaining tracks in background
+                async def _background_queue(tracks, chat_id, mention):
+                    for track_query in tracks[:config.PLAYLIST_LIMIT]:
+                        try:
+                            # small delay to prevent rate limit
+                            await asyncio.sleep(1.5)
+                            track = await yt.search(track_query, sent.id)
+                            if track:
+                                track.user = mention
+                                track.video = video
+                                queue.add(chat_id, track)
+                        except Exception:
+                            pass
+                
+                asyncio.create_task(_background_queue(spotify_tracks, chat_id, mention))
+                await safe_reply(m, f"<blockquote>⏳ Qᴜᴇᴜᴇɪɴɢ {min(len(spotify_tracks), config.PLAYLIST_LIMIT)} ꜱᴘᴏᴛɪꜰʏ ᴛʀᴀᴄᴋꜱ ɪɴ ʙᴀᴄᴋɢʀᴏᴜɴᴅ...</blockquote>")
+
+        elif "soundcloud.com" in url:
+            await safe_edit(sent, "<blockquote>☁️ ꜰᴇᴛᴄʜɪɴɢ ꜱᴏᴜɴᴅᴄʟᴏᴜᴅ ᴛʀᴀᴄᴋ...</blockquote>")
+            if "sets" in url or "playlist" in url:
+                tracks = await yt.playlist(config.PLAYLIST_LIMIT, mention, url)
+                if not tracks:
+                    await safe_edit(sent, m.lang["playlist_error"])
+                    return
+                file = tracks.pop(0)
+                file.message_id = sent.id
+            else:
+                file = await yt.search(url, sent.id)
+                if not file:
+                    await safe_edit(sent, m.lang["play_not_found"].format(config.SUPPORT_CHAT))
+                    return
+
+        elif "playlist" in url:
             await safe_edit(sent, m.lang["playlist_fetch"])
             try:
                 tracks = await yt.playlist(

@@ -79,8 +79,10 @@ lang = Language()
 # Initialize Telegram and YouTube utilities
 from HasiiMusic.core.telegram import Telegram
 from HasiiMusic.core.youtube import YouTube
+from HasiiMusic.core.spotify import SpotifyAPI
 tg = Telegram()
 yt = YouTube()
+spotify = SpotifyAPI()
 
 # Initialize preload manager for background track downloading
 from HasiiMusic.core.preload import PreloadManager

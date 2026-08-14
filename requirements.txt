@@ -27,4 +27,5 @@ pytgcrypto~=1.2.12
 py-tgcalls~=2.2.11
 
 python-dotenv~=1.2.2
+spotipy~=2.25.0
 yt-dlp[default] @ git+https://github.com/yt-dlp/yt-dlp.git

@@ -35,6 +35,11 @@ class Config:
         # MongoDB connection URL (mongodb+srv://...)
         self.MONGO_URL: str = getenv("MONGO_DB_URI", "")
 
+        # ============ SPOTIFY CONFIGURATION ============
+        # Get these from developer.spotify.com
+        self.SPOTIFY_CLIENT_ID: str = getenv("SPOTIFY_CLIENT_ID", "")
+        self.SPOTIFY_CLIENT_SECRET: str = getenv("SPOTIFY_CLIENT_SECRET", "")
+
         # ============ MUSIC BOT LIMITS ============
         # Convert minutes to seconds for duration limit
         # Max song duration (default: 300 min)
