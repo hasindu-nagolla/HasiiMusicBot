@@ -168,7 +168,8 @@ class YouTube:
                 return fresh
 
         try:
-            if self.valid(query):
+            is_url = bool(re.match(r"https?://", query))
+            if self.valid(query) or (is_url and "soundcloud.com" in query):
                 def _extract():
                     cookie = self.get_cookies() if self.checked else None
                     ydl_opts = {
@@ -257,16 +258,18 @@ class YouTube:
 
     async def playlist(self, limit: int, user: str, url: str) -> list[Track]:
         try:
-            def _extract_playlist():
-                cookie = self.get_cookies() if self.checked else None
-                ydl_opts = {
-                    "quiet": True,
-                    "extract_flat": "in_playlist",
-                    "cookiefile": cookie
-                }
-                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    return ydl.extract_info(url, download=False)
-                    
+            is_url = bool(re.match(r"https?://", url))
+            if self.valid(url) or (is_url and "soundcloud.com" in url):
+                def _extract_playlist():
+                    cookie = self.get_cookies() if self.checked else None
+                    ydl_opts = {
+                        "quiet": True,
+                        "extract_flat": "in_playlist",
+                        "cookiefile": cookie
+                    }
+                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                        return ydl.extract_info(url, download=False)
+                        
             plist = await asyncio.to_thread(_extract_playlist)
             tracks = []
 
