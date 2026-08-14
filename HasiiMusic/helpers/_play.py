@@ -56,8 +56,11 @@ def checkUB(play):
         
         url = yt.url(m)
         # Only validate URL if not replying to media (Telegram files have t.me URLs)
-        if url and not m.reply_to_message and not yt.valid(url):
-            return await m.reply_text(m.lang["play_unsupported"])
+        if url and not m.reply_to_message:
+            from HasiiMusic import spotify
+            is_valid = yt.valid(url) or spotify.valid(url) or "soundcloud.com" in url
+            if not is_valid:
+                return await m.reply_text(m.lang["play_unsupported"])
 
         play_mode = await db.get_play_mode(m.chat.id)
         if play_mode or force:
