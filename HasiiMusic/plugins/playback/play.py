@@ -8,7 +8,7 @@ from pyrogram import filters
 from pyrogram import types
 from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden, ChatSendPlainForbidden, ChatWriteForbidden
 
-from HasiiMusic import tune, app, config, db, lang, queue, tg, yt
+from HasiiMusic import tune, app, config, db, lang, queue, spotify, tg, yt
 from HasiiMusic.helpers import buttons, utils
 from HasiiMusic.helpers._play import checkUB
 import asyncio
@@ -43,8 +43,19 @@ async def safe_reply(message, text, **kwargs):
         logger.warning(f"Cannot send text in chat {message.chat.id} (chat write forbidden)")
         return None
     except Exception as e:
-        logger.error(f"Failed to send reply: {e}")
+        logger.error(f"Error in safe_reply: {e}")
         return None
+
+
+async def auto_delete(message: types.Message, delay: int = 15):
+    """Auto-delete a message after a given timeout."""
+    if not message:
+        return
+    await asyncio.sleep(delay)
+    try:
+        await message.delete()
+    except Exception:
+        pass
 
 
 def playlist_to_queue(chat_id: int, tracks: list) -> str:
@@ -113,8 +124,30 @@ async def play_hndlr(
         file = await tg.download(m.reply_to_message, sent)
 
     elif url:
-        if "playlist" in url:
-            await safe_edit(sent, m.lang["playlist_fetch"])
+        if spotify.valid(url):
+            if spotify.is_playlist(url):
+                try:
+                    tracks = await spotify.playlist(
+                        0, mention, url
+                    )
+                except Exception as e:
+                    await safe_edit(
+                        sent,
+                        f"<blockquote>❌ ꜰᴀɪʟᴇᴅ ᴛᴏ ꜰᴇᴛᴄʜ ꜱᴘᴏᴛɪꜰʏ ᴘʟᴀʏʟɪꜱᴛ.\n\n"
+                        f"ᴘʟᴇᴀꜱᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ.</blockquote>"
+                    )
+                    return
+
+                if not tracks:
+                    await safe_edit(sent, m.lang["playlist_error"])
+                    return
+
+                file = tracks[0]
+                tracks.remove(file)
+                file.message_id = sent.id
+            else:
+                file = await spotify.search(url, sent.id)
+        elif "playlist" in url:
             try:
                 tracks = await yt.playlist(
                     config.PLAYLIST_LIMIT, mention, url
@@ -137,6 +170,7 @@ async def play_hndlr(
             file.message_id = sent.id
         else:
             file = await yt.search(url, sent.id)
+
 
         if not file:
             await safe_edit(
@@ -202,10 +236,11 @@ async def play_hndlr(
             if tracks:
                 added = playlist_to_queue(chat_id, tracks)
                 try:
-                    await app.send_message(
+                    q_msg = await app.send_message(
                         chat_id=m.chat.id,
                         text=m.lang["playlist_queued"].format(len(tracks)) + added,
                     )
+                    asyncio.create_task(auto_delete(q_msg, 15))
                 except Exception:
                     # Can't send message, continue anyway
                     pass
@@ -298,10 +333,11 @@ async def play_hndlr(
         return
     added = playlist_to_queue(chat_id, tracks)
     try:
-        await app.send_message(
+        q_msg = await app.send_message(
             chat_id=m.chat.id,
             text=m.lang["playlist_queued"].format(len(tracks)) + added,
         )
+        asyncio.create_task(auto_delete(q_msg, 15))
     except Exception:
         # Can't send message, but playback is working
         pass

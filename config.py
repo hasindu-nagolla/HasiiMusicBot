@@ -44,6 +44,11 @@ class Config:
         # Max songs from playlist (default: 20)
         self.PLAYLIST_LIMIT: int = int(getenv("PLAYLIST_LIMIT", "20"))
 
+        # ============ SPOTIFY API (Optional) ============
+        # Spotify API credentials from https://developer.spotify.com/dashboard
+        self.SPOTIFY_CLIENT_ID: str = getenv("SPOTIFY_CLIENT_ID") or getenv("SPOTIPY_CLIENT_ID", "")
+        self.SPOTIFY_CLIENT_SECRET: str = getenv("SPOTIFY_CLIENT_SECRET") or getenv("SPOTIPY_CLIENT_SECRET", "")
+
         # ============ ASSISTANT/USERBOT SESSIONS ============
         # Pyrogram session strings - get from @StringFatherBot
         # You can have up to 3 assistants for handling multiple groups

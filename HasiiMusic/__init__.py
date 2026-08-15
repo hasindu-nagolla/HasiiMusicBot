@@ -29,6 +29,8 @@ logging.getLogger("ntgcalls").setLevel(logging.CRITICAL)
 logging.getLogger("pymongo").setLevel(logging.ERROR)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 logging.getLogger("pytgcalls").setLevel(logging.ERROR)
+logging.getLogger("spotipy").setLevel(logging.CRITICAL)
+logging.getLogger("spotipy.client").setLevel(logging.CRITICAL)
 
 logger = logging.getLogger("HasiiMusic")
 
@@ -76,11 +78,13 @@ db = MongoDB()
 from HasiiMusic.core.lang import Language
 lang = Language()
 
-# Initialize Telegram and YouTube utilities
+# Initialize Telegram, YouTube, and Spotify utilities
 from HasiiMusic.core.telegram import Telegram
 from HasiiMusic.core.youtube import YouTube
+from HasiiMusic.core.spotify import Spotify
 tg = Telegram()
 yt = YouTube()
+spotify = Spotify()
 
 # Initialize preload manager for background track downloading
 from HasiiMusic.core.preload import PreloadManager

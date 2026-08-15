@@ -350,6 +350,25 @@ class TgCall(PyTgCalls):
                     media.duration,
                     media.user,
                 )
+                if getattr(media, "playlist_name", None):
+                    pl_url = getattr(media, "playlist_url", None)
+                    pl_type = getattr(media, "playlist_type", None)
+                    if pl_type == "album":
+                        label = "ᴀʟʙᴜᴍ"
+                    elif pl_type == "artist":
+                        label = "ᴀʀᴛɪꜱᴛ"
+                    else:
+                        label = "ᴘʟᴀʏʟɪꜱᴛ"
+
+                    if pl_url:
+                        pl_display = f"<a href={pl_url}>{media.playlist_name}</a>"
+                    else:
+                        pl_display = media.playlist_name
+
+                    text = text.replace(
+                        "➤ <b>ᴅᴜʀᴀᴛɪᴏɴ :</b>",
+                        f"➤ <b>{label} :</b> {pl_display}\n➤ <b>ᴅᴜʀᴀᴛɪᴏɴ :</b>",
+                    )
                 if not media.is_live and media.duration_sec:
                     import time as time_module
                     played = media.time
