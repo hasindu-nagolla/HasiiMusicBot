@@ -9,9 +9,7 @@ from os import getenv
 from typing import List
 from dotenv import load_dotenv
 
-# Load environment variables from .env file (create one from sample.env)
 load_dotenv()
-
 
 class Config:
     def __init__(self):

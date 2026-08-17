@@ -20,16 +20,11 @@ from HasiiMusic import logger
 
 
 class PreloadManager:
-    """
-    Manages background preloading of upcoming tracks in queue.
-    
-    This class ensures seamless transitions between songs by downloading
-    upcoming tracks while the current track is still playing.
-    """
-    
+
+    #Manages background downloads for upcoming tracks in the queue.
     def __init__(self):
-        """Initialize the preload manager."""
-        # Track active preload tasks per chat: {chat_id: set of asyncio.Task}
+        # Initialize the preload manager.
+        # keep track of active preload tasks for each chat
         self._preload_tasks: Dict[int, Set[asyncio.Task]] = {}
         
         # Track which items are currently being preloaded to prevent duplicates
@@ -57,9 +52,9 @@ class PreloadManager:
         if chat_id not in self._preloading:
             self._preloading[chat_id] = set()
         
-        # Start preload task for each track that needs downloading
+        # start a preload task for each track that needs downloading
         for track in upcoming_tracks:
-            # Skip if already downloaded or currently being preloaded
+            # skip tracks that are already downloaded or being preloaded
             if queue.is_downloaded(track):
                 continue
             
@@ -67,7 +62,7 @@ class PreloadManager:
             if not track_id or track_id in self._preloading[chat_id]:
                 continue
             
-            # Mark as being preloaded
+            # mark the track as being preloaded
             self._preloading[chat_id].add(track_id)
             
             # Create background task for this track
@@ -95,7 +90,7 @@ class PreloadManager:
             track_id = track.id
             is_live = getattr(track, 'is_live', False)
             
-            # Download the track (uses existing semaphore for rate limiting)
+            # download the track using the existing download limit
             file_path = await yt.download(
                 track_id,
                 is_live=is_live,
@@ -110,11 +105,11 @@ class PreloadManager:
                 pass
         
         except asyncio.CancelledError:
-            # Task was cancelled (queue changed, playback stopped, etc.)
+            # the task was cancelled because the queue or playback changed
             raise
         
         except Exception as e:
-            # Log error but don't crash - track will be downloaded when it's time to play
+            # log the error and download the track normally when needed
             logger.error(f"❌ Error preloading track {track.id} for chat {chat_id}: {e}")
         
         finally:

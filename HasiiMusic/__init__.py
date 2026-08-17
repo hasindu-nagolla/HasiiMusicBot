@@ -9,7 +9,6 @@ import time
 import logging
 from logging.handlers import RotatingFileHandler
 from typing import List
-
 from pyrogram.errors import ChannelInvalid
 
 # Configure logging

@@ -26,10 +26,10 @@ from pymongo import AsyncMongoClient
 from HasiiMusic import config, logger, userbot
 
 
-# Suppress non-critical MongoDB background task errors
+# hide harmless MongoDB background errors
 class MongoBackgroundFilter(logging.Filter):
     def filter(self, record):
-        # Suppress AutoReconnect and _OperationCancelled background errors (these are handled internally)
+        # ignore background reconnect and cancellation errors
         msg = record.getMessage()
         return not (
             'MongoClient background task encountered an error' in msg or
@@ -42,9 +42,9 @@ logging.getLogger('pymongo.client').addFilter(MongoBackgroundFilter())
 
 class MongoDB:
     def __init__(self):
-        """
-        Initialize the MongoDB connection.
-        """
+        
+        # set up the MongoDB connection
+
         self.mongo = AsyncMongoClient(
             config.MONGO_URL,
             serverSelectionTimeoutMS=12500,
@@ -87,11 +87,7 @@ class MongoDB:
         self.usersdb = self.db.users
 
     async def connect(self) -> None:
-        """Check if we can connect to the database with exponential backoff retry logic.
-
-        Raises:
-            SystemExit: If the connection to the database fails after retries.
-        """
+        # connect to the database and retry if it fails.
         max_retries = 3
         retry_delay = 5  # Initial delay in seconds
         
@@ -108,10 +104,10 @@ class MongoDB:
                 await self.cache.create_index("_id")
 
                 await self.load_cache()
-                return  # Success, exit the function
+                return # connected successfully
             except Exception as e:
                 if attempt < max_retries:
-                    # Exponential backoff: 5s, 10s, 20s
+                    # wait longer after each failed attempt
                     wait_time = retry_delay * (2 ** (attempt - 1))
                     logger.warning(f"Database connection attempt {attempt}/{max_retries} failed: {type(e).__name__}. Retrying in {wait_time}s...")
                     await asyncio.sleep(wait_time)
@@ -120,7 +116,7 @@ class MongoDB:
                         f"Database connection failed after {max_retries} attempts: {type(e).__name__}") from e
 
     async def close(self) -> None:
-        """Close the connection to the database."""
+        # close the database connection
         await self.mongo.close()
         logger.info("Database connection closed.")
 
@@ -142,8 +138,8 @@ class MongoDB:
     async def get_admins(self, chat_id: int, reload: bool = False) -> list[int]:
         from HasiiMusic.helpers._admins import reload_admins
 
-        # **PERFORMANCE FIX**: Increased cache from 5 to 15 minutes
-        # Reduces MongoDB queries during peak load (15-20 concurrent streams)
+        # keep the admin cache for 15 minutes
+        # helps reduce database queries during heavy use
         current_time = time()
         cache_age = current_time - self.admin_cache_time.get(chat_id, 0)
 
@@ -197,9 +193,9 @@ class MongoDB:
             num = doc["num"] if doc else await self.set_assistant(chat_id)
             self.assistant[chat_id] = num
 
-        # Check if assigned assistant is out of range (e.g., assistant was removed)
+        # check if the assigned assistant still exists (e.g., assistant was removed)
         if self.assistant[chat_id] > len(userbot.clients):
-            # Reassign to a valid assistant
+            # assign a valid assistant instead
             num = await self.set_assistant(chat_id)
             self.assistant[chat_id] = num
 
@@ -209,12 +205,11 @@ class MongoDB:
         if chat_id not in self.assistant:
             await self.get_assistant(chat_id)
         
-        # Check if assigned assistant is out of range
+        # make sure the assigned assistant is still available
         if self.assistant[chat_id] > len(userbot.clients):
-            # Reassign to a valid assistant
             await self.set_assistant(chat_id)
         
-        # Get available clients dynamically based on what's actually running
+        # get the assistants that are currently running
         available_clients = {}
         if hasattr(userbot, 'one') and userbot.one in userbot.clients:
             available_clients[1] = userbot.one
@@ -293,7 +288,7 @@ class MongoDB:
 
     # VPLAY TOGGLE METHODS
     async def get_vplay_enabled(self) -> bool:
-        """Check if /vplay commands are enabled."""
+        # check if /vplay commands are enabled
         if hasattr(self, "vplay_enabled"):
             return self.vplay_enabled
 
@@ -302,7 +297,7 @@ class MongoDB:
         return self.vplay_enabled
 
     async def set_vplay_enabled(self, enabled: bool) -> None:
-        """Enable or disable /vplay commands globally."""
+        # Enable or disable /vplay commands globally.
         self.vplay_enabled = enabled
         await self.cache.update_one(
             {"_id": "vplay_toggle"},
@@ -334,12 +329,14 @@ class MongoDB:
 
     # AUTO LEAVE METHODS
     async def get_autoleave(self, chat_id: int) -> bool:
-        """Get auto-leave status for a chat. Default is False."""
+
+        # Get auto-leave status for a chat. Default is False
         doc = await self.cache.find_one({"_id": f"autoleave_{chat_id}"})
         return doc.get("enabled", False) if doc else False
 
     async def set_autoleave(self, chat_id: int, enabled: bool) -> None:
-        """Enable or disable auto-leave for a chat."""
+
+        # Enable or disable auto-leave for a chat
         await self.cache.update_one(
             {"_id": f"autoleave_{chat_id}"},
             {"$set": {"enabled": enabled}},
@@ -348,12 +345,14 @@ class MongoDB:
 
     # LOOP MODE METHODS
     async def get_loop(self, chat_id: int) -> int:
-        """Get loop mode for a chat. 0=off, 1=single, 10=queue"""
+
+        # get the loop mode for a chat: 0=off, 1=single, 10=queue
         doc = await self.cache.find_one({"_id": f"loop_{chat_id}"})
         return doc.get("mode", 0) if doc else 0
 
     async def set_loop(self, chat_id: int, mode: int) -> None:
-        """Set loop mode for a chat."""
+
+        # Set loop mode for a chat
         if mode == 0:
             await self.cache.delete_one({"_id": f"loop_{chat_id}"})
         else:
@@ -415,12 +414,9 @@ class MongoDB:
 
 
     async def load_cache(self) -> None:
-        """Preload cache data from database for faster access."""
-
-
-        # Preload all cache data
-        logger.info("📦 Loading database cache...")
         
+        # load cache data from the database for faster access
+        logger.info("📦 Loading database cache...")
         # Load chats, users, blacklists, and logger status
         await self.get_chats()
         await self.get_users()

@@ -6,9 +6,7 @@
 
 import re
 from pyrogram import filters, types, enums
-
 from HasiiMusic import app, config, lang
-
 
 # Pattern to detect admin triggers
 TRIGGER_PATTERN = re.compile(r"(?i)(\.|@|\/)admin")

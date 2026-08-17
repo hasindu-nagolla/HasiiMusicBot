@@ -13,7 +13,8 @@ from HasiiMusic import app, db
 
 
 def admin_check(func):
-    """Ensures only admins or sudo users can run the command."""
+
+    # Ensures only admins or sudo users can run the command.
     @wraps(func)
     async def wrapper(_, update: types.Message | types.CallbackQuery, *args, **kwargs):
         # Helper function to send reply (works for messages and callbacks)
@@ -59,7 +60,8 @@ def admin_check(func):
 
 
 def can_manage_vc(func):
-    """Ensures the user has permission to manage voice chats."""
+
+    # Ensures the user has permission to manage voice chats.
     @wraps(func)
     async def wrapper(_, update: types.Message | types.CallbackQuery, *args, **kwargs):
         # Get chat ID and user ID
@@ -126,7 +128,8 @@ async def reload_admins(chat_id: int) -> list[int]:
 
 
 async def is_admin_callback(query: types.CallbackQuery) -> bool:
-    """Check if callback query sender is admin"""
+    
+    # Check if callback query sender is admin
     if not query.from_user:
         return False
     

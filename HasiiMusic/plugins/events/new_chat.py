@@ -42,7 +42,7 @@ async def new_chat_member(_, message: types.Message):
 """
 
             try:
-                # Send the notification to the logger group
+                # send the notification to the logger group
                 await app.send_photo(
                     chat_id=config.LOGGER_ID,
                     photo=config.START_IMG,
