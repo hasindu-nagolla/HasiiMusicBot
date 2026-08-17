@@ -13,6 +13,7 @@ from HasiiMusic.helpers import buttons, utils
 from HasiiMusic.helpers._play import checkUB
 import asyncio
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -239,6 +240,18 @@ async def play_hndlr(
             return
 
     if not file.file_path:
+        if not re.fullmatch(r"[A-Za-z0-9_-]{11}", file.id):
+            try:
+                resolved = await yt.search(file.id, sent.id)
+                if resolved:
+                    file.id = resolved.id
+                    if resolved.thumbnail:
+                        file.thumbnail = resolved.thumbnail
+                    if resolved.duration_sec:
+                        file.duration_sec = resolved.duration_sec
+                        file.duration = resolved.duration
+            except Exception:
+                pass
         file.file_path = await yt.download(
             file.id,
             is_live=file.is_live,

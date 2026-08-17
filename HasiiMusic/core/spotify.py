@@ -120,7 +120,7 @@ class Spotify:
                             "name": title,
                             "artists": subtitle,
                             "duration_ms": duration_ms,
-                            "thumbnail": cover_thumb,
+                            "thumbnail": cover_thumb if item_type == "album" else "",
                             "url": t_url,
                             "id": t_id,
                         })
@@ -237,7 +237,7 @@ class Spotify:
                             )
                             duration_ms = track_data.get("duration_ms", 0)
                             images = track_data.get("album", {}).get("images", [])
-                            thumb = images[0].get("url", "") if images else cover_thumb
+                            thumb = images[0].get("url", "") if images else (cover_thumb if item_type == "album" else "")
                             t_id = track_data.get("id", "")
                             t_url = track_data.get("external_urls", {}).get("spotify") or (
                                 f"https://open.spotify.com/track/{t_id}" if t_id else url

@@ -13,6 +13,7 @@
 
 import asyncio
 import logging
+import re
 from ntgcalls import ConnectionNotFound, TelegramServerError, TransportParseException
 from pyrogram import enums, errors
 from pyrogram.errors import MessageIdInvalid
@@ -204,6 +205,8 @@ class TgCall(PyTgCalls):
 
         # Generate thumbnail only if THUMB_GEN is enabled, otherwise use default
         if config.THUMB_GEN and isinstance(media, Track):
+            if not getattr(media, "thumbnail", None) and re.fullmatch(r"[A-Za-z0-9_-]{11}", media.id):
+                media.thumbnail = f"https://i.ytimg.com/vi/{media.id}/hqdefault.jpg"
             _thumb = await thumb.generate(media)
         else:
             _thumb = config.DEFAULT_THUMB
@@ -653,6 +656,20 @@ class TgCall(PyTgCalls):
 
                 _lang = await lang.get_lang(chat_id)
                 msg = None
+
+                if not re.fullmatch(r"[A-Za-z0-9_-]{11}", media.id) or not getattr(media, "thumbnail", None):
+                    try:
+                        resolved = await yt.search(media.id, 0)
+                        if resolved:
+                            media.id = resolved.id
+                            if resolved.thumbnail:
+                                media.thumbnail = resolved.thumbnail
+                            if resolved.duration_sec:
+                                media.duration_sec = resolved.duration_sec
+                                media.duration = resolved.duration
+                    except Exception:
+                        pass
+
                 if not media.file_path:
                     is_live = getattr(media, 'is_live', False)
                     lock = self.get_lock(chat_id)
