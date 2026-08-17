@@ -30,6 +30,10 @@ class Spotify:
         self.client: Optional[spotipy.Spotify] = None
         self._init_client()
 
+        # Cache for embed fallback: (item_type, item_id) -> (title, [raw_tracks])
+        # Avoids re-downloading the full embed HTML on each paginated batch fetch
+        self._embed_cache: dict = {}
+
         # Match Spotify URLs & URIs (playlist, track, album, artist)
         self.url_regex = re.compile(
             r"(?:https?://)?(?:open\.)?spotify\.com/(?:intl-[a-zA-Z-]+/)?(playlist|track|album|artist)/([a-zA-Z0-9]+)(?:[?&][^\s]*)?"
@@ -85,8 +89,21 @@ class Spotify:
         return item_type in ("playlist", "album", "artist")
 
     def _fetch_embed_tracks(self, item_type: str, item_id: str, limit: int = 0, offset: int = 0) -> Tuple[str, List[dict]]:
-        """Fallback extractor using Spotify embed page (bypasses 403 API restriction)."""
-        raw_tracks: List[dict] = []
+        """Fallback extractor using Spotify embed page (bypasses 403 API restriction).
+
+        Caches the full tracklist on first fetch so paginated batch calls
+        (different offsets) slice from memory instead of re-downloading HTML.
+        """
+        cache_key = (item_type, item_id)
+
+        # --- Serve from cache if available ---
+        if cache_key in self._embed_cache:
+            cached_title, all_tracks = self._embed_cache[cache_key]
+            sliced = all_tracks[offset: offset + limit] if limit else all_tracks[offset:]
+            return cached_title, sliced
+
+        # --- Full fetch (first time only) ---
+        all_raw_tracks: List[dict] = []
         collection_title = ""
         try:
             embed_url = f"https://open.spotify.com/embed/{item_type}/{item_id}"
@@ -106,9 +123,7 @@ class Spotify:
                 cover_sources = cover_art.get("sources", []) if isinstance(cover_art, dict) else []
                 cover_thumb = cover_sources[0].get("url", "") if cover_sources else ""
                 track_list = entity.get("trackList", [])
-                for idx, t in enumerate(track_list):
-                    if idx < offset:
-                        continue
+                for t in track_list:
                     title = t.get("title", "")
                     subtitle = t.get("subtitle", "")
                     duration_ms = t.get("duration", 0)
@@ -116,7 +131,7 @@ class Spotify:
                     t_id = t_uri.split(":")[-1] if t_uri else ""
                     t_url = f"https://open.spotify.com/track/{t_id}" if t_id else ""
                     if title:
-                        raw_tracks.append({
+                        all_raw_tracks.append({
                             "name": title,
                             "artists": subtitle,
                             "duration_ms": duration_ms,
@@ -124,13 +139,11 @@ class Spotify:
                             "url": t_url,
                             "id": t_id,
                         })
-                    if limit and len(raw_tracks) >= limit:
-                        break
         except Exception as e:
             logger.debug(f"Embed parser failed for {item_type}/{item_id}: {e}")
 
-        # Fallback to oEmbed if raw_tracks empty (e.g. artist or single track)
-        if not raw_tracks or not collection_title:
+        # Fallback to oEmbed if all_raw_tracks empty (e.g. artist or single track)
+        if not all_raw_tracks or not collection_title:
             try:
                 oembed_url = f"https://open.spotify.com/oembed?url=https://open.spotify.com/{item_type}/{item_id}"
                 req = urllib.request.Request(
@@ -144,8 +157,8 @@ class Spotify:
                     if title:
                         if not collection_title:
                             collection_title = title
-                        if not raw_tracks and offset == 0:
-                            raw_tracks.append({
+                        if not all_raw_tracks:
+                            all_raw_tracks.append({
                                 "name": title,
                                 "artists": "" if item_type != "artist" else "Top Tracks",
                                 "duration_ms": 0,
@@ -156,7 +169,10 @@ class Spotify:
             except Exception as e:
                 logger.debug(f"oEmbed parser failed for {item_type}/{item_id}: {e}")
 
-        return collection_title, raw_tracks
+        # Store full tracklist in cache for future paginated fetches
+        self._embed_cache[cache_key] = (collection_title, all_raw_tracks)
+        sliced = all_raw_tracks[offset: offset + limit] if limit else all_raw_tracks[offset:]
+        return collection_title, sliced
 
     async def search(self, url: str, m_id: int) -> Optional[Track]:
         """Fetch a single track from Spotify and resolve to a YouTube Track."""

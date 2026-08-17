@@ -120,7 +120,7 @@ async def play_hndlr(
             if spotify.is_playlist(url):
                 try:
                     tracks = await spotify.playlist(
-                        config.PLAYLIST_LIMIT, mention, url
+                        min(config.PLAYLIST_LIMIT, getattr(config, "PLAYLIST_MAX", 100)), mention, url
                     )
                 except Exception as e:
                     await safe_edit(
@@ -142,7 +142,7 @@ async def play_hndlr(
         elif "playlist" in url:
             try:
                 tracks = await yt.playlist(
-                    config.PLAYLIST_LIMIT, mention, url
+                    min(config.PLAYLIST_LIMIT, getattr(config, "PLAYLIST_MAX", 100)), mention, url
                 )
             except Exception as e:
                 await safe_edit(

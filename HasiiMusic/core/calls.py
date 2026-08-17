@@ -743,7 +743,8 @@ class TgCall(PyTgCalls):
                 pl_idx = getattr(media, "playlist_index", 0)
                 pl_limit = getattr(config, "PLAYLIST_LIMIT", 30)
                 pl_max = getattr(config, "PLAYLIST_MAX", 100)
-                if pl_url and pl_idx > 0 and (pl_idx % pl_limit == (pl_limit - 2) or pl_idx % pl_limit == 28):
+                trigger_mod = max(1, pl_limit - 2) if pl_limit > 2 else 0
+                if pl_url and pl_idx > 0 and pl_idx % pl_limit == (trigger_mod % pl_limit):
                     next_offset = (pl_idx // pl_limit + 1) * pl_limit
                     if next_offset < pl_max:
                         batch_limit = min(pl_limit, pl_max - next_offset)
