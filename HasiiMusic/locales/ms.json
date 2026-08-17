@@ -10,7 +10,7 @@
   "auth_list": "<u><b>Senarai pengguna yang dibenarkan dalam {0}:</b></u>\n",
   "auth_is_admin": "<blockquote>Pengguna tersebut sudah pun menjadi <b>admin</b> dan tidak boleh ditambah ke senarai pengguna yang dibenarkan.</blockquote>",
   "auto_left": "<blockquote>Saya akan meninggalkan chat suara kerana tiada siapa yang mendengar saya.</blockquote>",
-  "auto_end": "<blockquote>✅ <b>Barisan (Queue) tamat.</b>\n\nStrim tamat secara automatik.</blockquote>",
+  "queue_end_message": "<blockquote>✅ <b>Barisan (Queue) tamat.</b>\n\nStrim tamat secara automatik.</blockquote>",
   "bl_usage": "<blockquote><b>Penggunaan:</b>\n\n/{0} [chat_id|user_id]</blockquote>",
   "bl_invalid": "<blockquote>Hanya ID chat dan ID pengguna disokong.</blockquote>",
   "bl_already": "<blockquote>Chat ini telah disenaraihitamkan (blacklisted).</blockquote>",

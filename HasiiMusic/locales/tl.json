@@ -10,7 +10,7 @@
   "auth_list": "<u><b>Listahan ng mga awtorisadong gumagamit sa {0}:</b></u>\n",
   "auth_is_admin": "<blockquote>Ang gumagamit ay isa nang <b>admin</b> at hindi na maaaring idagdag sa mga awtorisadong gumagamit.</blockquote>",
   "auto_left": "<blockquote>Aalis na ako sa voice chat dahil walang nakikinig sa akin.</blockquote>",
-  "auto_end": "<blockquote>✅ <b>Tapos na ang pila.</b>\n\nKusang natapos ang stream.</blockquote>",
+  "queue_end_message": "<blockquote>✅ <b>Tapos na ang pila.</b>\n\nKusang natapos ang stream.</blockquote>",
   "bl_usage": "<blockquote><b>Paggamit:</b>\n\n/{0} [chat_id|user_id]</blockquote>",
   "bl_invalid": "<blockquote>Mga chat ID at user ID lamang ang suportado.</blockquote>",
   "bl_already": "<blockquote>Naka-blacklist na ang chat na ito.</blockquote>",

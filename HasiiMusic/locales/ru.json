@@ -10,7 +10,7 @@
   "auth_list": "<u><b>Список авторизованных пользователей в {0}:</b></u>\n",
   "auth_is_admin": "<blockquote>Пользователь уже является <b>администратором</b> и не может быть добавлен в авторизованные пользователи.</blockquote>",
   "auto_left": "<blockquote>Я покидаю голосовой чат, потому что меня никто не слушает.</blockquote>",
-  "auto_end": "<blockquote>✅ <b>Очередь завершена.</b>\n\nСтрим автоматически завершен.</blockquote>",
+  "queue_end_message": "<blockquote>✅ <b>Очередь завершена.</b>\n\nСтрим автоматически завершен.</blockquote>",
   "bl_usage": "<blockquote><b>Использование:</b>\n\n/{0} [chat_id|user_id]</blockquote>",
   "bl_invalid": "<blockquote>Поддерживаются только ID чатов и ID пользователей.</blockquote>",
   "bl_already": "<blockquote>Этот чат уже в черном списке.</blockquote>",

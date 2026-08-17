@@ -619,17 +619,17 @@ class TgCall(PyTgCalls):
                         f"Could not delete previous message in {chat_id}: {e}")
 
                 if not media:
-                    if config.AUTO_END:
+                    if config.QUEUE_END_MESSAGE:
                         _lang = await lang.get_lang(chat_id)
                         try:
                             await app.send_message(
                                 chat_id=chat_id,
                                 text=_lang.get(
-                                    "auto_end", "✅ Queue finished. Stream ended automatically.")
+                                    "queue_end_message", "✅ Queue finished. Stream ended automatically.")
                             )
                         except Exception as e:
                             logger.debug(
-                                f"Could not send auto_end message in {chat_id}: {e}")
+                                f"Could not send queue_end message in {chat_id}: {e}")
                     return await self._stop_impl(chat_id)
 
                 _lang = await lang.get_lang(chat_id)

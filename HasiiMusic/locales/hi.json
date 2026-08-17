@@ -10,7 +10,7 @@
   "auth_list": "<u><b>{0} में अधिकृत उपयोगकर्ताओं की सूची:</b></u>\n",
   "auth_is_admin": "<blockquote>उपयोगकर्ता पहले से ही एक <b>एडमिन</b> है और उसे अधिकृत उपयोगकर्ताओं में नहीं जोड़ा जा सकता है।</blockquote>",
   "auto_left": "<blockquote>मैं वॉइस चैट से बाहर जा रहा हूँ क्योंकि कोई मुझे नहीं सुन रहा है।</blockquote>",
-  "auto_end": "<blockquote>✅ <b>कतार समाप्त हो गई।</b>\n\nस्ट्रीम अपने आप समाप्त हो गई।</blockquote>",
+  "queue_end_message": "<blockquote>✅ <b>कतार समाप्त हो गई।</b>\n\nस्ट्रीम अपने आप समाप्त हो गई।</blockquote>",
   "bl_usage": "<blockquote><b>उपयोग:</b>\n\n/{0} [chat_id|user_id]</blockquote>",
   "bl_invalid": "<blockquote>केवल चैट आईडी और यूज़र आईडी समर्थित हैं।</blockquote>",
   "bl_already": "<blockquote>यह चैट पहले से ही ब्लैकलिस्टेड है।</blockquote>",
