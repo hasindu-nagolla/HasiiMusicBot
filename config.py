@@ -65,7 +65,7 @@ class Config:
 
         # ============ FEATURE FLAGS ============
         # Auto-end stream when queue is empty
-        self.AUTO_END: bool = self._str_to_bool(getenv("AUTO_END", "False"))
+        self.QUEUE_END_MESSAGE: bool = self._str_to_bool(getenv("QUEUE_END_MESSAGE", "False"))
         # Auto-leave inactive chats
         self.AUTO_LEAVE: bool = self._str_to_bool(getenv("AUTO_LEAVE", "False"))
         # Enable/disable thumbnail generation (set False to use default thumb)
