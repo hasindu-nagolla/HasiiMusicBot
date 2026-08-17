@@ -8,7 +8,6 @@
 import asyncio
 import importlib
 import sys
-
 from pyrogram import idle
 
 # Raise the file descriptor limit on Linux to avoid "[Errno 24] Too many open files"

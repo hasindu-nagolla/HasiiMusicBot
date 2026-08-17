@@ -24,39 +24,6 @@ async def _watcher_vc(_, m: types.Message):
     await tune.stop(m.chat.id)
 
 
-async def auto_leave():
-    while True:
-        try:
-            await asyncio.sleep(1800)
-            for ub in userbot.clients:
-                left = 0
-                try:
-                    for dialog in await ub.get_dialogs():
-                        chat_id = dialog.chat.id
-                        if left >= 20:
-                            break
-                        # Skip logger and any excluded chats
-                        excluded = [app.logger] + config.EXCLUDED_CHATS
-                        if chat_id in excluded:
-                            continue
-                        if dialog.chat.type in [
-                            enums.ChatType.GROUP,
-                            enums.ChatType.SUPERGROUP,
-                        ]:
-                            if chat_id in db.active_calls:
-                                continue
-                            await ub.leave_chat(chat_id)
-                            left += 1
-                        await asyncio.sleep(5)
-                except Exception as e:
-                    logger.error(f"Auto-leave error for assistant {ub.me.username if hasattr(ub, 'me') and ub.me else 'Unknown'}: {e}")
-                    continue
-        except Exception as e:
-            logger.error(f"Critical error in auto_leave task: {e}")
-            await asyncio.sleep(60)  # Wait before retrying
-            continue
-
-
 async def track_time():
     while True:
         try:
@@ -188,7 +155,7 @@ async def update_timer(length=10):
 
 async def vc_watcher(sleep=15):
     alone_times = {}  # Track when assistant started being alone in VC
-    LEAVE_TIMEOUT = 300  # 5 minutes in seconds (hardcoded)
+    LEAVE_TIMEOUT = 1200  # 20 minutes in seconds
     
     while True:
         await asyncio.sleep(sleep)
@@ -196,8 +163,8 @@ async def vc_watcher(sleep=15):
         
         for chat_id in list(db.active_calls):
             try:
-                # Check if auto-leave is enabled for this chat
-                if not await db.get_autoleave(chat_id):
+                # Check if auto-leave is enabled globally
+                if not config.AUTO_LEAVE:
                     alone_times.pop(chat_id, None)
                     continue
                 
@@ -251,7 +218,5 @@ async def vc_watcher(sleep=15):
 
 # Always run VC watcher to check for empty voice chats
 tasks.append(asyncio.create_task(vc_watcher()))
-if config.AUTO_LEAVE:
-    tasks.append(asyncio.create_task(auto_leave()))
 tasks.append(asyncio.create_task(track_time()))
 tasks.append(asyncio.create_task(update_timer()))

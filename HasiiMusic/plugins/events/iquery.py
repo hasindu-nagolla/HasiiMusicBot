@@ -4,11 +4,12 @@
 # Lets users type @botname in any chat to search YouTube and share tracks.
 # ==============================================================================
 
-from py_yt import VideosSearch
+import asyncio
+import yt_dlp
 from pyrogram import types
 
-from HasiiMusic import app
-from HasiiMusic.helpers import buttons
+from HasiiMusic import app, yt
+from HasiiMusic.helpers import buttons, utils
 
 
 @app.on_inline_query(~app.bl_users)
@@ -18,35 +19,53 @@ async def inline_query_handler(_, query: types.InlineQuery):
         return
 
     try:
-        search = VideosSearch(text, limit=15)
-        results = (await search.next()).get("result", [])
+        def _extract():
+            cookie = yt.get_cookies() if yt.checked else None
+            ydl_opts = {
+                "quiet": True,
+                "extract_flat": True,
+                "cookiefile": cookie
+            }
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                return ydl.extract_info(f"ytsearch15:{text}", download=False)
+
+        results = await asyncio.to_thread(_extract)
+        if not results or "entries" not in results:
+            return
 
         answers = []
-        for video in results:
+        for video in results["entries"]:
+            if not video:
+                continue
+                
             title = video.get("title", "Unknown Title").title()
-            duration = video.get("duration", "N/A")
-            views = video.get("viewCount", {}).get("short", "N/A")
-            thumbnail = video.get("thumbnails", [{}])[
-                0].get("url", "").split("?")[0]
-            channel = video.get("channel", {}).get("name", "Unknown Channel")
-            channellink = video.get("channel", {}).get(
-                "link", "https://youtube.com")
-            link = video.get("link", "https://youtube.com")
-            published = video.get("publishedTime", "N/A")
+            
+            duration_sec = video.get("duration")
+            is_live = video.get("is_live", False)
+            if duration_sec is None and is_live:
+                duration = "LIVE"
+            else:
+                duration = utils.format_duration(int(duration_sec)) if duration_sec else "0:00"
+                
+            views = str(video.get("view_count", "N/A"))
+            thumbnail = video.get("thumbnails", [{}])[-1].get("url", "").split("?")[0] if video.get("thumbnails") else ""
+            channel = video.get("uploader", "Unknown Channel")
+            channellink = video.get("uploader_url", "https://youtube.com")
+            link = video.get("url") or video.get("webpage_url") or f"https://youtube.com/watch?v={video.get('id')}"
+            published = "N/A" # yt-dlp flat extract might not have this
 
-            description = f"{views} | {duration} | {channel} | {published}"
+            description = f"{views} views | {duration} | {channel}"
             caption = (
                 f"<b>Title:</b> <a href='{link}'>{title[:250]}</a>\n\n"
                 f"<b>Duration:</b> {duration}\n"
                 f"<b>Views:</b> <code>{views}</code>\n"
                 f"<b>Channel:</b> <a href='{channellink}'>{channel}</a>\n"
-                f"<b>Published:</b> {published}\n\n"
                 f"<u><i>Fetched by {app.name}</i></u>"
             )
 
             answers.append(
                 types.InlineQueryResultPhoto(
-                    photo_url=thumbnail,
+                    photo_url=thumbnail or config.PING_IMG, # fallback thumbnail
                     title=title,
                     description=description,
                     caption=caption,
@@ -56,5 +75,5 @@ async def inline_query_handler(_, query: types.InlineQuery):
 
         if answers:
             await app.answer_inline_query(query.id, results=answers, cache_time=5)
-    except:
+    except Exception as e:
         pass

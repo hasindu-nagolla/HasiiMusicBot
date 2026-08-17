@@ -10,7 +10,7 @@
   "auth_list": "<u><b>{0} இல் அங்கீகரிக்கப்பட்ட பயனர்கள் பட்டியல்:</b></u>\n",
   "auth_is_admin": "<blockquote>இந்த பயனர் ஏற்கனவே ஒரு <b>நிர்வாகி</b> ஆவார், அங்கீகரிக்கப்பட்ட பயனர்களாக சேர்க்க முடியாது.</blockquote>",
   "auto_left": "<blockquote>யாரும் என்னை கேட்காததால் நான் குரல் அரட்டையிலிருந்து (voice chat) வெளியேறுகிறேன்.</blockquote>",
-  "auto_end": "<blockquote>✅ <b>வரிசை முடிந்தது.</b>\n\nஸ்ட்ரீம் தானாகவே முடிந்தது.</blockquote>",
+  "queue_end_message": "<blockquote>✅ <b>வரிசை முடிந்தது.</b>\n\nஸ்ட்ரீம் தானாகவே முடிந்தது.</blockquote>",
   "bl_usage": "<blockquote><b>பயன்பாடு:</b>\n\n/{0} [chat_id|user_id]</blockquote>",
   "bl_invalid": "<blockquote>அரட்டை ஐடி மற்றும் பயனர் ஐடி மட்டுமே ஆதரிக்கப்படும்.</blockquote>",
   "bl_already": "<blockquote>இந்த அரட்டை ஏற்கனவே தடை செய்யப்பட்டுள்ளது (blacklisted).</blockquote>",

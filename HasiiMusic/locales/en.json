@@ -10,7 +10,7 @@
   "auth_list": "<u><b>ʟɪꜱᴛ ᴏꜰ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴜꜱᴇʀꜱ ɪɴ {0}:</b></u>\n",
   "auth_is_admin": "<blockquote>ᴛʜᴇ ᴜꜱᴇʀ ɪꜱ ᴀʟʀᴇᴀᴅʏ ᴀɴ <b>ᴀᴅᴍɪɴ</b> ᴀɴᴅ ᴄᴀɴ'ᴛ ʙᴇ ᴀᴅᴅᴇᴅ ᴛᴏ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴜꜱᴇʀꜱ.</blockquote>",
   "auto_left": "<blockquote>ɪ'ᴍ ʟᴇᴀᴠɪɴɢ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ʙᴇᴄᴀᴜꜱᴇ ɴᴏ ᴏɴᴇ ɪꜱ ʟɪꜱᴛᴇɴɪɴɢ ᴛᴏ ᴍᴇ.</blockquote>",
-  "auto_end": "<blockquote>✅ <b>Qᴜᴇᴜᴇ ꜰɪɴɪꜱʜᴇᴅ.</b>\n\nꜱᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ.</blockquote>",
+  "queue_end_message": "<blockquote>✅ <b>Qᴜᴇᴜᴇ ꜰɪɴɪꜱʜᴇᴅ.</b>\n\nꜱᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ.</blockquote>",
   "bl_usage": "<blockquote><b>ᴜꜱᴀɢᴇ:</b>\n\n/{0} [ᴄʜᴀᴛ_ɪᴅ|ᴜꜱᴇʀ_ɪᴅ]</blockquote>",
   "bl_invalid": "<blockquote>ᴏɴʟʏ ᴄʜᴀᴛ ɪᴅꜱ ᴀɴᴅ ᴜꜱᴇʀ ɪᴅꜱ ᴀʀᴇ ꜱᴜᴘᴘᴏʀᴛᴇᴅ.</blockquote>",
   "bl_already": "<blockquote>ᴛʜɪꜱ ᴄʜᴀᴛ ɪꜱ ᴀʟʀᴇᴀᴅʏ ʙʟᴀᴄᴋʟɪꜱᴛᴇᴅ.</blockquote>",

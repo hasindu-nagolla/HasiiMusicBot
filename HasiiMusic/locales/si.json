@@ -10,7 +10,7 @@
   "auth_list": "<u><b>{0} හි අනුමත පරිශීලකයින්ගේ ලැයිස්තුව:</b></u>\n",
   "auth_is_admin": "<blockquote>මෙම පරිශීලකයා දැනටමත් <b>පරිපාලකයෙකු</b> වන අතර අනුමත පරිශීලකයින්ට එක් කළ නොහැක.</blockquote>",
   "auto_left": "<blockquote>කිසිවෙකු මා හට සවන් නොදෙන බැවින් මම හඬ සංවාදයෙන් (voice chat) ඉවත් වෙමි.</blockquote>",
-  "auto_end": "<blockquote>✅ <b>පෝලිම අවසන් විය.</b>\n\nවිකාශනය ස්වයංක්‍රීයව අවසන් විය.</blockquote>",
+  "queue_end_message": "<blockquote>✅ <b>පෝලිම අවසන් විය.</b>\n\nවිකාශනය ස්වයංක්‍රීයව අවසන් විය.</blockquote>",
   "bl_usage": "<blockquote><b>භාවිතය:</b>\n\n/{0} [chat_id|user_id]</blockquote>",
   "bl_invalid": "<blockquote>chat id සහ user id පමණක් සහාය දක්වයි.</blockquote>",
   "bl_already": "<blockquote>මෙම සමූහය දැනටමත් අසාදු ලේඛනගත කර ඇත (blacklisted).</blockquote>",

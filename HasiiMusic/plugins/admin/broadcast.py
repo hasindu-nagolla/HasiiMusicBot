@@ -21,6 +21,7 @@ broadcasting: bool = False
 @app.on_message(filters.command(["broadcast"]) & app.sudo_filter)
 @lang.language()
 async def broadcast_message(_, message: types.Message) -> None:
+    
     # Auto-delete command message
     try:
         await message.delete()

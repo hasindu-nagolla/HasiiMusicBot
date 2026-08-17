@@ -67,7 +67,7 @@ class Userbot(Client):
             logger.error(f"   • Invalid session string (STRING_SESSION{num})")
             logger.error(f"   • Session logged out from another device")
             logger.error(f"   • Network/connectivity issues")
-            return  # Don't raise SystemExit, just skip this assistant
+            return
 
         try:
             await client.send_message(config.LOGGER_ID, f"Assistant {num} Started")
@@ -88,9 +88,8 @@ class Userbot(Client):
         logger.info(f"👤 Assistant {num} started as @{client.username}")
 
     async def boot(self):
-        """
-        Asynchronously starts the assistants.
-        """
+
+        #Asynchronously starts the assistants.
         if config.SESSION1:
             await self.boot_client(1, self.one)
         if config.SESSION2:
@@ -99,9 +98,8 @@ class Userbot(Client):
             await self.boot_client(3, self.three)
 
     async def exit(self):
-        """
-        Asynchronously stops the assistants.
-        """
+
+        # Asynchronously stops the assistants.
         try:
             if config.SESSION1 and hasattr(self.one, 'is_connected') and self.one.is_connected:
                 await self.one.stop()

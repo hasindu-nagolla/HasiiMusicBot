@@ -17,7 +17,6 @@ from pathlib import Path
 from typing import Optional, Union
 
 from pyrogram import enums, types
-from py_yt import Playlist, VideosSearch
 from HasiiMusic import config, logger
 from HasiiMusic.helpers import Track, utils
 
@@ -206,27 +205,40 @@ class YouTube:
                     is_live=is_live,
                 )
             else:
-                _search = VideosSearch(query, limit=1)
-                results = await _search.next()
+                def _extract_search():
+                    cookie = self.get_cookies() if self.checked else None
+                    ydl_opts = {
+                        "quiet": True,
+                        "extract_flat": True,
+                        "cookiefile": cookie
+                    }
+                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                        return ydl.extract_info(f"ytsearch1:{query}", download=False)
+                        
+                results = await asyncio.to_thread(_extract_search)
                 
-                if not results or not results.get("result"):
+                if not results or "entries" not in results or not results["entries"]:
                     return None
                     
-                data = results["result"][0]
-                duration = data.get("duration")
-                is_live = duration is None or duration == "LIVE"
+                data = results["entries"][0]
+                duration_sec = data.get("duration")
+                is_live = data.get("is_live", False)
+                if duration_sec is None and is_live:
+                    duration = "LIVE"
+                    duration_sec = 0
+                else:
+                    duration = utils.format_duration(int(duration_sec)) if duration_sec else "0:00"
 
                 track = Track(
                     id=data.get("id"),
-                    channel_name=data.get("channel", {}).get("name"),
-                    duration=duration if not is_live else "LIVE",
-                    duration_sec=0 if is_live else utils.to_seconds(duration),
+                    channel_name=data.get("uploader") or data.get("channel", ""),
+                    duration=duration,
+                    duration_sec=int(duration_sec) if duration_sec else 0,
                     message_id=m_id,
-                    title=data.get("title")[:25],
-                    thumbnail=data.get(
-                        "thumbnails", [{}])[-1].get("url").split("?")[0],
-                    url=data.get("link"),
-                    view_count=data.get("viewCount", {}).get("short"),
+                    title=(data.get("title") or "")[:25],
+                    thumbnail=data.get("thumbnails", [{}])[-1].get("url", "").split("?")[0] if data.get("thumbnails") else "",
+                    url=data.get("url") or data.get("webpage_url") or f"https://youtube.com/watch?v={data.get('id')}",
+                    view_count=str(data.get("view_count", "")),
                     is_live=is_live,
                 )
 
@@ -245,36 +257,41 @@ class YouTube:
 
     async def playlist(self, limit: int, user: str, url: str) -> list[Track]:
         try:
-            plist = await Playlist.get(url)
+            def _extract_playlist():
+                cookie = self.get_cookies() if self.checked else None
+                ydl_opts = {
+                    "quiet": True,
+                    "extract_flat": "in_playlist",
+                    "cookiefile": cookie
+                }
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    return ydl.extract_info(url, download=False)
+                    
+            plist = await asyncio.to_thread(_extract_playlist)
             tracks = []
 
             # Check for videos
-            if not plist or "videos" not in plist or not plist["videos"]:
+            if not plist or "entries" not in plist or not plist["entries"]:
                 return []
 
-            for data in plist["videos"][:limit]:
+            for data in plist["entries"][:limit]:
                 try:
-                    # Get thumbnail
-                    thumbnails = data.get("thumbnails", [])
-                    thumbnail_url = ""
-                    if thumbnails and len(thumbnails) > 0:
-                        thumbnail_url = thumbnails[-1].get(
-                            "url", "").split("?")[0]
-
-                    # Get link
-                    link = data.get("link", "")
-                    if "&list=" in link:
-                        link = link.split("&list=")[0]
+                    duration_sec = data.get("duration")
+                    is_live = data.get("is_live", False)
+                    if duration_sec is None and is_live:
+                        duration = "LIVE"
+                        duration_sec = 0
+                    else:
+                        duration = utils.format_duration(int(duration_sec)) if duration_sec else "0:00"
 
                     track = Track(
                         id=data.get("id", ""),
-                        channel_name=data.get("channel", {}).get("name", ""),
-                        duration=data.get("duration", "0:00"),
-                        duration_sec=utils.to_seconds(
-                            data.get("duration", "0:00")),
+                        channel_name=data.get("uploader") or data.get("channel", ""),
+                        duration=duration,
+                        duration_sec=int(duration_sec) if duration_sec else 0,
                         title=(data.get("title", "Unknown")[:25]),
-                        thumbnail=thumbnail_url,
-                        url=link,
+                        thumbnail=data.get("thumbnails", [{}])[-1].get("url", "").split("?")[0] if data.get("thumbnails") else "",
+                        url=data.get("url") or data.get("webpage_url") or f"https://youtube.com/watch?v={data.get('id')}",
                         user=user,
                         view_count="",
                     )
@@ -284,13 +301,9 @@ class YouTube:
                     continue
 
             return tracks
-        except KeyError as e:
-            # YouTube API changed
-            raise Exception(
-                f"Failed to parse playlist. YouTube may have changed their structure.")
         except Exception as e:
-            # Re-raise
-            raise
+            logger.warning(f"⚠️ YouTube playlist extraction failed for '{url}': {e}")
+            return []
 
     async def download(self, video_id: str, is_live: bool = False, video: bool = False) -> Optional[str]:
         # Lazily resolve query or Spotify link to a YouTube video ID if needed
