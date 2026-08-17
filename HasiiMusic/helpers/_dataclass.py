@@ -20,6 +20,10 @@ class Media:
     user: str = None
     is_live: bool = False
     video: bool = False
+    playlist_name: str = None
+    playlist_url: str = None
+    playlist_type: str = None
+    playlist_index: int = 0
 
 
 @dataclass
@@ -38,3 +42,7 @@ class Track:
     view_count: str = None
     is_live: bool = False
     video: bool = False
+    playlist_name: str = None
+    playlist_url: str = None
+    playlist_type: str = None
+    playlist_index: int = 0
