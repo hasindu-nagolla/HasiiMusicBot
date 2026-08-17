@@ -7,9 +7,7 @@
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.enums import ChatMembersFilter, ParseMode
-
 from HasiiMusic import app, lang
-
 
 @app.on_message(filters.command("bots") & filters.group)
 @lang.language()

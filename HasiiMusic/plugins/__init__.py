@@ -7,7 +7,6 @@
 
 from pathlib import Path
 
-
 def _list_modules():
     mod_dir = Path(__file__).parent
     modules = []

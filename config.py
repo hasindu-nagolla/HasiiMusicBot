@@ -9,79 +9,53 @@ from os import getenv
 from typing import List
 from dotenv import load_dotenv
 
-# Load environment variables from .env file (create one from sample.env)
 load_dotenv()
-
 
 class Config:
     def __init__(self):
 
-        # ============ TELEGRAM API CREDENTIALS ============
-        # Get these from https://my.telegram.org
-        # Telegram API ID (numeric)
+        # TELEGRAM API CREDENTIALS
         self.API_ID: int = int(getenv("API_ID", "0"))
-        # Telegram API Hash (hexadecimal)
         self.API_HASH: str = getenv("API_HASH", "")
 
-        # ============ BOT CONFIGURATION ============
-        # Bot token from @BotFather
+        # BOT CONFIGURATION
         self.BOT_TOKEN: str = getenv("BOT_TOKEN", "")
-        # Group/channel ID for logs (must be negative)
         self.LOGGER_ID: int = int(getenv("LOGGER_ID", "0"))
-        # Your user ID (get from @userinfobot)
         self.OWNER_ID: int = int(getenv("OWNER_ID", "0"))
 
-        # ============ DATABASE CONFIGURATION ============
-        # MongoDB connection URL (mongodb+srv://...)
+        # DATABASE CONFIGURATION
         self.MONGO_URL: str = getenv("MONGO_DB_URI", "")
 
-        # ============ MUSIC BOT LIMITS ============
-        # Convert minutes to seconds for duration limit
-        # Max song duration (default: 300 min)
+        # MUSIC BOT LIMITS
         self.DURATION_LIMIT: int = int(getenv("DURATION_LIMIT", "300")) * 60
-        # Max songs in queue (default: 30)
         self.QUEUE_LIMIT: int = int(getenv("QUEUE_LIMIT", "30"))
-        # Max songs from playlist (default: 20)
         self.PLAYLIST_LIMIT: int = int(getenv("PLAYLIST_LIMIT", "20"))
 
-        # ============ ASSISTANT/USERBOT SESSIONS ============
-        # Pyrogram session strings - get from @StringFatherBot
-        # You can have up to 3 assistants for handling multiple groups
-        # Primary assistant (required)
+        # ASSISTANT SESSIONS
+        # required at least one
         self.SESSION1: str = getenv("STRING_SESSION", "")
-        # Secondary assistant (optional)
         self.SESSION2: str = getenv("STRING_SESSION2", "")
-        # Tertiary assistant (optional)
         self.SESSION3: str = getenv("STRING_SESSION3", "")
 
-        # ============ SUPPORT LINKS ============
+        # SUPPORT LINKS
         self.SUPPORT_CHANNEL: str = getenv(
             "SUPPORT_CHANNEL", "https://t.me/hasiimusic")
         self.SUPPORT_CHAT: str = getenv("SUPPORT_CHAT", "https://t.me/TheInfinityAI")
 
-        # ============ EXCLUDED CHATS ============
-        # Parse comma-separated chat IDs that assistants should never leave
+        # EXCLUDED CHATS
         self.EXCLUDED_CHATS: List[int] = self._parse_excluded_chats()
 
-        # ============ FEATURE FLAGS ============
-        # Auto-end stream when queue is empty
+        # FEATURE FLAGS
         self.QUEUE_END_MESSAGE: bool = self._str_to_bool(getenv("QUEUE_END_MESSAGE", "False"))
-        # Auto-leave inactive chats
         self.AUTO_LEAVE: bool = self._str_to_bool(getenv("AUTO_LEAVE", "False"))
-        # Enable/disable thumbnail generation (set False to use default thumb)
         self.THUMB_GEN: bool = self._str_to_bool(getenv("THUMB_GEN", "True"))
-        # Enable/disable video playback commands (/vplay)
         self.VIDEO_PLAY: bool = self._str_to_bool(getenv("VIDEO_PLAY", "False"))
-        # Maximum video height (pixels) for /vplay download AND playback
-        # Lower = less CPU usage. Recommended: 480 for 100+ groups
         self.VIDEO_MAX_HEIGHT: int = self._parse_video_height()
 
-        # ============ YOUTUBE COOKIES ============
-        # Parse space-separated cookie URLs for age-restricted content
+        # YOUTUBE COOKIES
         self.COOKIES_URL: List[str] = self._parse_cookies()
 
-        # ============ IMAGE URLS ============
-        # URLs for various bot images
+        # IMAGE URLS
         self.DEFAULT_THUMB: str = getenv(
             "DEFAULT_THUMB",
             "https://files.catbox.moe/kgrs8f.png"  # Default thumbnail
@@ -93,8 +67,7 @@ class Config:
         self.RADIO_IMG: str = getenv(
             "RADIO_IMG", "https://files.catbox.moe/t03fzk.png")    # Radio command image
 
-        # ============ MODERATION ============
-        # List of usernames to exclude from admin mentions
+        # MODERATION
         self.EXCLUDED_USERNAMES: List[str] = getenv("EXCLUDED_USERNAMES", "").split()
 
     def _parse_video_height(self) -> int:

@@ -20,8 +20,7 @@ from HasiiMusic import config, logger
 
 class Bot(pyrogram.Client):
 
-    # This class sets up the bot and manages its startup and shutdown.
-
+    # Sets up the bot and handles starting and stopping it.
 
     def __init__(self):
         # Initialize the bot client.
@@ -39,7 +38,7 @@ class Bot(pyrogram.Client):
         self.owner: int = config.OWNER_ID
         self.logger: int = config.LOGGER_ID
         self.bl_users: pyrogram.filters.Filter = pyrogram.filters.user()
-        self.sudoers: set = {self.owner}  # Store sudo user IDs
+        self.sudoers: set = {self.owner}  # keep track of sudo users
         self.sudo_filter: pyrogram.filters.Filter = pyrogram.filters.user(
             self.owner)
 

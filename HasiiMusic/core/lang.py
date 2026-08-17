@@ -13,7 +13,7 @@ from pathlib import Path
 
 from HasiiMusic import db, logger
 
-# Supported language codes and their display names
+# supported languages and their display names
 lang_codes = {
     "en": "🇺🇸 English",
     "si": "🇱🇰 සිංහල",
@@ -26,7 +26,7 @@ lang_codes = {
 
 
 class LangDict(dict):
-    """A dictionary that falls back to a secondary dictionary for missing keys."""
+    # dictionary with a fallback for missing keys
     def __init__(self, primary_dict, fallback_dict):
         super().__init__(primary_dict)
         self.fallback = fallback_dict
@@ -34,7 +34,7 @@ class LangDict(dict):
     def __getitem__(self, key):
         try:
             val = super().__getitem__(key)
-            if not val:  # If value is empty string, fallback
+            if not val:  # use the fallback if the value is empty
                 return self.fallback.get(key, key)
             return val
         except KeyError:
@@ -42,12 +42,10 @@ class LangDict(dict):
 
 
 class Language:
-    """
-    Language class for managing multilingual support using JSON language files.
-    """
+    #Handles multiple languages using JSON translation files.
 
     def __init__(self):
-        """Initialize the language system and load all translation files."""
+        # set up the language system and load translation files
         self.lang_codes = lang_codes
         # Directory containing translation files
         self.lang_dir = Path("HasiiMusic/locales")
@@ -67,7 +65,7 @@ class Language:
             else:
                 logger.warning(f"Language file not found: {lang_file}")
         
-        # Ensure english is always present
+        # make sure English is always available
         if "en" not in languages:
             languages["en"] = {}
             
@@ -75,7 +73,7 @@ class Language:
         return languages
 
     async def get_lang(self, chat_id: int) -> dict:
-        """Get the translation dictionary for a specific chat."""
+        # get the translations for a chat
         lang_code = await db.get_lang(chat_id)
         if lang_code not in self.languages:
             lang_code = "en"

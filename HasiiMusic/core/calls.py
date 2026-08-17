@@ -23,19 +23,17 @@ from pytgcalls.pytgcalls_session import PyTgCallsSession
 from HasiiMusic import app, config, db, lang, logger, preload, queue, userbot, yt
 from HasiiMusic.helpers import Media, Track, buttons, thumb
 
-# Suppress pytgcalls harmless errors (library bugs - not critical)
-
-
+# hide harmless PyTgCalls errors from the logs
 class PyTgCallsErrorFilter(logging.Filter):
     def filter(self, record):
         msg = record.getMessage()
-        # Filter out UpdateGroupCall errors
+        # ignore UpdateGroupCall errors
         if 'UpdateGroupCall' in msg:
             return False
-        # Filter out ConnectionNotFound errors (happens when call ends but updates still arrive)
+        # ignore connection errors after a call ends
         if 'Connection with chat id' in msg and 'not found' in msg:
             return False
-        # Filter out InvalidStateError from pytgcalls clear_call (known library race condition)
+        # ignore InvalidStateError from PyTgCalls clear_call
         if 'invalid state' in msg.lower() and 'set_exception' in msg:
             return False
         return True
@@ -47,7 +45,7 @@ logging.getLogger('pyrogram.dispatcher').addFilter(PyTgCallsErrorFilter())
 class TgCall(PyTgCalls):
     def __init__(self):
         self.clients = []
-        self._chat_locks = {}  # Unified lock to prevent concurrent playback mutations per chat
+        self._chat_locks = {}  # one lock for each chat to avoid playback conflicts
         self._session_gen = {}
         self._track_index = {}
         self._pending_transitions = set()
@@ -58,7 +56,7 @@ class TgCall(PyTgCalls):
         return self._chat_locks[chat_id]
 
     async def _edit_media_with_retry(self, message: Message, media_obj: InputMediaPhoto, reply_markup):
-        """Edit media with basic FloodWait handling."""
+        #edit media and handle FloodWait
         try:
             return await message.edit_media(media=media_obj, reply_markup=reply_markup)
         except errors.FloodWait as fw:
@@ -73,7 +71,7 @@ class TgCall(PyTgCalls):
             return None
 
     async def _send_photo_with_retry(self, chat_id: int, photo, caption: str, reply_markup):
-        """Send photo with FloodWait handling."""
+        #Send photo with FloodWait handling.
         try:
             return await app.send_photo(
                 chat_id=chat_id,
@@ -157,10 +155,10 @@ class TgCall(PyTgCalls):
             # Small delay to let group call state stabilize after leaving
             await asyncio.sleep(0.5)
         except (ConnectionNotFound, exceptions.NotInCallError):
-            # Expected: userbot is not in a call
+            # the userbot is already out of the call
             pass
         except Exception as e:
-            # Only log unexpected errors
+            # unexpected errors
             error_msg = str(e).lower()
             if not any(ignore in error_msg for ignore in [
                 "not in a call",
@@ -202,7 +200,7 @@ class TgCall(PyTgCalls):
         client = await db.get_assistant(chat_id)
         _lang = await lang.get_lang(chat_id)
 
-        # Generate thumbnail only if THUMB_GEN is enabled, otherwise use default
+        # Generate thumbnail only if THUMB_GEN is enabled. otherwise use default
         if config.THUMB_GEN and isinstance(media, Track):
             _thumb = await thumb.generate(media)
         else:
@@ -215,7 +213,7 @@ class TgCall(PyTgCalls):
                 logger.error(f"No file path for media in {chat_id}")
                 return
 
-        # Validate chat_id - check if it's a valid group
+        # make sure this is a valid group chat
         try:
             chat = await app.get_chat(chat_id)
             if chat.type not in [enums.ChatType.SUPERGROUP, enums.ChatType.GROUP]:
@@ -226,18 +224,11 @@ class TgCall(PyTgCalls):
         except errors.RPCError as e:
             raise
 
-        # Configure audio stream with optimized buffering for lag-free playback
-        # PERFORMANCE FIX: Increased buffers prevent stuttering/lagging during playback
+        # Configure audio stream with optimized buffering for lag-free playback. larger buffers help reduce playback lag
         if seek_time > 1:
-            # Seeking: Still need buffers but skip to position first
+            # seek to the position first and keep the buffers
             ffmpeg_params = f"-ss {seek_time} -probesize 10M -analyzeduration 5M -rtbufsize 5M -fflags +genpts+igndts"
         else:
-            # Normal playback with aggressive buffering:
-            # - probesize 10M: Large input buffer (prevents underruns)
-            # - analyzeduration 5M: Analyze more data (better format detection)
-            # - rtbufsize 5M: Real-time buffer (crucial for network streams)
-            # - fflags +genpts+igndts: Generate PTS, ignore DTS (smooth playback)
-            # - sync ext: External sync (reduces A/V desync)
             ffmpeg_params = "-probesize 10M -analyzeduration 5M -rtbufsize 5M -fflags +genpts+igndts -sync ext"
 
         is_video = getattr(media, "video", False)
@@ -256,8 +247,8 @@ class TgCall(PyTgCalls):
         }
         
         if is_video:
-            # Use VIDEO_MAX_HEIGHT from .env for playback resolution
-            # Lower resolution + FPS = significantly less CPU usage
+            # use VIDEO_MAX_HEIGHT for the playback resolution.
+            # lower resolution and FPS use less CPU.
             h = config.VIDEO_MAX_HEIGHT or 720
             if h <= 360:
                 w, fps = 640, 15
@@ -277,7 +268,7 @@ class TgCall(PyTgCalls):
             # ALWAYS attempt to leave the call before starting a new stream to clear ghost streams
             # even if db.get_call says False, because PyTgCalls might be out of sync
             await client.leave_call(chat_id, close=False)
-            await asyncio.sleep(0.3)  # Small delay to let PyTgCalls process the leave
+            await asyncio.sleep(0.3)  # give PyTgCalls a moment to finish leaving
         except (ConnectionNotFound, exceptions.NotInCallError):
             pass
         except Exception as e:
@@ -308,7 +299,7 @@ class TgCall(PyTgCalls):
                     else:
                         raise
                 except TransportParseException:
-                    # WebRTC transport negotiation failed - VC may have ended
+                    # WebRTC transport negotiation failed, VC may have ended
                     if attempt < max_retries - 1:
                         logger.debug(
                             f"Transport not found for {chat_id}, retrying... (attempt {attempt + 1}/{max_retries})")
@@ -450,7 +441,7 @@ class TgCall(PyTgCalls):
                     pass
             await self._play_next_impl(chat_id)
         except TransportParseException:
-            # All retries failed - voice chat likely doesn't exist
+            # all retries failed, so the voice chat is probably gone
             logger.warning(f"Transport not found for {chat_id} after retries, stopping.")
             await self._stop_impl(chat_id)
             if message:
@@ -503,7 +494,7 @@ class TgCall(PyTgCalls):
             logger.error(f"Error in replay for {chat_id}: {e}", exc_info=True)
 
     async def seek_stream(self, chat_id: int, seconds: int) -> bool:
-        """Seek to a specific position in the current stream."""
+        """seek to a position in the current stream"""
         try:
             if not await db.get_call(chat_id):
                 return False
@@ -669,7 +660,7 @@ class TgCall(PyTgCalls):
                 try:
                     msg = await app.send_message(chat_id=chat_id, text=_lang["play_next"])
                 except errors.FloodWait as fw:
-                    # Do not block playback on UI flood waits; continue without message.
+                    # keep playback running even if the status message hits FloodWait
                     logger.warning(
                         f"FloodWait in play_next for {chat_id}: skipping status message ({fw.value}s)")
                     msg = None

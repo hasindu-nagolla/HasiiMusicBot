@@ -5,11 +5,8 @@
 # ==============================================================================
 
 from pyrogram import filters, types
-
 from HasiiMusic import app, db, lang
 
-
-#  ============== CHAT BLACKLIST COMMANDS ==============
 
 @app.on_message(filters.command(["blacklistchat"]) & app.sudo_filter)
 @lang.language()
