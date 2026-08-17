@@ -57,15 +57,6 @@ async def auto_delete(message: types.Message, delay: int = 15):
     except Exception:
         pass
 
-
-def playlist_to_queue(chat_id: int, tracks: list) -> str:
-    text = "<blockquote expandable>"
-    for track in tracks:
-        pos = queue.add(chat_id, track)  # Add track to queue (returns 0-based index)
-        text += f"<b>{pos}.</b> {track.title}\n"  # Show actual queue position
-    text = text[:1948] + "</blockquote>"  # Limit message length
-    return text
-
 @app.on_message(
     filters.command(
         [
@@ -128,7 +119,7 @@ async def play_hndlr(
             if spotify.is_playlist(url):
                 try:
                     tracks = await spotify.playlist(
-                        0, mention, url
+                        config.PLAYLIST_LIMIT, mention, url
                     )
                 except Exception as e:
                     await safe_edit(
@@ -234,16 +225,8 @@ async def play_hndlr(
                 ),
             )
             if tracks:
-                added = playlist_to_queue(chat_id, tracks)
-                try:
-                    q_msg = await app.send_message(
-                        chat_id=m.chat.id,
-                        text=m.lang["playlist_queued"].format(len(tracks)) + added,
-                    )
-                    asyncio.create_task(auto_delete(q_msg, 15))
-                except Exception:
-                    # Can't send message, continue anyway
-                    pass
+                for track in tracks:
+                    queue.add(chat_id, track)
             
             # ✨ NEW: Start preloading queued tracks in background
             try:
@@ -329,15 +312,6 @@ async def play_hndlr(
                 
             )
         return
-    if not tracks:
-        return
-    added = playlist_to_queue(chat_id, tracks)
-    try:
-        q_msg = await app.send_message(
-            chat_id=m.chat.id,
-            text=m.lang["playlist_queued"].format(len(tracks)) + added,
-        )
-        asyncio.create_task(auto_delete(q_msg, 15))
-    except Exception:
-        # Can't send message, but playback is working
-        pass
+    if tracks:
+        for track in tracks:
+            queue.add(chat_id, track)

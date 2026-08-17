@@ -23,6 +23,7 @@ class Media:
     playlist_name: str = None
     playlist_url: str = None
     playlist_type: str = None
+    playlist_index: int = 0
 
 
 @dataclass
@@ -44,3 +45,4 @@ class Track:
     playlist_name: str = None
     playlist_url: str = None
     playlist_type: str = None
+    playlist_index: int = 0

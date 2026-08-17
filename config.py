@@ -39,10 +39,12 @@ class Config:
         # Convert minutes to seconds for duration limit
         # Max song duration (default: 300 min)
         self.DURATION_LIMIT: int = int(getenv("DURATION_LIMIT", "300")) * 60
-        # Max songs in queue (default: 30)
-        self.QUEUE_LIMIT: int = int(getenv("QUEUE_LIMIT", "30"))
-        # Max songs from playlist (default: 20)
+        # Max songs in queue (default: 20)
+        self.QUEUE_LIMIT: int = int(getenv("QUEUE_LIMIT", "20"))
+        # Max songs from playlist per batch (default: 20)
         self.PLAYLIST_LIMIT: int = int(getenv("PLAYLIST_LIMIT", "20"))
+        # Max total songs to autoload from a playlist (default: 60)
+        self.PLAYLIST_MAX: int = int(getenv("PLAYLIST_MAX", "60"))
 
         # ============ SPOTIFY API (Optional) ============
         # Spotify API credentials from https://developer.spotify.com/dashboard

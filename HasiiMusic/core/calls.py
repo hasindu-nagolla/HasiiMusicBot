@@ -674,6 +674,10 @@ class TgCall(PyTgCalls):
                         logger.info(f"Queue altered during play_next download for {chat_id}")
                         return
                     if not media.file_path:
+                        if len(queue.get_queue(chat_id)) > 1:
+                            logger.warning(
+                                f"Skipping unplayable track '{getattr(media, 'title', 'unknown')}' in {chat_id}")
+                            return await self._play_next_impl(chat_id)
                         await self._stop_impl(chat_id)
                         if msg:
                             try:
@@ -716,6 +720,25 @@ class TgCall(PyTgCalls):
                 except Exception as e:
                     logger.debug(
                         f"Error starting preload after play_next for {chat_id}: {e}")
+
+                # Autoload next playlist batch in background when reaching track 28 (up to PLAYLIST_MAX)
+                pl_url = getattr(media, "playlist_url", None)
+                pl_idx = getattr(media, "playlist_index", 0)
+                pl_limit = getattr(config, "PLAYLIST_LIMIT", 30)
+                pl_max = getattr(config, "PLAYLIST_MAX", 100)
+                if pl_url and pl_idx > 0 and (pl_idx % pl_limit == (pl_limit - 2) or pl_idx % pl_limit == 28):
+                    next_offset = (pl_idx // pl_limit + 1) * pl_limit
+                    if next_offset < pl_max:
+                        batch_limit = min(pl_limit, pl_max - next_offset)
+                        asyncio.create_task(
+                            self._fetch_next_playlist_batch(
+                                chat_id=chat_id,
+                                playlist_url=pl_url,
+                                user=media.user,
+                                offset=next_offset,
+                                limit=batch_limit,
+                            )
+                        )
             except Exception as e:
                 logger.error(
                     f"Error in play_next for {chat_id}: {e}", exc_info=True)
@@ -723,6 +746,22 @@ class TgCall(PyTgCalls):
                     await self._stop_impl(chat_id)
                 except Exception:
                     pass
+
+    async def _fetch_next_playlist_batch(
+        self, chat_id: int, playlist_url: str, user: str, offset: int, limit: int = 30
+    ) -> None:
+        try:
+            from HasiiMusic import spotify, queue
+            if spotify.valid(playlist_url) and spotify.is_playlist(playlist_url):
+                next_tracks = await spotify.playlist(limit, user, playlist_url, offset=offset)
+                if next_tracks:
+                    for track in next_tracks:
+                        queue.add(chat_id, track)
+                    logger.info(
+                        f"📋 Autoloaded next {len(next_tracks)} playlist tracks (offset {offset}) for chat {chat_id}"
+                    )
+        except Exception as e:
+            logger.debug(f"Could not autoload next playlist batch for {chat_id}: {e}")
 
     async def ping(self) -> float:
         pings = [client.ping for client in self.clients]
