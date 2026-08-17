@@ -31,7 +31,7 @@ async def auto_leave():
             for ub in userbot.clients:
                 left = 0
                 try:
-                    for dialog in await ub.get_dialogs():
+                    async for dialog in ub.get_dialogs():
                         chat_id = dialog.chat.id
                         if left >= 20:
                             break
