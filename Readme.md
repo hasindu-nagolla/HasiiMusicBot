@@ -1,12 +1,7 @@
 <div align="center">
 
-<img src="https://i.ibb.co/cKzySsgr/yy.png" alt="Hasii Music" width="400"/>
-
 # 🎵 ˹ʜᴀꜱɪɪ ꭙ ᴍᴜꜱɪᴄ˼
-
 ### A Modern Telegram Music Bot for High-Quality Voice Chat Streaming
-
-An open-source Telegram music bot built with **Python**, **Pyrogram**, **PyTgCalls**, and **FFmpeg**, delivering fast, reliable, and high-quality audio streaming directly to Telegram voice chats.
 
 <br>
 
@@ -14,39 +9,21 @@ An open-source Telegram music bot built with **Python**, **Pyrogram**, **PyTgCal
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/hasindu-nagolla/HasiiMusicBot?style=for-the-badge)](https://github.com/hasindu-nagolla/HasiiMusicBot/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/hasindu-nagolla/HasiiMusicBot?style=for-the-badge)](https://github.com/hasindu-nagolla/HasiiMusicBot/network/members)
-[![GitHub Issues](https://img.shields.io/github/issues/hasindu-nagolla/HasiiMusicBot?style=for-the-badge)](https://github.com/hasindu-nagolla/HasiiMusicBot/issues)
-
 [![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/TheInfinityAI)
 [![Telegram Support](https://img.shields.io/badge/Telegram-Support-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/Hasindu_Lakshan)
+
+<img src="https://github.com/user-attachments/assets/0a447dfd-961f-4f81-87e1-976392320c49" alt="Hasii Music" width="720" height="auto"/>
+
+Open-source Telegram music bot built with **Python**, **Pyrogram**, **PyTgCalls** and **FFmpeg**.<br>
+Delivering fast, reliable and high-quality audio streaming directly to Telegram voice chats.
 
 </div>
 
 ---
 
-## 📖 About
+# 📖 About
 
-**˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼** is a powerful and modern Telegram music bot built for seamless voice chat streaming. It enables users to play music directly in Telegram voice chats using YouTube links, search queries, and live radio stations while offering administrators complete control over playback.
-
-Designed with performance, stability, and simplicity in mind, the project combines modern asynchronous technologies to provide a fast, reliable, and highly customizable music streaming experience. Whether you're hosting a small community or managing a large Telegram group, Hasii Music is built to deliver consistent performance with minimal configuration.
-
----
-
-# 📑 Table of Contents
-
-- [📖 About](#-about)
-- [⭐ Why Hasii Music?](#-why-hasii-music)
-- [✨ Features](#-features)
-- [🏗 Tech Stack](#-tech-stack)
-- [📋 Requirements](#-requirements)
-- [🚀 Quick Start](#-quick-start)
-- [⚙️ Environment Variables](#️-environment-variables)
-- [🛠 Installation](#️-installation)
-- [📖 Commands](#-commands)
-- [📂 Project Structure](#-project-structure)
-- [🤝 Contributing](#-contributing)
-- [📞 Support](#-support)
-- [🙏 Credits](#-credits)
-- [📄 License](#-license)
+**˹ʜᴀꜱɪɪ ᴍᴜꜱɪᴄ˼** is a powerful and modern Telegram music bot built for seamless voice chat streaming. It enables users to play music directly in Telegram voice chats using YouTube links, search queries, and live radio stations while offering administrators complete control over playback. Designed with performance, stability, and simplicity in mind, the project combines modern asynchronous technologies to provide a fast, reliable, and highly customizable music streaming experience. Whether you're hosting a small community or managing a large Telegram group, Hasii Music is built to deliver consistent performance with minimal configuration.
 
 ---
 
