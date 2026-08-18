@@ -150,7 +150,7 @@ class YouTube:
             return link.split("&si")[0].split("?si")[0]
         return None
 
-    async def search(self, query: str, m_id: int) -> Track | None:
+    async def search(self, query: str, m_id: int, music: bool = False) -> Track | None:
         # Check cache (10 min TTL)
         cache_key = query
         current_time = asyncio.get_running_loop().time()
@@ -213,7 +213,8 @@ class YouTube:
                         "cookiefile": cookie
                     }
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                        return ydl.extract_info(f"ytsearch1:{query}", download=False)
+                        prefix = "ytmsearch1" if music else "ytsearch1"
+                        return ydl.extract_info(f"{prefix}:{query}", download=False)
                         
                 results = await asyncio.to_thread(_extract_search)
                 

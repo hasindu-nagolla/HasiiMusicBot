@@ -650,7 +650,9 @@ class TgCall(PyTgCalls):
 
                 if not re.fullmatch(r"[A-Za-z0-9_-]{11}", media.id) or not getattr(media, "thumbnail", None):
                     try:
-                        resolved = await yt.search(media.id, 0)
+                        # use YouTube Music search for spotify tracks, regular YT for everything else
+                        is_spotify_track = getattr(media, "playlist_type", None) in ("playlist", "album", "artist")
+                        resolved = await yt.search(media.id, 0, music=is_spotify_track)
                         if resolved:
                             media.id = resolved.id
                             if resolved.thumbnail:
