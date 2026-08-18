@@ -370,7 +370,7 @@ class Spotify:
                 )
                 tracks.append(track)
 
-            logger.info(f"📋 Loaded {len(tracks)} raw tracks (offset {offset}) from Spotify {item_type} ({collection_title}).")
+
             return tracks
 
         except Exception as e:
