@@ -167,6 +167,10 @@ class YouTube:
                 fresh.video = False
                 return fresh
 
+        # Optimize query for Spotify tracks to get highest quality official audio
+        if music and not query.lower().endswith("audio"):
+            query = f"{query} Official Audio"
+            
         try:
             if self.valid(query):
                 def _extract():
