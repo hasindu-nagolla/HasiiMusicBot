@@ -213,8 +213,7 @@ class YouTube:
                         "cookiefile": cookie
                     }
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                        prefix = "ytmsearch1" if music else "ytsearch1"
-                        return ydl.extract_info(f"{prefix}:{query}", download=False)
+                        return ydl.extract_info(f"ytsearch1:{query}", download=False)
                         
                 results = await asyncio.to_thread(_extract_search)
                 
