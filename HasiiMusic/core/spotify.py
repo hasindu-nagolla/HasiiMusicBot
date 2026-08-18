@@ -209,8 +209,7 @@ class Spotify:
             if not query:
                 logger.warning(f"⚠️ Could not extract track details for {url}")
                 return None
-            logger.info(f"🎵 Spotify track resolved: '{query}'. Searching YouTube...")
-            return await yt.search(query, m_id)
+            return await yt.search(query, m_id, music=True)
         except Exception as e:
             logger.error(f"❌ Spotify single track error: {e}")
             return None
