@@ -8,11 +8,12 @@ from pyrogram import filters
 from pyrogram import types
 from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden, ChatSendPlainForbidden, ChatWriteForbidden
 
-from HasiiMusic import tune, app, config, db, lang, queue, tg, yt
+from HasiiMusic import tune, app, config, db, lang, queue, spotify, tg, yt
 from HasiiMusic.helpers import buttons, utils
 from HasiiMusic.helpers._play import checkUB
 import asyncio
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -43,17 +44,19 @@ async def safe_reply(message, text, **kwargs):
         logger.warning(f"Cannot send text in chat {message.chat.id} (chat write forbidden)")
         return None
     except Exception as e:
-        logger.error(f"Failed to send reply: {e}")
+        logger.error(f"Error in safe_reply: {e}")
         return None
 
 
-def playlist_to_queue(chat_id: int, tracks: list) -> str:
-    text = "<blockquote expandable>"
-    for track in tracks:
-        pos = queue.add(chat_id, track)  # Add track to queue (returns 0-based index)
-        text += f"<b>{pos}.</b> {track.title}\n"  # Show actual queue position
-    text = text[:1948] + "</blockquote>"  # Limit message length
-    return text
+async def auto_delete(message: types.Message, delay: int = 15):
+    """Auto-delete a message after a given timeout."""
+    if not message:
+        return
+    await asyncio.sleep(delay)
+    try:
+        await message.delete()
+    except Exception as e:
+        logger.debug(f"auto_delete: couldnt delete message: {e}")
 
 @app.on_message(
     filters.command(
@@ -113,11 +116,33 @@ async def play_hndlr(
         file = await tg.download(m.reply_to_message, sent)
 
     elif url:
-        if "playlist" in url:
-            await safe_edit(sent, m.lang["playlist_fetch"])
+        if spotify.valid(url):
+            if spotify.is_playlist(url):
+                try:
+                    tracks = await spotify.playlist(
+                        min(config.PLAYLIST_LIMIT, getattr(config, "PLAYLIST_MAX", 100)), mention, url
+                    )
+                except Exception as e:
+                    await safe_edit(
+                        sent,
+                        f"<blockquote>❌ ꜰᴀɪʟᴇᴅ ᴛᴏ ꜰᴇᴛᴄʜ ꜱᴘᴏᴛɪꜰʏ ᴘʟᴀʏʟɪꜱᴛ.\n\n"
+                        f"ᴘʟᴇᴀꜱᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ.</blockquote>"
+                    )
+                    return
+
+                if not tracks:
+                    await safe_edit(sent, m.lang["playlist_error"])
+                    return
+
+                file = tracks[0]
+                tracks.remove(file)
+                file.message_id = sent.id
+            else:
+                file = await spotify.search(url, sent.id)
+        elif "playlist" in url:
             try:
                 tracks = await yt.playlist(
-                    config.PLAYLIST_LIMIT, mention, url
+                    min(config.PLAYLIST_LIMIT, getattr(config, "PLAYLIST_MAX", 100)), mention, url
                 )
             except Exception as e:
                 await safe_edit(
@@ -137,6 +162,7 @@ async def play_hndlr(
             file.message_id = sent.id
         else:
             file = await yt.search(url, sent.id)
+
 
         if not file:
             await safe_edit(
@@ -200,15 +226,8 @@ async def play_hndlr(
                 ),
             )
             if tracks:
-                added = playlist_to_queue(chat_id, tracks)
-                try:
-                    await app.send_message(
-                        chat_id=m.chat.id,
-                        text=m.lang["playlist_queued"].format(len(tracks)) + added,
-                    )
-                except Exception:
-                    # Can't send message, continue anyway
-                    pass
+                for track in tracks:
+                    queue.add(chat_id, track)
             
             # ✨ NEW: Start preloading queued tracks in background
             try:
@@ -221,6 +240,18 @@ async def play_hndlr(
             return
 
     if not file.file_path:
+        if not re.fullmatch(r"[A-Za-z0-9_-]{11}", file.id):
+            try:
+                resolved = await yt.search(file.id, sent.id)
+                if resolved:
+                    file.id = resolved.id
+                    if resolved.thumbnail:
+                        file.thumbnail = resolved.thumbnail
+                    if resolved.duration_sec:
+                        file.duration_sec = resolved.duration_sec
+                        file.duration = resolved.duration
+            except Exception:
+                pass
         file.file_path = await yt.download(
             file.id,
             is_live=file.is_live,
@@ -294,14 +325,6 @@ async def play_hndlr(
                 
             )
         return
-    if not tracks:
-        return
-    added = playlist_to_queue(chat_id, tracks)
-    try:
-        await app.send_message(
-            chat_id=m.chat.id,
-            text=m.lang["playlist_queued"].format(len(tracks)) + added,
-        )
-    except Exception:
-        # Can't send message, but playback is working
-        pass
+    if tracks:
+        for track in tracks:
+            queue.add(chat_id, track)

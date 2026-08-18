@@ -30,6 +30,13 @@ class Config:
         self.DURATION_LIMIT: int = int(getenv("DURATION_LIMIT", "300")) * 60
         self.QUEUE_LIMIT: int = int(getenv("QUEUE_LIMIT", "30"))
         self.PLAYLIST_LIMIT: int = int(getenv("PLAYLIST_LIMIT", "20"))
+        # Max total songs to autoload from a playlist (default: 60)
+        self.PLAYLIST_MAX: int = int(getenv("PLAYLIST_MAX", "60"))
+
+        # ============ SPOTIFY API (Optional) ============
+        # Spotify API credentials from https://developer.spotify.com/dashboard
+        self.SPOTIFY_CLIENT_ID: str = getenv("SPOTIFY_CLIENT_ID") or getenv("SPOTIPY_CLIENT_ID", "")
+        self.SPOTIFY_CLIENT_SECRET: str = getenv("SPOTIFY_CLIENT_SECRET") or getenv("SPOTIPY_CLIENT_SECRET", "")
 
         # ASSISTANT SESSIONS
         # required at least one
