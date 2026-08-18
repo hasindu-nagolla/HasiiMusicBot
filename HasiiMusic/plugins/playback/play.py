@@ -55,8 +55,8 @@ async def auto_delete(message: types.Message, delay: int = 15):
     await asyncio.sleep(delay)
     try:
         await message.delete()
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"auto_delete: couldnt delete message: {e}")
 
 @app.on_message(
     filters.command(
