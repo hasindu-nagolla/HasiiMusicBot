@@ -150,7 +150,7 @@ class YouTube:
             return link.split("&si")[0].split("?si")[0]
         return None
 
-    async def search(self, query: str, m_id: int) -> Track | None:
+    async def search(self, query: str, m_id: int, music: bool = False) -> Track | None:
         # Check cache (10 min TTL)
         cache_key = query
         current_time = asyncio.get_running_loop().time()
@@ -167,6 +167,10 @@ class YouTube:
                 fresh.video = False
                 return fresh
 
+        # Optimize query for Spotify tracks to get highest quality official audio
+        if music and not query.lower().endswith("audio"):
+            query = f"{query} Official Audio"
+            
         try:
             if self.valid(query):
                 def _extract():
@@ -306,6 +310,24 @@ class YouTube:
             return []
 
     async def download(self, video_id: str, is_live: bool = False, video: bool = False) -> Optional[str]:
+        # Lazily resolve query or Spotify link to a YouTube video ID if needed
+        if not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id):
+            try:
+                from HasiiMusic import spotify
+                if spotify.valid(video_id):
+                    resolved = await spotify.search(video_id, 0)
+                else:
+                    resolved = await self.search(video_id, 0)
+                if resolved and resolved.id:
+                    video_id = resolved.id
+                    is_live = getattr(resolved, "is_live", is_live)
+                else:
+                    logger.warning(f"Could not resolve '{video_id}' for download")
+                    return None
+            except Exception as e:
+                logger.warning(f"Failed to lazily resolve '{video_id}': {e}")
+                return None
+
         url = self.base + video_id
 
         # Extract live stream URL

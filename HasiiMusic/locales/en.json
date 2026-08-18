@@ -214,3 +214,4 @@
   "loop_queue_set": "<blockquote>🔁 Loop mode set to Queue</blockquote>",
   "loop_usage": "<blockquote><b>Usage:</b>\n• /loop - Cycle through modes\n• /loop disable - Disable loop\n• /loop single - Loop current track\n• /loop queue - Loop entire queue</blockquote>"
 }
+

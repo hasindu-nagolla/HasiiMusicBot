@@ -68,13 +68,21 @@ class Thumbnail:
 
     async def generate(self, song: Track, size=(1280, 720)) -> str:
         try:
-            temp = f"cache/temp_{song.id}.jpg"
-            output = f"cache/{song.id}_modern.png"
+            thumb_url = getattr(song, "thumbnail", "")
+            if not thumb_url:
+                if re.fullmatch(r"[A-Za-z0-9_-]{11}", song.id):
+                    thumb_url = f"https://i.ytimg.com/vi/{song.id}/hqdefault.jpg"
+                else:
+                    return config.DEFAULT_THUMB
+
+            safe_id = re.sub(r'[^a-zA-Z0-9_-]', '_', song.id)[:40]
+            temp = f"cache/temp_{safe_id}.jpg"
+            output = f"cache/{safe_id}_modern.png"
             if os.path.exists(output):
                 return output
 
             # Download thumbnail (async operation)
-            await self.save_thumb(temp, song.thumbnail)
+            await self.save_thumb(temp, thumb_url)
             
             # **PERFORMANCE FIX**: Run PIL operations in thread executor to avoid blocking event loop
             # This prevents lag when generating thumbnails for multiple groups simultaneously

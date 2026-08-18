@@ -9,7 +9,7 @@ import asyncio
 
 from pyrogram import enums, errors, types
 
-from HasiiMusic import app, config, db, queue, yt
+from HasiiMusic import app, config, db, queue, spotify, yt
 
 
 def checkUB(play):
@@ -56,7 +56,7 @@ def checkUB(play):
         
         url = yt.url(m)
         # Only validate URL if not replying to media (Telegram files have t.me URLs)
-        if url and not m.reply_to_message and not yt.valid(url):
+        if url and not m.reply_to_message and not (yt.valid(url) or spotify.valid(url)):
             return await m.reply_text(m.lang["play_unsupported"])
 
         play_mode = await db.get_play_mode(m.chat.id)

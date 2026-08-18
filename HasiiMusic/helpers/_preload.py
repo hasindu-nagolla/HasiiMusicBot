@@ -61,6 +61,19 @@ class PreloadManager:
             
             # Download the track
             if not media.file_path:
+                import re
+                if not re.fullmatch(r"[A-Za-z0-9_-]{11}", media.id) or not getattr(media, "thumbnail", None):
+                    try:
+                        resolved = await yt.search(media.id, 0)
+                        if resolved:
+                            media.id = resolved.id
+                            if resolved.thumbnail:
+                                media.thumbnail = resolved.thumbnail
+                            if resolved.duration_sec:
+                                media.duration_sec = resolved.duration_sec
+                                media.duration = resolved.duration
+                    except Exception:
+                        pass
                 media.file_path = await yt.download(
                     media.id,
                     video=getattr(media, "video", False),

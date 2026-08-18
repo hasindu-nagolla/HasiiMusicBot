@@ -13,6 +13,7 @@
 
 import asyncio
 import logging
+import re
 from ntgcalls import ConnectionNotFound, TelegramServerError, TransportParseException
 from pyrogram import enums, errors
 from pyrogram.errors import MessageIdInvalid
@@ -202,6 +203,8 @@ class TgCall(PyTgCalls):
 
         # Generate thumbnail only if THUMB_GEN is enabled. otherwise use default
         if config.THUMB_GEN and isinstance(media, Track):
+            if not getattr(media, "thumbnail", None) and re.fullmatch(r"[A-Za-z0-9_-]{11}", media.id):
+                media.thumbnail = f"https://i.ytimg.com/vi/{media.id}/hqdefault.jpg"
             _thumb = await thumb.generate(media)
         else:
             _thumb = config.DEFAULT_THUMB
@@ -341,6 +344,25 @@ class TgCall(PyTgCalls):
                     media.duration,
                     media.user,
                 )
+                if getattr(media, "playlist_name", None):
+                    pl_url = getattr(media, "playlist_url", None)
+                    pl_type = getattr(media, "playlist_type", None)
+                    if pl_type == "album":
+                        label = "ᴀʟʙᴜᴍ"
+                    elif pl_type == "artist":
+                        label = "ᴀʀᴛɪꜱᴛ"
+                    else:
+                        label = "ᴘʟᴀʏʟɪꜱᴛ"
+
+                    if pl_url:
+                        pl_display = f"<a href={pl_url}>{media.playlist_name}</a>"
+                    else:
+                        pl_display = media.playlist_name
+
+                    text = text.replace(
+                        "➤ <b>ᴅᴜʀᴀᴛɪᴏɴ :</b>",
+                        f"➤ <b>{label} :</b> {pl_display}\n➤ <b>ᴅᴜʀᴀᴛɪᴏɴ :</b>",
+                    )
                 if not media.is_live and media.duration_sec:
                     import time as time_module
                     played = media.time
@@ -625,6 +647,22 @@ class TgCall(PyTgCalls):
 
                 _lang = await lang.get_lang(chat_id)
                 msg = None
+
+                if not re.fullmatch(r"[A-Za-z0-9_-]{11}", media.id) or not getattr(media, "thumbnail", None):
+                    try:
+                        # use YouTube Music search for spotify tracks, regular YT for everything else
+                        is_spotify_track = getattr(media, "playlist_type", None) in ("playlist", "album", "artist")
+                        resolved = await yt.search(media.id, 0, music=is_spotify_track)
+                        if resolved:
+                            media.id = resolved.id
+                            if resolved.thumbnail:
+                                media.thumbnail = resolved.thumbnail
+                            if resolved.duration_sec:
+                                media.duration_sec = resolved.duration_sec
+                                media.duration = resolved.duration
+                    except Exception:
+                        pass
+
                 if not media.file_path:
                     is_live = getattr(media, 'is_live', False)
                     lock = self.get_lock(chat_id)
@@ -646,6 +684,10 @@ class TgCall(PyTgCalls):
                         logger.info(f"Queue altered during play_next download for {chat_id}")
                         return
                     if not media.file_path:
+                        if len(queue.get_queue(chat_id)) > 1:
+                            logger.warning(
+                                f"Skipping unplayable track '{getattr(media, 'title', 'unknown')}' in {chat_id}")
+                            return await self._play_next_impl(chat_id)
                         await self._stop_impl(chat_id)
                         if msg:
                             try:
@@ -688,6 +730,26 @@ class TgCall(PyTgCalls):
                 except Exception as e:
                     logger.debug(
                         f"Error starting preload after play_next for {chat_id}: {e}")
+
+                # Autoload next playlist batch in background when reaching track 28 (up to PLAYLIST_MAX)
+                pl_url = getattr(media, "playlist_url", None)
+                pl_idx = getattr(media, "playlist_index", 0)
+                pl_limit = getattr(config, "PLAYLIST_LIMIT", 30)
+                pl_max = getattr(config, "PLAYLIST_MAX", 100)
+                trigger_mod = max(1, pl_limit - 2) if pl_limit > 2 else 0
+                if pl_url and pl_idx > 0 and pl_idx % pl_limit == (trigger_mod % pl_limit):
+                    next_offset = (pl_idx // pl_limit + 1) * pl_limit
+                    if next_offset < pl_max:
+                        batch_limit = min(pl_limit, pl_max - next_offset)
+                        asyncio.create_task(
+                            self._fetch_next_playlist_batch(
+                                chat_id=chat_id,
+                                playlist_url=pl_url,
+                                user=media.user,
+                                offset=next_offset,
+                                limit=batch_limit,
+                            )
+                        )
             except Exception as e:
                 logger.error(
                     f"Error in play_next for {chat_id}: {e}", exc_info=True)
@@ -695,6 +757,22 @@ class TgCall(PyTgCalls):
                     await self._stop_impl(chat_id)
                 except Exception:
                     pass
+
+    async def _fetch_next_playlist_batch(
+        self, chat_id: int, playlist_url: str, user: str, offset: int, limit: int = 30
+    ) -> None:
+        try:
+            from HasiiMusic import spotify, queue
+            if spotify.valid(playlist_url) and spotify.is_playlist(playlist_url):
+                next_tracks = await spotify.playlist(limit, user, playlist_url, offset=offset)
+                if next_tracks:
+                    for track in next_tracks:
+                        queue.add(chat_id, track)
+                    logger.info(
+                        f"📋 Autoloaded next {len(next_tracks)} playlist tracks (offset {offset}) for chat {chat_id}"
+                    )
+        except Exception as e:
+            logger.debug(f"Could not autoload next playlist batch for {chat_id}: {e}")
 
     async def ping(self) -> float:
         pings = [client.ping for client in self.clients]
