@@ -99,7 +99,8 @@ class Searcher:
                 query_lower = query.lower()
                 avoid_keywords = [
                     "cover", "remix", "karaoke", "instrumental", "slowed", 
-                    "reverb", "parody", "mashup", "sped up", "ai cover", " a.i ", " ai "
+                    "reverb", "parody", "mashup", "sped up", "ai cover", " a.i ", " ai ",
+                    "reggae", "lofi", "8d", "bass boosted", "nightcore", "acoustic", "unplugged"
                 ]
                 
                 allowed_keywords = [kw for kw in avoid_keywords if kw.strip() in query_lower]
