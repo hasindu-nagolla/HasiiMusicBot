@@ -66,7 +66,7 @@ class MongoDB:
         self.notified = []
         self.cache = self.db.cache
         self.logger = False
-        self.vplay_enabled = config.VIDEO_PLAY
+        self.vplay_enabled = False
 
         self.assistant = {}
         self.assistantdb = self.db.assistant
@@ -293,7 +293,7 @@ class MongoDB:
             return self.vplay_enabled
 
         doc = await self.cache.find_one({"_id": "vplay_toggle"})
-        self.vplay_enabled = doc.get("enabled", config.VIDEO_PLAY) if doc else config.VIDEO_PLAY
+        self.vplay_enabled = doc.get("enabled", False) if doc else False
         return self.vplay_enabled
 
     async def set_vplay_enabled(self, enabled: bool) -> None:

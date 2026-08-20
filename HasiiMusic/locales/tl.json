@@ -60,7 +60,7 @@
   "help_play": "<u><b>Mga Play Command:</b></u>\n<blockquote>/play [pangalan ng kanta/YouTube URL/reply]: I-play ang audio sa voice chat.\n/vplay [pangalan ng kanta/YouTube URL/reply]: I-play ang video.\n/playforce: Piliting i-play ang audio (laktawan ang pila).\n/vplayforce: Piliting i-play ang video.\n/radio: I-play ang online radio stations.\n\n<b>Halimbawa:</b> <code>/play -f live_stream_name</code></blockquote>",
   "help_queue": "<u><b>Mga Queue Command:</b></u>\n<blockquote>/queue: Ipinapakita ang mga nakapila ngayon sa pila.\n/loop: I-enable/i-disable ang loop mode.</blockquote>",
   "help_stats": "<blockquote><u><b>Mga Stats Command:</b></u>\n\n/stats: Ipinapakita ang stats ng bot.</blockquote>",
-  "help_sudo": "<blockquote><b><u>Mga Sudo Command:</b></u>\n\n/ac: Ipinapakita ang bilang ng mga aktibong tawag.\n/broadcast [mag-reply sa mensahe]: I-broadcast ang mensahe sa lahat ng chat.\n/logs: Ipinapadala ang log file.\n/logger [on/off]: Ine-enable/dini-disable ang logger.\n/restart: Nire-restart ang bot.</blockquote>",
+  "help_sudo": "<blockquote><b><u>Mga Sudo Command:</b></u>\n\n/ac: Ipinapakita ang bilang ng mga aktibong tawag.\n/broadcast [mag-reply sa mensahe]: I-broadcast ang mensahe sa lahat ng chat.\n/logs: Ipinapadala ang log file.\n/logger [on/off]: Ine-enable/dini-disable ang logger.\n/restart: Nire-restart ang bot.\n\n/enable vplay: ᴇɴᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.\n/disable vplay: ᴅɪꜱᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.</blockquote>",
   "log_fetch": "<blockquote>Kinukuha ang mga log...</blockquote>",
   "log_not_found": "<blockquote>Hindi umiiral ang log file.</blockquote>",
   "log_sent": "<blockquote>Log file ng {0}</blockquote>",
@@ -126,7 +126,7 @@
   "sudo_removed": "<blockquote>Inalis si {0} sa listahan ng mga Sudo user.</blockquote>",
   "sudo_fetching": "<blockquote>Kinukuha ang listahan ng mga Sudo user...</blockquote>",
   "sudo_owner": "<blockquote><u><b>May-ari:</b></u>\n- {0}\n\n</blockquote>",
-  "sudo_users": "<blockquote><u><b>Mga Sudo User:</b></u></blockquote>",
+  "sudo_users": "<blockquote><u><b>Mga Sudo User:</b></u>{0}\n\n</blockquote>",
   "user_not_admin": "<blockquote>O sige, pamahalaan mo ang voice chat... ay teka, hindi ka pala admin.</blockquote>",
   "user_no_perms": "Ikaw? Mamamahala sa voice chat? Hindi pwede sa mga permission na 'yan.",
   "user_not_found": "<blockquote>Kakailanganin ko ng user ID — o maaari ka bang mag-reply sa mensahe ng isang tao?</blockquote>",
@@ -212,5 +212,6 @@
   "loop_disabled": "<blockquote>➡️ Naka-disable ang loop mode</blockquote>",
   "loop_single": "<blockquote>🔂 Ang loop mode ay naka-set sa Single Track</blockquote>",
   "loop_queue_set": "<blockquote>🔁 Ang loop mode ay naka-set sa Pila</blockquote>",
-  "loop_usage": "<blockquote><b>Paggamit:</b>\n• /loop - I-cycle ang mga mode\n• /loop disable - I-disable ang loop\n• /loop single - I-loop ang kasalukuyang track\n• /loop queue - I-loop ang buong pila</blockquote>"
+  "loop_usage": "<blockquote><b>Paggamit:</b>\n• /loop - I-cycle ang mga mode\n• /loop disable - I-disable ang loop\n• /loop single - I-loop ang kasalukuyang track\n• /loop queue - I-loop ang buong pila</blockquote>",
+  "sudo_deleted": "\n- Deleted Account ({0})"
 }

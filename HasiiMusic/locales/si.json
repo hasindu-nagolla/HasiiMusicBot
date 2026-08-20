@@ -60,7 +60,7 @@
   "help_play": "<u><b>වාදන විධානයන් (Play):</b></u>\n<blockquote>/play [ගීතයේ නම/YouTube URL/reply]: හඬ සංවාදයේ ශ්‍රව්‍ය වාදනය කරන්න.\n/vplay [ගීතයේ නම/YouTube URL/reply]: වීඩියෝ වාදනය කරන්න.\n/playforce: බලහත්කාරයෙන් වාදනය කරන්න (පෝලිම මඟ හරින්න).\n/vplayforce: බලහත්කාරයෙන් වීඩියෝ වාදනය කරන්න.\n/radio: ඔන්ලයින් ගුවන් විදුලි නාලිකා වාදනය කරන්න.\n\n<b>උදාහරණ:</b> <code>/play -f live_stream_name</code></blockquote>",
   "help_queue": "<u><b>පෝලිම් විධානයන් (Queue):</b></u>\n<blockquote>/queue: පෝලිමේ ඇති ගීත පෙන්වයි.\n/loop: ලූප් ප්‍රකාරය සක්‍රීය/අක්‍රීය කරන්න.</blockquote>",
   "help_stats": "<blockquote><u><b>සංඛ්‍යාලේඛන (Stats):</b></u>\n\n/stats: බොට් හි සංඛ්‍යාලේඛන පෙන්වයි.</blockquote>",
-  "help_sudo": "<blockquote><b><u>සුඩෝ විධානයන් (Sudo Commands):</b></u>\n\n/ac: සක්‍රීය ඇමතුම් ගණන පෙන්වයි.\n/broadcast [reply]: සියලුම සමූහ වලට පණිවිඩය යවයි.\n/logs: log ගොනුව ලබා දෙයි.\n/logger [on/off]: ලොගරය සක්‍රීය/අක්‍රීය කරයි.\n/restart: බොට් නැවත ආරම්භ කරයි.</blockquote>",
+  "help_sudo": "<blockquote><b><u>සුඩෝ විධානයන් (Sudo Commands):</b></u>\n\n/ac: සක්‍රීය ඇමතුම් ගණන පෙන්වයි.\n/broadcast [reply]: සියලුම සමූහ වලට පණිවිඩය යවයි.\n/logs: log ගොනුව ලබා දෙයි.\n/logger [on/off]: ලොගරය සක්‍රීය/අක්‍රීය කරයි.\n/restart: බොට් නැවත ආරම්භ කරයි.\n\n/enable vplay: ᴇɴᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.\n/disable vplay: ᴅɪꜱᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.</blockquote>",
   "log_fetch": "<blockquote>ලොග් ගොනු ලබා ගනිමින්...</blockquote>",
   "log_not_found": "<blockquote>ලොග් ගොනුව නොපවතී.</blockquote>",
   "log_sent": "<blockquote>{0} හි ලොග් ගොනුව</blockquote>",
@@ -126,7 +126,7 @@
   "sudo_removed": "<blockquote>සුඩෝ පරිශීලකයින්ගේ ලැයිස්තුවෙන් {0} ඉවත් කරන ලදි.</blockquote>",
   "sudo_fetching": "<blockquote>සුඩෝ පරිශීලකයින්ගේ ලැයිස්තුව ලබා ගනිමින්...</blockquote>",
   "sudo_owner": "<blockquote><u><b>හිමිකරු:</b></u>\n- {0}\n\n</blockquote>",
-  "sudo_users": "<blockquote><u><b>සුඩෝ පරිශීලකයින්:</b></u></blockquote>",
+  "sudo_users": "<blockquote><u><b>සුඩෝ පරිශීලකයින්:</b></u>{0}\n\n</blockquote>",
   "user_not_admin": "<blockquote>ඔහ් ඇත්ත වශයෙන්ම, ඉදිරියට ගොස් හඬ සංවාදය කළමනාකරණය කරන්න... ඔහ් ඉන්න, ඔබ පරිපාලකයෙකු නොවේ.</blockquote>",
   "user_no_perms": "ඔබ? හඬ සංවාදය කළමනාකරණය කරන්න? එම අවසරයන් සමග නම් බැහැ.",
   "user_not_found": "<blockquote>මට පරිශීලක ID එකක් අවශ්‍යයි — නැතහොත් ඔබට කෙනෙකුගේ පණිවිඩයකට reply කළ හැකිද?</blockquote>",
@@ -212,5 +212,6 @@
   "loop_disabled": "<blockquote>➡️ ලූප් ප්‍රකාරය අක්‍රීය කරන ලදි</blockquote>",
   "loop_single": "<blockquote>🔂 ලූප් ප්‍රකාරය තනි ගීතයකට සකසන ලදි</blockquote>",
   "loop_queue_set": "<blockquote>🔁 ලූප් ප්‍රකාරය පෝලිමට සකසන ලදි</blockquote>",
-  "loop_usage": "<blockquote><b>භාවිතය:</b>\n• /loop - ප්‍රකාර හරහා ගමන් කරන්න\n• /loop disable - ලූප් අක්‍රීය කරන්න\n• /loop single - වත්මන් ගීතය ලූප් කරන්න\n• /loop queue - සම්පූර්ණ පෝලිම ලූප් කරන්න</blockquote>"
+  "loop_usage": "<blockquote><b>භාවිතය:</b>\n• /loop - ප්‍රකාර හරහා ගමන් කරන්න\n• /loop disable - ලූප් අක්‍රීය කරන්න\n• /loop single - වත්මන් ගීතය ලූප් කරන්න\n• /loop queue - සම්පූර්ණ පෝලිම ලූප් කරන්න</blockquote>",
+  "sudo_deleted": "\n- Deleted Account ({0})"
 }

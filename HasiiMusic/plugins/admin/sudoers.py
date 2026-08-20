@@ -18,7 +18,7 @@ async def _sudo(_, m: types.Message):
         await m.delete()
     except Exception:
         pass
-    
+
     user = await utils.extract_user(m)
     if not user:
         return await m.reply_text(m.lang["user_not_found"])
@@ -53,16 +53,16 @@ async def _listsudo(_, m: types.Message):
         await m.delete()
     except Exception:
         pass
-    
+
     sent = await m.reply_text(m.lang["sudo_fetching"])
 
     # Always fetch fresh owner info with ID
     owner_user = await app.get_users(app.owner)
     o_mention = f"{owner_user.mention} ({app.owner})"
-    
+
     txt = m.lang["sudo_owner"].format(o_mention)
     sudoers = await db.get_sudoers()
-    
+
     if sudoers:
         sudo_list = ""
         for user_id in sudoers:
@@ -73,7 +73,7 @@ async def _listsudo(_, m: types.Message):
                 # Deleted account or inaccessible user
                 sudo_list += f"\n- Deleted Account ({user_id})"
                 continue
-        
+
         if sudo_list:
             txt += f"<blockquote><u><b>ꜱᴜᴅᴏ ᴜꜱᴇʀꜱ:</b></u>{sudo_list}\n\n</blockquote>"
 

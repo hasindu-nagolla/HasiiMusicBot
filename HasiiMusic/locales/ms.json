@@ -60,7 +60,7 @@
   "help_play": "<u><b>Perintah Play:</b></u>\n<blockquote>/play [nama lagu/YouTube URL/balas]: Mainkan audio di chat suara.\n/vplay [nama lagu/YouTube URL/balas]: Mainkan video.\n/playforce: Paksa main (langkau barisan).\n/vplayforce: Paksa main video.\n/radio: Mainkan stesen radio dalam talian.\n\n<b>Contoh:</b> <code>/play -f live_stream_name</code></blockquote>",
   "help_queue": "<u><b>Perintah Barisan (Queue):</b></u>\n<blockquote>/queue: Menunjukkan trek yang sedang beratur.\n/loop: Dayakan/lumpuhkan mod ulangan.</blockquote>",
   "help_stats": "<blockquote><u><b>Perintah Statistik (Stats):</b></u>\n\n/stats: Menunjukkan statistik bot.</blockquote>",
-  "help_sudo": "<blockquote><b><u>Perintah Sudo:</b></u>\n\n/ac: Menunjukkan jumlah panggilan aktif.\n/broadcast [balas mesej]: Siarkan mesej ke semua grup.\n/logs: Hantar fail log.\n/logger [on/off]: Dayakan/lumpuhkan log.\n/restart: Mula semula bot.</blockquote>",
+  "help_sudo": "<blockquote><b><u>Perintah Sudo:</b></u>\n\n/ac: Menunjukkan jumlah panggilan aktif.\n/broadcast [balas mesej]: Siarkan mesej ke semua grup.\n/logs: Hantar fail log.\n/logger [on/off]: Dayakan/lumpuhkan log.\n/restart: Mula semula bot.\n\n/enable vplay: ᴇɴᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.\n/disable vplay: ᴅɪꜱᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.</blockquote>",
   "log_fetch": "<blockquote>Mengambil fail log...</blockquote>",
   "log_not_found": "<blockquote>Fail log tidak wujud.</blockquote>",
   "log_sent": "<blockquote>Fail log {0}</blockquote>",
@@ -126,7 +126,7 @@
   "sudo_removed": "<blockquote>{0} telah dialih keluar dari senarai pengguna Sudo.</blockquote>",
   "sudo_fetching": "<blockquote>Mengambil senarai pengguna Sudo...</blockquote>",
   "sudo_owner": "<blockquote><u><b>Pemilik (Owner):</b></u>\n- {0}\n\n</blockquote>",
-  "sudo_users": "<blockquote><u><b>Pengguna Sudo:</b></u></blockquote>",
+  "sudo_users": "<blockquote><u><b>Pengguna Sudo:</b></u>{0}\n\n</blockquote>",
   "user_not_admin": "<blockquote>Oh pasti, teruskan mengurus chat suara... oh tunggu, anda bukan admin.</blockquote>",
   "user_no_perms": "Anda? Mengurus chat suara? Bukan dengan kebenaran itu.",
   "user_not_found": "<blockquote>Saya perlukan ID pengguna — atau boleh anda membalas mesej seseorang?</blockquote>",
@@ -212,5 +212,6 @@
   "loop_disabled": "<blockquote>➡️ Mod ulangan dilumpuhkan</blockquote>",
   "loop_single": "<blockquote>🔂 Mod ulangan ditetapkan kepada Lagu Semasa</blockquote>",
   "loop_queue_set": "<blockquote>🔁 Mod ulangan ditetapkan kepada Barisan (Queue)</blockquote>",
-  "loop_usage": "<blockquote><b>Penggunaan:</b>\n• /loop - Tukar antara mod\n• /loop disable - Lumpuhkan mod ulangan\n• /loop single - Ulang lagu semasa\n• /loop queue - Ulang seluruh barisan</blockquote>"
+  "loop_usage": "<blockquote><b>Penggunaan:</b>\n• /loop - Tukar antara mod\n• /loop disable - Lumpuhkan mod ulangan\n• /loop single - Ulang lagu semasa\n• /loop queue - Ulang seluruh barisan</blockquote>",
+  "sudo_deleted": "\n- Deleted Account ({0})"
 }
