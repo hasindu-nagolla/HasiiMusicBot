@@ -42,6 +42,33 @@ class YouTube:
         # Limit concurrent downloads to prevent lag
         self._download_semaphore = asyncio.Semaphore(5)  # Max 5 simultaneous downloads
         self._max_video_height = getattr(config, "VIDEO_MAX_HEIGHT", 1080)
+        self.MIN_VALID_BYTES = 4096  # 4 KB minimum — any real audio file exceeds this
+        self._download_locks: dict = {}  # Per-video-ID locks to prevent duplicate downloads
+
+    def _is_valid_file(self, path: str) -> bool:
+        """Return True only if path exists, is a real file, and has enough content.
+        Guards against 0-byte stubs and partial writes that cause unexpected EOF in ntgcalls.
+        """
+        try:
+            return os.path.isfile(path) and os.path.getsize(path) >= self.MIN_VALID_BYTES
+        except OSError:
+            return False
+
+    def _delete_stub(self, path: str) -> None:
+        """Delete an invalid/corrupt file stub so a fresh download is triggered next time."""
+        try:
+            os.remove(path)
+            logger.warning(f"🗑️ Deleted invalid cached file (too small or corrupt): {path}")
+        except OSError:
+            pass
+
+    def _get_download_lock(self, video_id: str) -> asyncio.Lock:
+        """Return a per-video-ID asyncio.Lock, creating it if it does not exist yet.
+        Prevents two coroutines from downloading the same video simultaneously.
+        """
+        if video_id not in self._download_locks:
+            self._download_locks[video_id] = asyncio.Lock()
+        return self._download_locks[video_id]
 
     def _locate_download_file(self, video_id: str, video: bool = False) -> Optional[str]:
         pattern = f"downloads/{video_id}*"
@@ -58,18 +85,19 @@ class YouTube:
                 if os.path.isdir(path):
                     continue
                 if Path(path).suffix.lower() in video_exts:
-                    return path
+                    if self._is_valid_file(path):
+                        return path
+                    self._delete_stub(path)
         else:
             for path in candidates:
                 if os.path.isdir(path):
                     continue
                 if Path(path).suffix.lower() in audio_exts:
-                    return path
+                    if self._is_valid_file(path):
+                        return path
+                    self._delete_stub(path)
 
-        for path in candidates:
-            if os.path.isdir(path):
-                continue
-            return path
+        # No valid file found
         return None
 
     def get_cookies(self):
@@ -387,37 +415,49 @@ class YouTube:
 
         # Let yt-dlp choose the best format
         filename_pattern = f"downloads/{video_id}"
-        
-        # Check existing files
-        existing_files = [
-            f for f in glob.glob(f"{filename_pattern}.*")
-            if not f.endswith('.part')
-        ]
-        if video:
-            # NOTE: .webm excluded — audio downloads from /play produce .webm
-            # which are audio-only. Only trust .mp4/.mkv/.mov as cached video.
-            video_candidates = [
-                f for f in existing_files
-                if Path(f).suffix.lower() in {".mp4", ".mkv", ".mov"}
-            ]
-            if video_candidates:
-                return video_candidates[0]
-        else:
-            audio_candidates = [
-                f for f in existing_files
-                if Path(f).suffix.lower() in {".m4a", ".webm", ".opus", ".mp3", ".ogg", ".wav", ".flac"}
-            ]
-            if audio_candidates:
-                return audio_candidates[0]
 
-            # Fallback to mp4 for audio
-            container_fallbacks = [
-                f for f in existing_files
-                if Path(f).suffix.lower() in {".mp4", ".mkv", ".mov"}
+        def _check_cache() -> Optional[str]:
+            """Check downloads/ for a valid existing file. Deletes invalid stubs on the way."""
+            existing_files = [
+                f for f in glob.glob(f"{filename_pattern}.*")
+                if not f.endswith((".part", ".ytdl", ".temp"))
             ]
-            if container_fallbacks:
-                return container_fallbacks[0]
-        
+            if video:
+                # NOTE: .webm excluded — audio downloads from /play produce .webm
+                # which are audio-only. Only trust .mp4/.mkv/.mov as cached video.
+                video_candidates = [
+                    f for f in existing_files
+                    if Path(f).suffix.lower() in {".mp4", ".mkv", ".mov"}
+                ]
+                for f in video_candidates:
+                    if self._is_valid_file(f):
+                        return f
+                    self._delete_stub(f)
+            else:
+                audio_candidates = [
+                    f for f in existing_files
+                    if Path(f).suffix.lower() in {".m4a", ".webm", ".opus", ".mp3", ".ogg", ".wav", ".flac"}
+                ]
+                for f in audio_candidates:
+                    if self._is_valid_file(f):
+                        return f
+                    self._delete_stub(f)
+                # Fallback to mp4 for audio
+                container_fallbacks = [
+                    f for f in existing_files
+                    if Path(f).suffix.lower() in {".mp4", ".mkv", ".mov"}
+                ]
+                for f in container_fallbacks:
+                    if self._is_valid_file(f):
+                        return f
+                    self._delete_stub(f)
+            return None
+
+        # Fast path: check cache without acquiring any lock
+        cached = _check_cache()
+        if cached:
+            return cached
+
         # Create downloads dir
         downloads_dir = Path("downloads")
         if not downloads_dir.exists():
@@ -428,123 +468,133 @@ class YouTube:
                 logger.error(f"❌ Cannot create downloads directory: {e}")
                 return None
 
-        # **PERFORMANCE FIX**: Use semaphore to limit concurrent downloads
-        # Prevents bandwidth saturation when 15-20 groups download simultaneously
-        async with self._download_semaphore:
-            cookie = self.get_cookies()
-            base_opts = {
-                "outtmpl": "downloads/%(id)s.%(ext)s",
-                "quiet": True,
-                "noplaylist": True,
-                "geo_bypass": True,
-                "no_warnings": True,
-                "overwrites": False,
-                "nocheckcertificate": True,
-                "continuedl": True,
-                "noprogress": True,
-                # Max 4 fragments for stability
-                "concurrent_fragment_downloads": 4,
-                "http_chunk_size": 524288,  # 512KB chunks
-                "socket_timeout": 30,
-                "retries": 2,
-                "fragment_retries": 2,
-                "extractor_retries": 5,
-                "sleep_interval_requests": 1,
-                # Android client bypass
-                # "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
-            }
+        # Acquire per-video-ID lock to prevent duplicate concurrent downloads of the same video.
+        # Two chats requesting the same uncached song simultaneously will now queue behind
+        # this lock — the second waiter gets a cache hit inside and skips the download.
+        async with self._get_download_lock(video_id):
+            # Double-checked locking: re-verify cache inside the lock in case another
+            # coroutine finished downloading while we were waiting to acquire.
+            cached = _check_cache()
+            if cached:
+                return cached
 
-            if video:
-                # Download best video
-                height_filter = ""
-                if self._max_video_height and self._max_video_height > 0:
-                    height_filter = f"[height<={self._max_video_height}]"
-                format_chain = (
-                    f"bestvideo[ext=mp4]{height_filter}+bestaudio[ext=m4a]/"
-                    f"bestvideo{height_filter}+bestaudio/"
-                    "bestvideo+bestaudio/best"
-                )
-                ydl_opts = {
-                    **base_opts,
-                    "format": format_chain,
-                    "merge_output_format": "mp4",
-                    "postprocessors": [
-                        {
-                            "key": "FFmpegVideoConvertor",
-                            "preferedformat": "mp4",
-                        }
-                    ],
-                }
-            else:
-                # Download best audio
-                ydl_opts = {
-                    **base_opts,
-                    # "format": "bestaudio[ext=m4a]/bestaudio[acodec=opus]/bestaudio/best",
-                    "format": "bestaudio/best",
-                    "postprocessors": [],
+            # **PERFORMANCE FIX**: Use semaphore to limit concurrent downloads
+            # Prevents bandwidth saturation when 15-20 groups download simultaneously
+            async with self._download_semaphore:
+                cookie = self.get_cookies()
+                base_opts = {
+                    "outtmpl": "downloads/%(id)s.%(ext)s",
+                    "quiet": True,
+                    "noplaylist": True,
+                    "geo_bypass": True,
+                    "no_warnings": True,
+                    "overwrites": False,
+                    "nocheckcertificate": True,
+                    "continuedl": True,
+                    "noprogress": True,
+                    # Max 4 fragments for stability
+                    "concurrent_fragment_downloads": 4,
+                    "http_chunk_size": 524288,  # 512KB chunks
+                    "socket_timeout": 30,
+                    "retries": 2,
+                    "fragment_retries": 2,
+                    "extractor_retries": 5,
+                    "sleep_interval_requests": 1,
+                    # Android client bypass
+                    # "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
                 }
 
-            ydl_opts_cookie = {
-                **ydl_opts,
-                "cookiefile": cookie,
-            }
+                if video:
+                    # Download best video
+                    height_filter = ""
+                    if self._max_video_height and self._max_video_height > 0:
+                        height_filter = f"[height<={self._max_video_height}]"
+                    format_chain = (
+                        f"bestvideo[ext=mp4]{height_filter}+bestaudio[ext=m4a]/"
+                        f"bestvideo{height_filter}+bestaudio/"
+                        "bestvideo+bestaudio/best"
+                    )
+                    ydl_opts = {
+                        **base_opts,
+                        "format": format_chain,
+                        "merge_output_format": "mp4",
+                        "postprocessors": [
+                            {
+                                "key": "FFmpegVideoConvertor",
+                                "preferedformat": "mp4",
+                            }
+                        ],
+                    }
+                else:
+                    # Download best audio
+                    ydl_opts = {
+                        **base_opts,
+                        # "format": "bestaudio[ext=m4a]/bestaudio[acodec=opus]/bestaudio/best",
+                        "format": "bestaudio/best",
+                        "postprocessors": [],
+                    }
 
-            def _download(ydl_runtime_opts):
-                ydl_instance = None
-                try:
-                    ydl_instance = yt_dlp.YoutubeDL(ydl_runtime_opts)
-                    # Extract info
-                    info = ydl_instance.extract_info(url, download=True)
-                    if not info:
-                        logger.error(f"❌ Failed to extract info for {video_id}")
+                ydl_opts_cookie = {
+                    **ydl_opts,
+                    "cookiefile": cookie,
+                }
+
+                def _download(ydl_runtime_opts):
+                    ydl_instance = None
+                    try:
+                        ydl_instance = yt_dlp.YoutubeDL(ydl_runtime_opts)
+                        # Extract info
+                        info = ydl_instance.extract_info(url, download=True)
+                        if not info:
+                            logger.error(f"❌ Failed to extract info for {video_id}")
+                            return None
+
+                        time.sleep(0.5)
+                        located = self._locate_download_file(video_id, video=video)
+                        if located:
+                            return located
+                        logger.error(f"❌ Download completed but file not found for: {video_id}")
                         return None
-                    
-                    time.sleep(0.5)
-                    located = self._locate_download_file(video_id, video=video)
-                    if located:
-                        return located
-                    logger.error(f"❌ Download completed but file not found for: {video_id}")
-                    return None
-                except yt_dlp.utils.ExtractorError as ex:
-                    error_msg = str(ex)
-                    if "not available" in error_msg.lower():
-                        logger.error(
-                            "❌ Video not available: May be region-blocked or private.")
-                    elif "age" in error_msg.lower():
-                        logger.error(
-                            "❌ Age-restricted video: Cookies required.")
-                    else:
-                        logger.error("❌ YouTube extraction failed: %s", ex)
-                    return None
-                except yt_dlp.utils.DownloadError as ex:
-                    error_msg = str(ex)
-                    recovered = self._locate_download_file(video_id, video=video)
-                    if "unable to rename file" in error_msg.lower() and recovered:
-                        logger.warning(
-                            f"⚠️ Renaming failed for {video_id}, using recovered file {Path(recovered).name}"
-                        )
-                        return recovered
-                    if "416" in error_msg or "Requested range not satisfiable" in error_msg:
-                        # HTTP 416 range error
-                        logger.warning(f"⚠️ Range error for {video_id}, skipping")
-                    else:
-                        logger.warning(f"⚠️ Download error for {video_id}: {ex}")
-                        if recovered:
+                    except yt_dlp.utils.ExtractorError as ex:
+                        error_msg = str(ex)
+                        if "not available" in error_msg.lower():
+                            logger.error(
+                                "❌ Video not available: May be region-blocked or private.")
+                        elif "age" in error_msg.lower():
+                            logger.error(
+                                "❌ Age-restricted video: Cookies required.")
+                        else:
+                            logger.error("❌ YouTube extraction failed: %s", ex)
+                        return None
+                    except yt_dlp.utils.DownloadError as ex:
+                        error_msg = str(ex)
+                        recovered = self._locate_download_file(video_id, video=video)
+                        if "unable to rename file" in error_msg.lower() and recovered:
                             logger.warning(
-                                f"⚠️ Using recovered file for {video_id} despite download error"
+                                f"⚠️ Renaming failed for {video_id}, using recovered file {Path(recovered).name}"
                             )
                             return recovered
-                    return None
-                except Exception as ex:
-                    logger.warning(f"⚠️ Unexpected download error for {video_id}: {ex}")
-                    return None
-                finally:
-                    # Close yt-dlp safely
-                    if ydl_instance:
-                        try:
-                            ydl_instance.close()
-                        except Exception:
-                            pass
+                        if "416" in error_msg or "Requested range not satisfiable" in error_msg:
+                            # HTTP 416 range error
+                            logger.warning(f"⚠️ Range error for {video_id}, skipping")
+                        else:
+                            logger.warning(f"⚠️ Download error for {video_id}: {ex}")
+                            if recovered:
+                                logger.warning(
+                                    f"⚠️ Using recovered file for {video_id} despite download error"
+                                )
+                                return recovered
+                        return None
+                    except Exception as ex:
+                        logger.warning(f"⚠️ Unexpected download error for {video_id}: {ex}")
+                        return None
+                    finally:
+                        # Close yt-dlp safely
+                        if ydl_instance:
+                            try:
+                                ydl_instance.close()
+                            except Exception:
+                                pass
 
-            # Start download thread
-            return await asyncio.to_thread(_download, ydl_opts_cookie)
+                # Start download thread
+                return await asyncio.to_thread(_download, ydl_opts_cookie)
