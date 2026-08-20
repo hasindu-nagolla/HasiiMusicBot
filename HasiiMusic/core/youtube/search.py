@@ -89,14 +89,36 @@ class Searcher:
                         "cookiefile": cookie
                     }
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                        return ydl.extract_info(f"ytsearch1:{query}", download=False)
+                        return ydl.extract_info(f"ytsearch5:{query}", download=False)
                         
                 results = await asyncio.to_thread(_extract_search)
                 
                 if not results or "entries" not in results or not results["entries"]:
                     return None
                     
+                query_lower = query.lower()
+                avoid_keywords = [
+                    "cover", "remix", "karaoke", "instrumental", "slowed", 
+                    "reverb", "parody", "mashup", "sped up", "ai cover", " a.i ", " ai "
+                ]
+                
+                allowed_keywords = [kw for kw in avoid_keywords if kw.strip() in query_lower]
+                
                 data = results["entries"][0]
+                
+                for entry in results["entries"]:
+                    title_lower = entry.get("title", "").lower()
+                    has_unwanted_kw = False
+                    
+                    for kw in avoid_keywords:
+                        if kw in title_lower and kw not in allowed_keywords:
+                            has_unwanted_kw = True
+                            break
+                            
+                    if not has_unwanted_kw:
+                        data = entry
+                        break
+
                 duration_sec = data.get("duration")
                 is_live = data.get("is_live", False)
                 if duration_sec is None and is_live:
