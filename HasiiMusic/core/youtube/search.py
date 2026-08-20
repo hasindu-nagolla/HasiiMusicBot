@@ -14,6 +14,7 @@ from HasiiMusic import logger
 from HasiiMusic.helpers import Track, utils
 import yt_dlp
 
+
 class Searcher:
     def __init__(self, cookies_manager):
         self._cookies = cookies_manager
@@ -40,9 +41,19 @@ class Searcher:
                 fresh.video = False
                 return fresh
 
-        if music and not query.lower().endswith("audio"):
+        avoid_keywords = [
+            "cover", "remix", "karaoke", "instrumental", "slowed", 
+            "reverb", "parody", "mashup", "sped up", "ai cover", " a.i ", " ai ",
+            "reggae", "reggea", "lofi", "8d", "bass boosted", "nightcore", "acoustic", "unplugged",
+            "dj "
+        ]
+        
+        query_lower = query.lower()
+        has_avoid_kw = any(kw in query_lower for kw in avoid_keywords)
+
+        if music and not query_lower.endswith("audio") and not has_avoid_kw:
             query = f"{query} Official Audio"
-            
+
         try:
             if self.valid(query):
                 def _extract():
@@ -66,11 +77,13 @@ class Searcher:
                     duration = "LIVE"
                     duration_sec = 0
                 else:
-                    duration = utils.format_duration(int(duration_sec)) if duration_sec else "0:00"
+                    duration = utils.format_duration(
+                        int(duration_sec)) if duration_sec else "0:00"
 
                 track = Track(
                     id=data.get("id"),
-                    channel_name=data.get("uploader") or data.get("channel", ""),
+                    channel_name=data.get(
+                        "uploader") or data.get("channel", ""),
                     duration=duration,
                     duration_sec=int(duration_sec) if duration_sec else 0,
                     message_id=m_id,
@@ -90,32 +103,32 @@ class Searcher:
                     }
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                         return ydl.extract_info(f"ytsearch5:{query}", download=False)
-                        
+
                 results = await asyncio.to_thread(_extract_search)
-                
+
                 if not results or "entries" not in results or not results["entries"]:
                     return None
-                    
+
                 query_lower = query.lower()
                 avoid_keywords = [
-                    "cover", "remix", "karaoke", "instrumental", "slowed", 
-                    "reverb", "parody", "mashup", "sped up", "ai cover", " a.i ", " ai ",
-                    "reggae", "lofi", "8d", "bass boosted", "nightcore", "acoustic", "unplugged"
+                    "cover", "remix", "karaoke", "instrumental", "slowed",
+                    "reverb", "parody", "mashup", "sped up", "ai cover", " a.i ", " ai "
                 ]
-                
-                allowed_keywords = [kw for kw in avoid_keywords if kw.strip() in query_lower]
-                
+
+                allowed_keywords = [
+                    kw for kw in avoid_keywords if kw.strip() in query_lower]
+
                 data = results["entries"][0]
-                
+
                 for entry in results["entries"]:
                     title_lower = entry.get("title", "").lower()
                     has_unwanted_kw = False
-                    
+
                     for kw in avoid_keywords:
                         if kw in title_lower and kw not in allowed_keywords:
                             has_unwanted_kw = True
                             break
-                            
+
                     if not has_unwanted_kw:
                         data = entry
                         break
@@ -126,17 +139,21 @@ class Searcher:
                     duration = "LIVE"
                     duration_sec = 0
                 else:
-                    duration = utils.format_duration(int(duration_sec)) if duration_sec else "0:00"
+                    duration = utils.format_duration(
+                        int(duration_sec)) if duration_sec else "0:00"
 
                 track = Track(
                     id=data.get("id"),
-                    channel_name=data.get("uploader") or data.get("channel", ""),
+                    channel_name=data.get(
+                        "uploader") or data.get("channel", ""),
                     duration=duration,
                     duration_sec=int(duration_sec) if duration_sec else 0,
                     message_id=m_id,
                     title=(data.get("title") or "")[:25],
-                    thumbnail=data.get("thumbnails", [{}])[-1].get("url", "").split("?")[0] if data.get("thumbnails") else "",
-                    url=data.get("url") or data.get("webpage_url") or f"https://youtube.com/watch?v={data.get('id')}",
+                    thumbnail=data.get("thumbnails", [
+                                       {}])[-1].get("url", "").split("?")[0] if data.get("thumbnails") else "",
+                    url=data.get("url") or data.get(
+                        "webpage_url") or f"https://youtube.com/watch?v={data.get('id')}",
                     view_count=str(data.get("view_count", "")),
                     is_live=is_live,
                 )
@@ -148,7 +165,7 @@ class Searcher:
                 del self.search_cache[oldest_key]
 
             return replace(track)
-            
+
         except Exception as e:
             logger.warning(f"⚠️ YouTube search failed for '{query}': {e}")
             return None
@@ -164,7 +181,7 @@ class Searcher:
                 }
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     return ydl.extract_info(url, download=False)
-                    
+
             plist = await asyncio.to_thread(_extract_playlist)
             tracks = []
 
@@ -179,16 +196,20 @@ class Searcher:
                         duration = "LIVE"
                         duration_sec = 0
                     else:
-                        duration = utils.format_duration(int(duration_sec)) if duration_sec else "0:00"
+                        duration = utils.format_duration(
+                            int(duration_sec)) if duration_sec else "0:00"
 
                     track = Track(
                         id=data.get("id", ""),
-                        channel_name=data.get("uploader") or data.get("channel", ""),
+                        channel_name=data.get(
+                            "uploader") or data.get("channel", ""),
                         duration=duration,
                         duration_sec=int(duration_sec) if duration_sec else 0,
                         title=(data.get("title", "Unknown")[:25]),
-                        thumbnail=data.get("thumbnails", [{}])[-1].get("url", "").split("?")[0] if data.get("thumbnails") else "",
-                        url=data.get("url") or data.get("webpage_url") or f"https://youtube.com/watch?v={data.get('id')}",
+                        thumbnail=data.get("thumbnails", [
+                                           {}])[-1].get("url", "").split("?")[0] if data.get("thumbnails") else "",
+                        url=data.get("url") or data.get(
+                            "webpage_url") or f"https://youtube.com/watch?v={data.get('id')}",
                         user=user,
                         view_count="",
                     )
@@ -198,5 +219,6 @@ class Searcher:
 
             return tracks
         except Exception as e:
-            logger.warning(f"⚠️ YouTube playlist extraction failed for '{url}': {e}")
+            logger.warning(
+                f"⚠️ YouTube playlist extraction failed for '{url}': {e}")
             return []
