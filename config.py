@@ -56,7 +56,7 @@ class Config:
         self.QUEUE_END_MESSAGE: bool = self._str_to_bool(getenv("QUEUE_END_MESSAGE", "False"))
         self.AUTO_LEAVE: bool = self._str_to_bool(getenv("AUTO_LEAVE", "False"))
         self.THUMB_GEN: bool = self._str_to_bool(getenv("THUMB_GEN", "True"))
-        self.VIDEO_PLAY: bool = self._str_to_bool(getenv("VIDEO_PLAY", "False"))
+
         self.VIDEO_MAX_HEIGHT: int = self._parse_video_height()
 
         # YOUTUBE COOKIES

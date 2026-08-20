@@ -60,7 +60,7 @@
   "help_play": "<u><b>ᴘʟᴀʏ ᴄᴏᴍᴍᴀɴᴅꜱ:</b></u>\nʏᴏᴜ ᴄᴀɴ ᴘʟᴀʏ ᴍᴜꜱɪᴄ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴜꜱɪɴɢ ᴛʜᴇ ꜰᴏʟʟᴏᴡɪɴɢ ᴄᴏᴍᴍᴀɴᴅꜱ.\n<blockquote>/play [ꜱᴏɴɢ ɴᴀᴍᴇ/ʏᴛ ᴜʀʟ/ʀᴇᴘʟʏ]: ᴘʟᴀʏ ᴀᴜᴅɪᴏ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ.\n/vplay [ꜱᴏɴɢ ɴᴀᴍᴇ/ʏᴛ ᴜʀʟ/ʀᴇᴘʟʏ]: ᴘʟᴀʏ ᴠɪᴅᴇᴏ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ (ɪꜰ ᴇɴᴀʙʟᴇᴅ).\n/playforce: ꜰᴏʀᴄᴇ ᴘʟᴀʏ ᴀᴜᴅɪᴏ (ꜱᴋɪᴘ ǫᴜᴇᴜᴇ).\n/vplayforce: ꜰᴏʀᴄᴇ ᴘʟᴀʏ ᴠɪᴅᴇᴏ (ꜱᴋɪᴘ ǫᴜᴇᴜᴇ).\n/radio: ᴘʟᴀʏ ᴏɴʟɪɴᴇ ʀᴀᴅɪᴏ ꜱᴛᴀᴛɪᴏɴꜱ.\n\n<b>ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍꜱ:</b> ꜱᴜᴘᴘᴏʀᴛꜱ ʏᴏᴜᴛᴜʙᴇ ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍꜱ\n\n<b>ᴇxᴀᴍᴘʟᴇ:</b> <code>/play -f live_stream_name</code></blockquote>",
   "help_queue": "<u><b>ǫᴜᴇᴜᴇ ᴄᴏᴍᴍᴀɴᴅꜱ:</b></u>\n<blockquote>/queue: ꜱʜᴏᴡꜱ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛʟʏ ǫᴜᴇᴜᴇᴅ ᴛʀᴀᴄᴋꜱ ɪɴ ᴛʜᴇ ǫᴜᴇᴜᴇ.\n/loop: ᴇɴᴀʙʟᴇ/ᴅɪꜱᴀʙʟᴇ ʟᴏᴏᴘ ᴍᴏᴅᴇ ꜰᴏʀ ǫᴜᴇᴜᴇ ᴏʀ ꜱɪɴɢʟᴇ ᴛʀᴀᴄᴋ.</blockquote>",
   "help_stats": "<blockquote><u><b>ꜱᴛᴀᴛꜱ ᴄᴏᴍᴍᴀɴᴅꜱ:</b></u>\n\n/stats: ꜱʜᴏᴡꜱ ᴛʜᴇ ʙᴏᴛ'ꜱ ꜱᴛᴀᴛꜱ.</blockquote>",
-  "help_sudo": "<blockquote><b><u>ꜱᴜᴅᴏ ᴄᴏᴍᴍᴀɴᴅꜱ:</b></u>\n\n/ac: ꜱʜᴏᴡꜱ ᴛʜᴇ ᴀᴄᴛɪᴠᴇ ᴄᴀʟʟꜱ ᴄᴏᴜɴᴛ.\n\n/broadcast [ʀᴇᴘʟʏ ᴛᴏ ᴍᴇꜱꜱᴀɢᴇ]: ʙʀᴏᴀᴅᴄᴀꜱᴛꜱ ᴛʜᴇ ᴍᴇꜱꜱᴀɢᴇ ᴛᴏ ᴀʟʟ ᴛʜᴇ ᴄʜᴀᴛꜱ.\n  • -ɴᴏᴄʜᴀᴛ: ᴇxᴄʟᴜᴅᴇꜱ ɢʀᴏᴜᴘꜱ ꜰʀᴏᴍ ᴛʜᴇ ʙʀᴏᴀᴅᴄᴀꜱᴛ.\n  • -ᴜꜱᴇʀ: ɪɴᴄʟᴜᴅᴇ ᴜꜱᴇʀꜱ ɪɴ ᴛʜᴇ ʙʀᴏᴀᴅᴄᴀꜱᴛ.\n  • -ᴄᴏᴘʏ: ʀᴇᴍᴏᴠᴇꜱ ꜰᴏʀᴡᴀʀᴅᴇᴅ ᴛᴀɢ.\n<b>ᴇxᴀᴍᴘʟᴇ:</b> <code>/broadcast -user -copy</code>\n\n/leave: ᴍᴀᴋᴇ ʙᴏᴛ ᴀɴᴅ ᴀꜱꜱɪꜱᴛᴀɴᴛ ʟᴇᴀᴠᴇ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ ᴄʜᴀᴛ.\n/leaveall: ᴍᴀᴋᴇ ᴀʟʟ ᴀꜱꜱɪꜱᴛᴀɴᴛꜱ ʟᴇᴀᴠᴇ ɪɴᴀᴄᴛɪᴠᴇ ᴄʜᴀᴛꜱ.\n\n/logs: ꜱᴇɴᴅꜱ ᴛʜᴇ ʟᴏɢ ꜰɪʟᴇ.\n/logger [on/off]: ᴇɴᴀʙʟᴇꜱ/ᴅɪꜱᴀʙʟᴇ ᴛʜᴇ ʟᴏɢɢᴇʀ.\n\n/restart: ʀᴇꜱᴛᴀʀᴛꜱ ᴛʜᴇ ʙᴏᴛ.\n\n/addsudo: ᴀᴅᴅ ᴀ ᴜꜱᴇʀ ᴛᴏ ᴛʜᴇ ꜱᴜᴅᴏ ᴜꜱᴇʀꜱ ʟɪꜱᴛ.\n/rmsudo: ʀᴇᴍᴏᴠᴇ ᴀ ᴜꜱᴇʀ ꜰʀᴏᴍ ᴛʜᴇ ꜱᴜᴅᴏ ᴜꜱᴇʀꜱ ʟɪꜱᴛ.</blockquote>",
+  "help_sudo": "<blockquote><b><u>ꜱᴜᴅᴏ ᴄᴏᴍᴍᴀɴᴅꜱ:</b></u>\n\n/ac: ꜱʜᴏᴡꜱ ᴛʜᴇ ᴀᴄᴛɪᴠᴇ ᴄᴀʟʟꜱ ᴄᴏᴜɴᴛ.\n\n/broadcast [ʀᴇᴘʟʏ ᴛᴏ ᴍᴇꜱꜱᴀɢᴇ]: ʙʀᴏᴀᴅᴄᴀꜱᴛꜱ ᴛʜᴇ ᴍᴇꜱꜱᴀɢᴇ ᴛᴏ ᴀʟʟ ᴛʜᴇ ᴄʜᴀᴛꜱ.\n  • -ɴᴏᴄʜᴀᴛ: ᴇxᴄʟᴜᴅᴇꜱ ɢʀᴏᴜᴘꜱ ꜰʀᴏᴍ ᴛʜᴇ ʙʀᴏᴀᴅᴄᴀꜱᴛ.\n  • -ᴜꜱᴇʀ: ɪɴᴄʟᴜᴅᴇ ᴜꜱᴇʀꜱ ɪɴ ᴛʜᴇ ʙʀᴏᴀᴅᴄᴀꜱᴛ.\n  • -ᴄᴏᴘʏ: ʀᴇᴍᴏᴠᴇꜱ ꜰᴏʀᴡᴀʀᴅᴇᴅ ᴛᴀɢ.\n<b>ᴇxᴀᴍᴘʟᴇ:</b> <code>/broadcast -user -copy</code>\n\n/leave: ᴍᴀᴋᴇ ʙᴏᴛ ᴀɴᴅ ᴀꜱꜱɪꜱᴛᴀɴᴛ ʟᴇᴀᴠᴇ ᴛʜᴇ ᴄᴜʀʀᴇɴᴛ ᴄʜᴀᴛ.\n/leaveall: ᴍᴀᴋᴇ ᴀʟʟ ᴀꜱꜱɪꜱᴛᴀɴᴛꜱ ʟᴇᴀᴠᴇ ɪɴᴀᴄᴛɪᴠᴇ ᴄʜᴀᴛꜱ.\n\n/logs: ꜱᴇɴᴅꜱ ᴛʜᴇ ʟᴏɢ ꜰɪʟᴇ.\n/logger [on/off]: ᴇɴᴀʙʟᴇꜱ/ᴅɪꜱᴀʙʟᴇ ᴛʜᴇ ʟᴏɢɢᴇʀ.\n\n/restart: ʀᴇꜱᴛᴀʀᴛꜱ ᴛʜᴇ ʙᴏᴛ.\n\n/addsudo: ᴀᴅᴅ ᴀ ᴜꜱᴇʀ ᴛᴏ ᴛʜᴇ ꜱᴜᴅᴏ ᴜꜱᴇʀꜱ ʟɪꜱᴛ.\n/rmsudo: ʀᴇᴍᴏᴠᴇ ᴀ ᴜꜱᴇʀ ꜰʀᴏᴍ ᴛʜᴇ ꜱᴜᴅᴏ ᴜꜱᴇʀꜱ ʟɪꜱᴛ.\n\n/enable vplay: ᴇɴᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.\n/disable vplay: ᴅɪꜱᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.</blockquote>",
   "log_fetch": "<blockquote>ꜰᴇᴛᴄʜɪɴɢ ʟᴏɢꜱ...</blockquote>",
   "log_not_found": "<blockquote>ʟᴏɢ ꜰɪʟᴇ ᴅᴏᴇꜱɴ'ᴛ ᴇxɪꜱᴛ.</blockquote>",
   "log_sent": "<blockquote>ʟᴏɢ ꜰɪʟᴇ ᴏꜰ {0}</blockquote>",
@@ -126,7 +126,7 @@
   "sudo_removed": "<blockquote>ʀᴇᴍᴏᴠᴇᴅ {0} ꜰʀᴏᴍ ᴛʜᴇ ꜱᴜᴅᴏ ᴜꜱᴇʀꜱ ʟɪꜱᴛ.</blockquote>",
   "sudo_fetching": "<blockquote>ꜰᴇᴛᴄʜɪɴɢ ꜱᴜᴅᴏ ᴜꜱᴇʀꜱ ʟɪꜱᴛ...</blockquote>",
   "sudo_owner": "<blockquote><u><b>ᴏᴡɴᴇʀ:</b></u>\n- {0}\n\n</blockquote>",
-  "sudo_users": "<blockquote><u><b>ꜱᴜᴅᴏ ᴜꜱᴇʀꜱ:</b></u></blockquote>",
+  "sudo_users": "<blockquote><u><b>ꜱᴜᴅᴏ ᴜꜱᴇʀꜱ:</b></u>{0}\n\n</blockquote>",
   "user_not_admin": "<blockquote>ᴏʜ ꜱᴜʀᴇ, ɢᴏ ᴀʜᴇᴀᴅ ᴀɴᴅ ᴍᴀɴᴀɢᴇ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ... ᴏʜ ᴡᴀɪᴛ, ʏᴏᴜ'ʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ.</blockquote>",
   "user_no_perms": "ʏᴏᴜ? ᴍᴀɴᴀɢᴇ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ? ɴᴏᴛ ᴡɪᴛʜ ᴛʜᴏꜱᴇ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ, ꜱᴡᴇᴇᴛɪᴇ.",
   "user_not_found": "<blockquote>ɪ'ʟʟ ɴᴇᴇᴅ ᴀ ᴜꜱᴇʀ ɪᴅ — ᴏʀ ᴡᴏᴜʟᴅ ʏᴏᴜ ᴍɪɴᴅ ʀᴇᴘʟʏɪɴɢ ᴛᴏ ꜱᴏᴍᴇᴏɴᴇ'ꜱ ᴍᴇꜱꜱᴀɢᴇ?</blockquote>",
@@ -212,6 +212,6 @@
   "loop_disabled": "<blockquote>➡️ Loop mode disabled</blockquote>",
   "loop_single": "<blockquote>🔂 Loop mode set to Single Track</blockquote>",
   "loop_queue_set": "<blockquote>🔁 Loop mode set to Queue</blockquote>",
-  "loop_usage": "<blockquote><b>Usage:</b>\n• /loop - Cycle through modes\n• /loop disable - Disable loop\n• /loop single - Loop current track\n• /loop queue - Loop entire queue</blockquote>"
+  "loop_usage": "<blockquote><b>Usage:</b>\n• /loop - Cycle through modes\n• /loop disable - Disable loop\n• /loop single - Loop current track\n• /loop queue - Loop entire queue</blockquote>",
+  "sudo_deleted": "\n- Deleted Account ({0})"
 }
-
