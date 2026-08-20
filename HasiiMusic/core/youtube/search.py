@@ -42,10 +42,13 @@ class Searcher:
                 return fresh
 
         avoid_keywords = [
-            "cover", "remix", "karaoke", "instrumental", "slowed", 
+            "cover", "remix", "karaoke", "karoke", "instrumental", "slowed", 
             "reverb", "parody", "mashup", "sped up", "ai cover", " a.i ", " ai ",
-            "reggae", "reggea", "lofi", "8d", "bass boosted", "nightcore", "acoustic", "unplugged",
-            "dj "
+            "reggae", "reggea", "lofi", "lo-fi", "8d", "16d", "3d", "bass boosted", 
+            "nightcore", "daycore", "acoustic", "unplugged", "dj ", "edm", " mix ", 
+            "tiktok", "trend", "bootleg", "rework", "flip", "vocal cover", 
+            "piano version", "guitar version", "baila", "nonstop", "non stop", 
+            "papare", "live performance", "studio session", "ringtone"
         ]
         
         query_lower = query.lower()
