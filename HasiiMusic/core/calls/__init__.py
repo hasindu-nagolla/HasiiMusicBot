@@ -25,7 +25,7 @@ logging.getLogger('pyrogram.dispatcher').addFilter(PyTgCallsErrorFilter())
 
 class TgCall(PyTgCalls):
     def __init__(self):
-        super().__init__()
+
         
         # Shared state
         self.clients = []
