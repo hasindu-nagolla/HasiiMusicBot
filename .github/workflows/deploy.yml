@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Deploying to VPS via tmux
         uses: appleboy/ssh-action@master
