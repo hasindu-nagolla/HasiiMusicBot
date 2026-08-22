@@ -60,7 +60,7 @@
   "help_play": "<u><b>பிளே கட்டளைகள் (Play):</b></u>\n<blockquote>/play [பாடல் பெயர்/YouTube URL/reply]: குரல் அரட்டையில் ஆடியோவை இயக்கு.\n/vplay [பாடல் பெயர்/YouTube URL/reply]: வீடியோவை இயக்கு.\n/playforce: கட்டாயமாக இயக்கு (வரிசையைத் தவிர்).\n/vplayforce: கட்டாயமாக வீடியோவை இயக்கு.\n/radio: ஆன்லைன் வானொலி நிலையங்களை இயக்கு.\n\n<b>உதாரணம்:</b> <code>/play -f live_stream_name</code></blockquote>",
   "help_queue": "<u><b>வரிசை கட்டளைகள் (Queue):</b></u>\n<blockquote>/queue: வரிசையில் உள்ள பாடல்களைக் காட்டுகிறது.\n/loop: லூப் பயன்முறையை இயக்கு/முடக்கு.</blockquote>",
   "help_stats": "<blockquote><u><b>புள்ளிவிவர கட்டளைகள் (Stats):</b></u>\n\n/stats: போட்டின் புள்ளிவிவரங்களைக் காட்டுகிறது.</blockquote>",
-  "help_sudo": "<blockquote><b><u>சுடோ கட்டளைகள் (Sudo Commands):</b></u>\n\n/ac: செயலில் உள்ள அழைப்புகளின் எண்ணிக்கையைக் காட்டுகிறது.\n/broadcast [reply]: அனைத்து குழுக்களுக்கும் செய்தியை ஒளிபரப்புகிறது.\n/logs: லாக் கோப்பை அனுப்புகிறது.\n/logger [on/off]: லாக்கரை இயக்குகிறது/முடக்குகிறது.\n/restart: போட்டை மீண்டும் தொடங்குகிறது.</blockquote>",
+  "help_sudo": "<blockquote><b><u>சுடோ கட்டளைகள் (Sudo Commands):</b></u>\n\n/ac: செயலில் உள்ள அழைப்புகளின் எண்ணிக்கையைக் காட்டுகிறது.\n/broadcast [reply]: அனைத்து குழுக்களுக்கும் செய்தியை ஒளிபரப்புகிறது.\n/logs: லாக் கோப்பை அனுப்புகிறது.\n/logger [on/off]: லாக்கரை இயக்குகிறது/முடக்குகிறது.\n/restart: போட்டை மீண்டும் தொடங்குகிறது.\n\n/enable vplay: ᴇɴᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.\n/disable vplay: ᴅɪꜱᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.</blockquote>",
   "log_fetch": "<blockquote>லாக் கோப்புகளைப் பெறுகிறது...</blockquote>",
   "log_not_found": "<blockquote>லாக் கோப்பு இல்லை.</blockquote>",
   "log_sent": "<blockquote>{0} இன் லாக் கோப்பு</blockquote>",
@@ -126,7 +126,7 @@
   "sudo_removed": "<blockquote>சுடோ பயனர்கள் பட்டியலிலிருந்து {0} நீக்கப்பட்டார்.</blockquote>",
   "sudo_fetching": "<blockquote>சுடோ பயனர்கள் பட்டியலைப் பெறுகிறது...</blockquote>",
   "sudo_owner": "<blockquote><u><b>உரிமையாளர்:</b></u>\n- {0}\n\n</blockquote>",
-  "sudo_users": "<blockquote><u><b>சுடோ பயனர்கள்:</b></u></blockquote>",
+  "sudo_users": "<blockquote><u><b>சுடோ பயனர்கள்:</b></u>{0}\n\n</blockquote>",
   "user_not_admin": "<blockquote>ஓ நிச்சயமாக, குரல் அரட்டையை நிர்வகிக்கவும்... ஓ காத்திருங்கள், நீங்கள் நிர்வாகி அல்ல.</blockquote>",
   "user_no_perms": "நீங்கள்? குரல் அரட்டையை நிர்வகிப்பதா? அந்த அனுமதிகளுடன் முடியாது.",
   "user_not_found": "<blockquote>எனக்கு ஒரு பயனர் ID தேவை — அல்லது ஒருவரின் செய்திக்கு நீங்கள் reply செய்ய முடியுமா?</blockquote>",
@@ -212,5 +212,6 @@
   "loop_disabled": "<blockquote>➡️ லூப் பயன்முறை முடக்கப்பட்டது</blockquote>",
   "loop_single": "<blockquote>🔂 லூப் பயன்முறை ஒற்றை பாடலுக்கு அமைக்கப்பட்டது</blockquote>",
   "loop_queue_set": "<blockquote>🔁 லூப் பயன்முறை வரிசைக்கு அமைக்கப்பட்டது</blockquote>",
-  "loop_usage": "<blockquote><b>பயன்பாடு:</b>\n• /loop - முறைகள் வழியாக சுழற்சி\n• /loop disable - லூப்பை முடக்கு\n• /loop single - தற்போதைய பாடலை லூப் செய்\n• /loop queue - முழு வரிசையையும் லூப் செய்</blockquote>"
+  "loop_usage": "<blockquote><b>பயன்பாடு:</b>\n• /loop - முறைகள் வழியாக சுழற்சி\n• /loop disable - லூப்பை முடக்கு\n• /loop single - தற்போதைய பாடலை லூப் செய்\n• /loop queue - முழு வரிசையையும் லூப் செய்</blockquote>",
+  "sudo_deleted": "\n- Deleted Account ({0})"
 }

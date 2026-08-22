@@ -60,7 +60,7 @@
   "help_play": "<u><b>प्ले कमांड्स (Play):</b></u>\n<blockquote>/play [गाने का नाम/YouTube URL/रिप्लाई]: वॉइस चैट में ऑडियो प्ले करें।\n/vplay [गाने का नाम/YouTube URL/रिप्लाई]: वीडियो प्ले करें।\n/playforce: जबरन प्ले करें (कतार छोड़ें)।\n/vplayforce: जबरन वीडियो प्ले करें।\n/radio: ऑनलाइन रेडियो स्टेशन प्ले करें।\n\n<b>उदाहरण:</b> <code>/play -f live_stream_name</code></blockquote>",
   "help_queue": "<u><b>कतार कमांड्स (Queue):</b></u>\n<blockquote>/queue: कतार में मौजूदा ट्रैक दिखाता है।\n/loop: लूप मोड को सक्षम/अक्षम करें।</blockquote>",
   "help_stats": "<blockquote><u><b>आँकड़े कमांड्स (Stats):</b></u>\n\n/stats: बॉट के आँकड़े दिखाता है।</blockquote>",
-  "help_sudo": "<blockquote><b><u>सूडो कमांड्स (Sudo):</b></u>\n\n/ac: सक्रिय कॉल की गिनती दिखाता है。\n/broadcast [रिप्लाई]: सभी ग्रुप्स में संदेश ब्रॉडकास्ट करता है।\n/logs: लॉग फ़ाइल भेजता है।\n/logger [on/off]: लॉगर को चालू/बंद करता है।\n/restart: बॉट को पुनरारंभ करता है।</blockquote>",
+  "help_sudo": "<blockquote><b><u>सूडो कमांड्स (Sudo):</b></u>\n\n/ac: सक्रिय कॉल की गिनती दिखाता है。\n/broadcast [रिप्लाई]: सभी ग्रुप्स में संदेश ब्रॉडकास्ट करता है।\n/logs: लॉग फ़ाइल भेजता है।\n/logger [on/off]: लॉगर को चालू/बंद करता है।\n/restart: बॉट को पुनरारंभ करता है।\n\n/enable vplay: ᴇɴᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.\n/disable vplay: ᴅɪꜱᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.</blockquote>",
   "log_fetch": "<blockquote>लॉग फ़ाइलें प्राप्त की जा रही हैं...</blockquote>",
   "log_not_found": "<blockquote>लॉग फ़ाइल मौजूद नहीं है।</blockquote>",
   "log_sent": "<blockquote>{0} की लॉग फ़ाइल</blockquote>",
@@ -126,7 +126,7 @@
   "sudo_removed": "<blockquote>{0} को सूडो उपयोगकर्ताओं की सूची से हटा दिया गया।</blockquote>",
   "sudo_fetching": "<blockquote>सूडो उपयोगकर्ताओं की सूची प्राप्त की जा रही है...</blockquote>",
   "sudo_owner": "<blockquote><u><b>मालिक (Owner):</b></u>\n- {0}\n\n</blockquote>",
-  "sudo_users": "<blockquote><u><b>सूडो उपयोगकर्ता:</b></u></blockquote>",
+  "sudo_users": "<blockquote><u><b>सूडो उपयोगकर्ता:</b></u>{0}\n\n</blockquote>",
   "user_not_admin": "<blockquote>ओह बिल्कुल, आगे बढ़ो और वॉइस चैट को प्रबंधित करो... ओह रुको, तुम एडमिन नहीं हो।</blockquote>",
   "user_no_perms": "तुम? वॉइस चैट को प्रबंधित करोगे? उन अनुमतियों के साथ तो नहीं।",
   "user_not_found": "<blockquote>मुझे एक यूज़र ID की आवश्यकता होगी — या क्या आप किसी के संदेश का रिप्लाई कर सकते हैं?</blockquote>",
@@ -212,5 +212,6 @@
   "loop_disabled": "<blockquote>➡️ लूप मोड अक्षम किया गया</blockquote>",
   "loop_single": "<blockquote>🔂 लूप मोड सिंगल ट्रैक (Single Track) पर सेट किया गया</blockquote>",
   "loop_queue_set": "<blockquote>🔁 लूप मोड कतार (Queue) पर सेट किया गया</blockquote>",
-  "loop_usage": "<blockquote><b>उपयोग:</b>\n• /loop - मोड के माध्यम से साइकिल करें\n• /loop disable - लूप को अक्षम करें\n• /loop single - वर्तमान ट्रैक को लूप करें\n• /loop queue - पूरी कतार को लूप करें</blockquote>"
+  "loop_usage": "<blockquote><b>उपयोग:</b>\n• /loop - मोड के माध्यम से साइकिल करें\n• /loop disable - लूप को अक्षम करें\n• /loop single - वर्तमान ट्रैक को लूप करें\n• /loop queue - पूरी कतार को लूप करें</blockquote>",
+  "sudo_deleted": "\n- Deleted Account ({0})"
 }

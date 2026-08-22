@@ -60,7 +60,7 @@
   "help_play": "<u><b>Команды воспроизведения:</b></u>\n<blockquote>/play [название песни/YouTube URL/ответ]: Воспроизвести аудио в голосовом чате.\n/vplay [название/URL/ответ]: Воспроизвести видео.\n/playforce: Принудительное воспроизведение аудио (пропуск очереди).\n/vplayforce: Принудительное воспроизведение видео.\n/radio: Воспроизведение онлайн-радиостанций.\n\n<b>Пример:</b> <code>/play -f live_stream_name</code></blockquote>",
   "help_queue": "<u><b>Команды очереди:</b></u>\n<blockquote>/queue: Показывает текущие треки в очереди.\n/loop: Включить/выключить режим зацикливания.</blockquote>",
   "help_stats": "<blockquote><u><b>Команды статистики:</b></u>\n\n/stats: Показывает статистику бота.</blockquote>",
-  "help_sudo": "<blockquote><b><u>Команды Судо (Sudo):</b></u>\n\n/ac: Показывает количество активных звонков.\n/broadcast [ответ на сообщение]: Рассылает сообщение во все чаты.\n/logs: Отправляет лог-файл.\n/logger [on/off]: Включает/выключает логгер.\n/restart: Перезапускает бота.</blockquote>",
+  "help_sudo": "<blockquote><b><u>Команды Судо (Sudo):</b></u>\n\n/ac: Показывает количество активных звонков.\n/broadcast [ответ на сообщение]: Рассылает сообщение во все чаты.\n/logs: Отправляет лог-файл.\n/logger [on/off]: Включает/выключает логгер.\n/restart: Перезапускает бота.\n\n/enable vplay: ᴇɴᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.\n/disable vplay: ᴅɪꜱᴀʙʟᴇ ᴠɪᴅᴇᴏ ᴘʟᴀʏ ꜰᴇᴀᴛᴜʀᴇ.</blockquote>",
   "log_fetch": "<blockquote>Получение логов...</blockquote>",
   "log_not_found": "<blockquote>Лог-файл не существует.</blockquote>",
   "log_sent": "<blockquote>Лог-файл {0}</blockquote>",
@@ -126,7 +126,7 @@
   "sudo_removed": "<blockquote>{0} удален из списка пользователей Sudo.</blockquote>",
   "sudo_fetching": "<blockquote>Получение списка пользователей Sudo...</blockquote>",
   "sudo_owner": "<blockquote><u><b>Владелец:</b></u>\n- {0}\n\n</blockquote>",
-  "sudo_users": "<blockquote><u><b>Судо пользователи:</b></u></blockquote>",
+  "sudo_users": "<blockquote><u><b>Судо пользователи:</b></u>{0}\n\n</blockquote>",
   "user_not_admin": "<blockquote>Да конечно, вперед, управляй голосовым чатом... ой подожди, ты же не админ.</blockquote>",
   "user_no_perms": "Ты? Управлять голосовым чатом? Не с такими правами.",
   "user_not_found": "<blockquote>Мне нужен ID пользователя — или не мог бы ты ответить на чье-нибудь сообщение?</blockquote>",
@@ -212,5 +212,6 @@
   "loop_disabled": "<blockquote>➡️ Режим зацикливания отключен</blockquote>",
   "loop_single": "<blockquote>🔂 Режим зацикливания установлен на Одиночный трек</blockquote>",
   "loop_queue_set": "<blockquote>🔁 Режим зацикливания установлен на Очередь</blockquote>",
-  "loop_usage": "<blockquote><b>Использование:</b>\n• /loop - Переключение режимов\n• /loop disable - Отключить зацикливание\n• /loop single - Зациклить текущий трек\n• /loop queue - Зациклить всю очередь</blockquote>"
+  "loop_usage": "<blockquote><b>Использование:</b>\n• /loop - Переключение режимов\n• /loop disable - Отключить зацикливание\n• /loop single - Зациклить текущий трек\n• /loop queue - Зациклить всю очередь</blockquote>",
+  "sudo_deleted": "\n- Deleted Account ({0})"
 }
