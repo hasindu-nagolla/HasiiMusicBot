@@ -54,14 +54,15 @@ The core bot application containing all functionality.
 
 Contains the fundamental building blocks of the bot.
 
-| File          | Purpose                                                     |
+| File/Folder   | Purpose                                                     |
 | ------------- | ----------------------------------------------------------- |
 | `bot.py`      | Main bot client class (extends Pyrogram Client)             |
 | `userbot.py`  | Assistant/userbot clients (for joining voice chats)         |
-| `calls.py`    | Voice call management (PyTgCalls integration)               |
+| `calls/`      | Voice call management, queues, and PyTgCalls integration    |
+| `spotify/`    | Spotify integration, lazy-loading, and metadata processing  |
+| `youtube/`    | YouTube video/audio downloading, cache locking, and search  |
 | `mongo.py`    | MongoDB database operations (users, chats, blacklist, etc.) |
 | `telegram.py` | Telegram API helper functions                               |
-| `youtube.py`  | YouTube video/audio downloading and processing              |
 | `dir.py`      | Directory management (temp files, downloads, etc.)          |
 | `preload.py`  | Background track preloading for seamless playback           |
 
@@ -337,10 +338,11 @@ HasiiMusicBot/
     ├── 🔧 core/                  # Core functionality
     │   ├── bot.py                # Main bot client
     │   ├── userbot.py            # Assistant clients
-    │   ├── calls.py              # Voice call handler
+    │   ├── calls/                # Voice call handler & pyTgCalls integration
+    │   ├── spotify/              # Spotify API, embeds, and lazy-loading
+    │   ├── youtube/              # yt-dlp downloader, locking & processing
     │   ├── mongo.py              # Database operations
     │   ├── telegram.py           # Telegram helpers
-    │   ├── youtube.py            # YouTube downloader
     │   ├── lang.py               # Language system
     │   ├── dir.py                # Directory manager
     │   └── preload.py            # Track preloader
@@ -528,8 +530,8 @@ All sensitive data is stored in environment variables, not hardcoded:
 
 ### For Advanced Users
 
-1. Explore `core/calls.py` - PyTgCalls integration
-2. Study `core/youtube.py` - Media downloading logic
+1. Explore `core/calls/` - Modular PyTgCalls integration & playback states
+2. Study `core/youtube/` - Robust media downloading and cache locking logic
 3. Review `helpers/_queue.py` - Queue management
 4. Understand async/await patterns throughout codebase
 
@@ -557,4 +559,4 @@ When adding new features:
 
 ---
 
-**Last Updated:** March 4, 2026
+**Last Updated:** August 22, 2026

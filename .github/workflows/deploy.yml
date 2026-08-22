@@ -1,0 +1,36 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploying to VPS via tmux
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            # 1. Kill existing tmux session
+            tmux kill-session -t HasiiMusic || true
+            
+            # 2. Create a new detached tmux session
+            tmux new-session -d -s HasiiMusic
+            
+            # 3. Send commands to tmux session
+            tmux send-keys -t HasiiMusic 'cd ~/HasiiMusicBot' C-m
+            tmux send-keys -t HasiiMusic 'source hasiimusic/bin/activate' C-m
+            tmux send-keys -t HasiiMusic 'git checkout main' C-m
+            tmux send-keys -t HasiiMusic 'git fetch --all' C-m
+            tmux send-keys -t HasiiMusic 'git reset --hard origin/main' C-m
+            tmux send-keys -t HasiiMusic 'git pull origin main' C-m
+            tmux send-keys -t HasiiMusic 'pip uninstall -r requirements.txt -y' C-m
+            tmux send-keys -t HasiiMusic 'pip install --no-cache-dir -r requirements.txt' C-m
+            tmux send-keys -t HasiiMusic 'clear' C-m
+            tmux send-keys -t HasiiMusic 'bash start' C-m
