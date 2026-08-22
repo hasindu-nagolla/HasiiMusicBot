@@ -15,14 +15,18 @@ Welcome to the technical documentation for **HasiiMusicBot**. This document expl
 ### 2. PyTgCalls (Voice Chat Streaming API)
 [PyTgCalls](https://pytgcalls.github.io/PyTgCalls/) is a powerful asynchronous Python library for handling Telegram Group Voice Calls.
 * **Role in HasiiMusicBot:** While Pyrogram handles the text and UI logic, PyTgCalls is entirely responsible for the audio processing and streaming. It connects the Assistant Account to the Telegram Voice Chat via WebRTC.
-* **Implementation:** Managed centrally in `HasiiMusic/core/calls.py`. It natively handles audio queues, pausing, resuming, and muting the stream directly inside the active voice chat.
+* **Implementation:** Managed centrally in the modular `HasiiMusic/core/calls/` package. It natively handles audio queues, pausing, resuming, and muting the stream directly inside the active voice chat.
 
 ### 3. yt-dlp & FFmpeg (Media Extraction & Processing)
-* **yt-dlp:** We use `yt-dlp` (located in `HasiiMusic/core/youtube.py`) to bypass the need to download entire videos. Instead, it extracts the direct high-quality audio stream URLs (like Opus/WebM) from YouTube and other platforms.
+* **yt-dlp:** We use `yt-dlp` (located in the modular `HasiiMusic/core/youtube/` package) to bypass the need to download entire videos. Instead, it extracts the direct high-quality audio stream URLs (like Opus/WebM) from YouTube and other platforms. It also utilizes robust file-locking mechanisms to safely manage parallel downloads and caching.
 * **FFmpeg:** Acts as the backend engine. `PyTgCalls` utilizes FFmpeg to transcode these media streams on-the-fly into a format compatible with Telegram Voice Chats (Raw Audio/PCM).
 
 ### 4. Motor (Asynchronous MongoDB)
 * **Role in HasiiMusicBot:** To maintain the asynchronous nature of the bot, we use `Motor` (in `HasiiMusic/core/mongo.py`) for all database interactions. This ensures that saving and retrieving data (like broadcast lists, banned users, and chat settings) does not block the main event loop, keeping the bot fast and responsive.
+
+### 5. Spotify Integration & Lazy Loading
+* **Role in HasiiMusicBot:** To support massive Spotify playlists without hitting API rate limits or timeouts, the bot employs a highly optimized lazy-loading architecture.
+* **Implementation:** Managed in the `HasiiMusic/core/spotify/` package. When a Spotify playlist is queued, the bot instantly fetches basic metadata and lazily resolves the actual YouTube audio streams (fetching "Official Audio" for studio quality) only when the track is about to be played.
 
 ---
 

@@ -134,5 +134,5 @@ This software is provided "as is" under the GNU General Public License v3.0 (GPL
 
 ---
 
-**Last Updated:** July 4, 2026  
+**Last Updated:** August 22, 2026  
 **Contact:** [@Hasindu_Lakshan](https://t.me/Hasindu_Lakshan) on Telegram
