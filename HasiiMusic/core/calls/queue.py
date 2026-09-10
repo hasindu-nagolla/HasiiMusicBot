@@ -42,14 +42,27 @@ class CallQueue:
             self.controller._track_index[chat_id] = self.controller._track_index.get(chat_id, 0) + 1
             await self._play_next_impl(chat_id)
 
-    async def _play_next_impl(self, chat_id: int) -> None:
+    async def play_previous(self, chat_id: int) -> bool:
+        lock = self.controller.get_lock(chat_id)
+        async with lock:
+            self.controller._pending_transitions.discard(chat_id)
+            self.controller._track_index[chat_id] = self.controller._track_index.get(chat_id, 0) + 1
+            
+            media = queue.get_previous(chat_id)
+            if not media:
+                return False
+            
+            await self._play_next_impl(chat_id, is_previous=True)
+            return True
+
+    async def _play_next_impl(self, chat_id: int, is_previous: bool = False) -> None:
         try:
             if not await db.get_call(chat_id):
                 return
 
             loop_mode = await db.get_loop(chat_id)
 
-            if loop_mode == 1:
+            if loop_mode == 1 and not is_previous:
                 media = queue.get_current(chat_id)
                 if media:
                     _lang = await lang.get_lang(chat_id)
@@ -67,7 +80,10 @@ class CallQueue:
                         await db.rm_chat(chat_id)
                     return
 
-            media = queue.get_next(chat_id)
+            if not is_previous:
+                media = queue.get_next(chat_id)
+            else:
+                media = queue.get_current(chat_id)
 
             if not media and loop_mode == 10:
                 all_items = queue.get_all(chat_id)

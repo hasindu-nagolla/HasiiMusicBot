@@ -144,6 +144,11 @@ async def _controls(_, query: types.CallbackQuery):
             )
         reply = query.lang["play_resumed"].format(user)
 
+    elif action == "previous":
+        await tune.play_previous(chat_id)
+        status = query.lang["skipped"]  # We reuse the "skipped" text or define a new one if available
+        reply = "Track reverted." # Basic reply
+
     elif action == "skip":
         await tune.play_next(chat_id)
         status = query.lang["skipped"]
@@ -218,7 +223,8 @@ async def _controls(_, query: types.CallbackQuery):
                 flags=re.DOTALL,
             )
             keyboard = buttons.controls(
-                chat_id, status=status if action != "resume" else None
+                chat_id, status=status if action != "resume" else None,
+                is_playing=(action != "pause")
             )
         await query.edit_message_text(
             f"{mtext}\n\n<blockquote>{reply}</blockquote>", reply_markup=keyboard
