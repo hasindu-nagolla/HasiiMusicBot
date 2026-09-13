@@ -42,7 +42,8 @@ async def safe_reply(message, text, **kwargs):
     try:
         return await message.reply_text(text, **kwargs)
     except (ChatSendPlainForbidden, ChatWriteForbidden):
-        logger.warning(f"Cannot send text in chat {message.chat.id} (chat write forbidden)")
+        logger.warning(
+            f"Cannot send text in chat {message.chat.id} (chat write forbidden)")
         return None
     except Exception as e:
         logger.error(f"Error in safe_reply: {e}")
@@ -58,6 +59,7 @@ async def auto_delete(message: types.Message, delay: int = 15):
         await message.delete()
     except Exception as e:
         logger.debug(f"auto_delete: couldnt delete message: {e}")
+
 
 @app.on_message(
     filters.command(
@@ -85,12 +87,12 @@ async def play_hndlr(
         await m.delete()
     except Exception:
         pass
-    
+
     chat_id = m.chat.id
 
     # Select emoji for this play session
     play_emoji = m.lang["play_emoji"]
-    
+
     try:
         sent = await safe_reply(m, m.lang["play_searching"].format(play_emoji))
     except FloodWait as e:
@@ -105,7 +107,7 @@ async def play_hndlr(
             return  # Abort silently
     except Exception:
         return  # If we can't even send initial message, abort
-    
+
     mention = m.from_user.mention
     media = tg.get_media(m.reply_to_message) if m.reply_to_message else None
     tracks = []
@@ -136,7 +138,8 @@ async def play_hndlr(
             if spotify.is_playlist(url):
                 try:
                     tracks = await spotify.playlist(
-                        min(config.PLAYLIST_LIMIT, getattr(config, "PLAYLIST_MAX", 100)), mention, url
+                        min(config.PLAYLIST_LIMIT, getattr(
+                            config, "PLAYLIST_MAX", 100)), mention, url
                     )
                 except Exception as e:
                     await safe_edit(
@@ -158,7 +161,8 @@ async def play_hndlr(
         elif "playlist" in url:
             try:
                 tracks = await yt.playlist(
-                    min(config.PLAYLIST_LIMIT, getattr(config, "PLAYLIST_MAX", 100)), mention, url
+                    min(config.PLAYLIST_LIMIT, getattr(
+                        config, "PLAYLIST_MAX", 100)), mention, url
                 )
             except Exception as e:
                 await safe_edit(
@@ -178,7 +182,6 @@ async def play_hndlr(
             file.message_id = sent.id
         else:
             file = await yt.search(url, sent.id)
-
 
         if not file:
             await safe_edit(
@@ -244,7 +247,7 @@ async def play_hndlr(
             if tracks:
                 for track in tracks:
                     queue.add(chat_id, track)
-            
+
             # ✨ NEW: Start preloading queued tracks in background
             try:
                 from HasiiMusic import preload
@@ -252,7 +255,7 @@ async def play_hndlr(
             except Exception:
                 # Non-critical, continue without preload
                 pass
-            
+
             return
 
     if not file.file_path:
@@ -288,8 +291,8 @@ async def play_hndlr(
 
     try:
         await tune.play_media(
-            chat_id=chat_id, 
-            message=sent, 
+            chat_id=chat_id,
+            message=sent,
             media=file
         )
         # React with emoji on successful play
@@ -318,27 +321,27 @@ async def play_hndlr(
                 sent,
                 f"<blockquote>❌ Playback error:\n{error_msg}\n\n"
                 f"Support: {config.SUPPORT_CHAT}</blockquote>"
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             )
         return
     if tracks:
