@@ -21,9 +21,20 @@ class YouTubeUtils:
             r"(youtube\.com/(watch\?v=|shorts/|live/|embed/|playlist\?list=)|youtu\.be/)"
             r"([A-Za-z0-9_-]{11}|PL[A-Za-z0-9_-]+)([&?][^\s]*)?"
         )
+        # Match direct stream URLs: m3u8, mpd, or plain http media streams
+        self.stream_regex = re.compile(
+            r"https?://[^\s]+\.(?:m3u8|mpd|ts)(\?[^\s]*)?"
+            r"|https?://[^\s]*/(?:stream|live|hls|dash)[^\s]*",
+            re.IGNORECASE
+        )
+
+    def is_direct_stream(self, url: str) -> bool:
+        """Check if the URL is a direct m3u8/HLS/DASH stream link."""
+        return bool(re.match(self.stream_regex, url))
 
     def valid(self, url: str) -> bool:
-        return bool(re.match(self.regex, url))
+        # Accept YouTube URLs and direct stream URLs (m3u8, mpd, etc.)
+        return bool(re.match(self.regex, url)) or self.is_direct_stream(url)
 
     def url(self, message_1: types.Message) -> Union[str, None]:
         messages = [message_1]

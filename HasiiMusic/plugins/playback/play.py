@@ -11,6 +11,7 @@ from pyrogram.errors import FloodWait, MessageIdInvalid, MessageDeleteForbidden,
 from HasiiMusic import tune, app, config, db, lang, queue, spotify, tg, yt
 from HasiiMusic.helpers import buttons, utils
 from HasiiMusic.helpers._play import checkUB
+from HasiiMusic.helpers._dataclass import Media
 import asyncio
 import logging
 import re
@@ -116,7 +117,22 @@ async def play_hndlr(
         file = await tg.download(m.reply_to_message, sent)
 
     elif url:
-        if spotify.valid(url):
+        # Handle direct stream URLs (m3u8, HLS, DASH) — no download needed
+        if yt.is_direct_stream(url):
+            # Build a Media object directly and treat it as a live stream
+            stream_title = url.split("/")[-1].split("?")[0] or "Live Stream"
+            file = Media(
+                id=url,
+                title=stream_title,
+                duration="🔴 Live",
+                duration_sec=0,
+                file_path=url,   # Pass URL directly — no download
+                message_id=sent.id,
+                url=url,
+                is_live=True,
+                video=video,
+            )
+        elif spotify.valid(url):
             if spotify.is_playlist(url):
                 try:
                     tracks = await spotify.playlist(
