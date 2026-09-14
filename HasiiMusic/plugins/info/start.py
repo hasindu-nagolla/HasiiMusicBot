@@ -4,7 +4,7 @@
 # Essential user-facing commands: /start, /help, /settings, etc.
 # ==============================================================================
 
-from pyrogram import enums, errors, filters, types
+from pyrogram import enums, filters, types
 
 from HasiiMusic import app, config, db, lang
 from HasiiMusic.helpers import buttons, utils
@@ -24,14 +24,12 @@ async def _help(_, m: types.Message):
             photo=config.START_IMG,  # Use same image as start command
             caption=m.lang["help_menu"],
             reply_markup=buttons.help_markup(m.lang),
-            quote=False,
         )
     except Exception:
         # Fallback to text if photo fails
         await m.reply_text(
             text=m.lang["help_menu"],
             reply_markup=buttons.help_markup(m.lang),
-            quote=True,
         )
 
 
@@ -73,14 +71,12 @@ async def start(_, message: types.Message):
             photo=config.START_IMG,
             caption=_text,
             reply_markup=key,
-            quote=False,
         )
-    except errors.ChatSendPhotosForbidden:
-        # If photos are not allowed, send text only
+    except Exception:
+        # If the welcome photo cannot be sent, send the text menu instead.
         await message.reply_text(
             text=_text,
             reply_markup=key,
-            quote=False,
         )
 
     # For private chats, add user to database if new
