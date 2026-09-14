@@ -66,7 +66,7 @@ class MongoDB:
         self.notified = []
         self.cache = self.db.cache
         self.logger = False
-        self.vplay_enabled = False
+        self.vplay_enabled = None  # None means not yet loaded from DB
 
         self.assistant = {}
         self.assistantdb = self.db.assistant
@@ -288,10 +288,11 @@ class MongoDB:
 
     # VPLAY TOGGLE METHODS
     async def get_vplay_enabled(self) -> bool:
-        # check if /vplay commands are enabled
-        if hasattr(self, "vplay_enabled"):
+        # Use None as sentinel — False means "loaded and disabled", not "never loaded"
+        if self.vplay_enabled is not None:
             return self.vplay_enabled
 
+        # First call after bot start — read the real value from MongoDB
         doc = await self.cache.find_one({"_id": "vplay_toggle"})
         self.vplay_enabled = doc.get("enabled", False) if doc else False
         return self.vplay_enabled

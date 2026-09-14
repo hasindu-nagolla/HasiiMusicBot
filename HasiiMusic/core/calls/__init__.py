@@ -78,3 +78,6 @@ class TgCall(PyTgCalls):
 
     async def play_next(self, chat_id: int, expected_index: int = None) -> None:
         return await self._queue.play_next(chat_id, expected_index)
+
+    async def play_previous(self, chat_id: int) -> bool:
+        return await self._queue.play_previous(chat_id)
