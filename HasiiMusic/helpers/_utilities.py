@@ -107,13 +107,18 @@ class Utilities:
     ) -> types.Message | None:
         if not message:
             return None
+
+        # Newer Pyrogram removed the 'quote' param — use reply_to_message_id instead
+        reply_to = message.id if quote else None
+
         try:
             return await message.reply_text(
                 text=text,
                 reply_markup=reply_markup,
-                quote=quote,
+                reply_to_message_id=reply_to,
             )
         except (errors.ChatSendPlainForbidden, errors.ChatWriteForbidden):
+            # If plain text is not allowed, try sending a photo with caption
             fallback_photo = getattr(config, "START_IMG", None)
             if not fallback_photo:
                 return None
@@ -122,7 +127,7 @@ class Utilities:
                     photo=fallback_photo,
                     caption=text,
                     reply_markup=reply_markup,
-                    quote=quote,
+                    reply_to_message_id=reply_to,
                 )
             except errors.RPCError:
                 return None

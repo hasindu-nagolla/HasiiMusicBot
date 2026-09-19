@@ -199,7 +199,11 @@ def checkUB(play):
                         await umm.delete()
                     except:
                         pass
-                await client.resolve_peer(m.chat.id)
+                # Try to cache the peer — ignore errors if chat is not accessible yet
+                try:
+                    await client.resolve_peer(m.chat.id)
+                except Exception:
+                    pass
 
         try:
             await m.delete()
