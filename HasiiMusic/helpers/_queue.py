@@ -19,6 +19,7 @@ class Queue:
         # Dictionary mapping chat_id to its queue (deque of Media/Track items)
         # defaultdict automatically creates a new deque for new chat_ids
         self.queues: dict[int, deque[MediaItem]] = defaultdict(deque)
+        self.history: dict[int, list[MediaItem]] = defaultdict(list)
 
     def add(self, chat_id: int, item: MediaItem) -> int:
         self.queues[chat_id].append(item)  # Add to end of queue
@@ -38,12 +39,16 @@ class Queue:
     def force_add(
         self, chat_id: int, item: MediaItem, remove: int | bool = False
     ) -> None:
-        self.remove_current(chat_id)
-        self.queues[chat_id].appendleft(item)
-        if remove:
-            self.queues[chat_id].rotate(-remove)
-            self.queues[chat_id].popleft()
-            self.queues[chat_id].rotate(remove)
+        if remove is False:
+            self.queues[chat_id].appendleft(item)
+        else:
+            self.remove_current(chat_id)
+            self.queues[chat_id].appendleft(item)
+            if remove is not True:
+                # If remove is an integer representing position
+                self.queues[chat_id].rotate(-remove)
+                self.queues[chat_id].popleft()
+                self.queues[chat_id].rotate(remove)
 
     def get_current(self, chat_id: int) -> MediaItem | None:
         return self.queues[chat_id][0] if self.queues[chat_id] else None
@@ -54,8 +59,20 @@ class Queue:
         if check:
             return self.queues[chat_id][1] if len(self.queues[chat_id]) > 1 else None
 
-        self.queues[chat_id].popleft()
+        popped_item = self.queues[chat_id].popleft()
+        self.history[chat_id].append(popped_item)
         return self.queues[chat_id][0] if self.queues[chat_id] else None
+
+    def get_previous(self, chat_id: int) -> MediaItem | None:
+        if not self.history[chat_id]:
+            return None
+        
+        # Pop from history and prepend to queue
+        prev_item = self.history[chat_id].pop()
+        
+        # Current playing item becomes the "next" item (index 1)
+        self.queues[chat_id].appendleft(prev_item)
+        return prev_item
 
     def get_queue(self, chat_id: int) -> list[MediaItem]:
         return list(self.queues[chat_id])
@@ -65,10 +82,11 @@ class Queue:
 
     def remove_current(self, chat_id: int) -> None:
         if self.queues[chat_id]:
-            self.queues[chat_id].popleft()
+            self.history[chat_id].append(self.queues[chat_id].popleft())
 
     def clear(self, chat_id: int) -> None:
         self.queues[chat_id].clear()
+        self.history[chat_id].clear()
 
     def peek_next(self, chat_id: int, count: int = 2) -> list[MediaItem]:
         if not self.queues[chat_id] or len(self.queues[chat_id]) <= 1:

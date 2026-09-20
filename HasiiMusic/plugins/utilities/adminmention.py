@@ -8,11 +8,18 @@ import re
 from pyrogram import filters, types, enums
 from HasiiMusic import app, config, lang
 
-# Pattern to detect admin triggers
-TRIGGER_PATTERN = re.compile(r"(?i)(\.|@|\/)admin")
+# Pattern to detect and clean admin triggers from the message text
+TRIGGER_PATTERN = re.compile(r"(?i)([/@.!]admin[s]?|[/@.!]report|\b@(admin|admins)\b)")
 
 
-@app.on_message(filters.command(["admin", "admins", "report"]) & filters.group)
+# Listen for /admin, .admin, @admin commands and @admin mentions in groups
+@app.on_message(
+    (
+        filters.command(["admin", "admins", "report"], prefixes=["/", "!", "@", "."])
+        | filters.regex(r"(?i)\b@(admin|admins)\b")
+    )
+    & filters.group
+)
 @lang.language()
 async def tag_admins(client, message: types.Message):
     try:

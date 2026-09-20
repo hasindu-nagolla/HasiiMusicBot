@@ -33,6 +33,10 @@ class YouTube:
     def valid(self, url: str) -> bool:
         return self._utils.valid(url)
 
+    def is_direct_stream(self, url: str) -> bool:
+        # Check if URL is a direct m3u8/HLS/DASH stream (not YouTube)
+        return self._utils.is_direct_stream(url)
+
     def url(self, message: types.Message) -> Union[str, None]:
         return self._utils.url(message)
 

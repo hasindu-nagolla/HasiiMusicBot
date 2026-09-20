@@ -24,6 +24,7 @@ class Inline:
         status: str = None,
         timer: str = None,
         remove: bool = False,
+        is_playing: bool = True,
     ) -> types.InlineKeyboardMarkup:
         keyboard = []
         if status:
@@ -55,13 +56,15 @@ class Inline:
             keyboard.append(
                 [
                     self.ikb(
-                        text="▷", callback_data=f"controls resume {chat_id}"),
+                        text="II" if is_playing else "▷", 
+                        callback_data=f"controls {'pause' if is_playing else 'resume'} {chat_id}"
+                    ),
                     self.ikb(
-                        text="II", callback_data=f"controls pause {chat_id}"),
+                        text="I◁", callback_data=f"controls previous {chat_id}"),
                     self.ikb(
                         text="↻", callback_data=f"controls replay {chat_id}"),
                     self.ikb(
-                        text="‣‣I", callback_data=f"controls skip {chat_id}"),
+                        text="▷I", callback_data=f"controls skip {chat_id}"),
                     self.ikb(
                         text="▢", callback_data=f"controls stop {chat_id}"),
                 ]

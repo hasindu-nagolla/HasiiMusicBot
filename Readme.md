@@ -6,10 +6,8 @@
 <br>
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+![Repo Views](https://komarev.com/ghpvc/?username=hasindu-nagolla-HasiiMusicBot&label=Repo%20views&color=0e75b6&style=for-the-badge)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/hasindu-nagolla/HasiiMusicBot?style=for-the-badge)](https://github.com/hasindu-nagolla/HasiiMusicBot/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/hasindu-nagolla/HasiiMusicBot?style=for-the-badge)](https://github.com/hasindu-nagolla/HasiiMusicBot/network/members)
-[![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/TheInfinityAI)
 [![Telegram Support](https://img.shields.io/badge/Telegram-Support-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/Hasindu_Lakshan)
 
 <img src="https://github.com/user-attachments/assets/0a447dfd-961f-4f81-87e1-976392320c49" alt="Hasii Music" width="720" height="auto"/>
