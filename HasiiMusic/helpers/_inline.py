@@ -195,7 +195,7 @@ class Inline:
                 [
                     self.ikb(
                         text=lang["source"],
-                        url="https://hasiimusic.hasindunagolla.live/",
+                        url="https://github.com/lakzexe/HasiiMusicBot",
                     )
                 ]
             ]
