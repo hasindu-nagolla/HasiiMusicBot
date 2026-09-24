@@ -6,7 +6,7 @@
 <br>
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-![Repo Views](https://komarev.com/ghpvc/?username=hasindu-nagolla-HasiiMusicBot&label=Repo%20views&color=0e75b6&style=for-the-badge)
+![Repo Views](https://komarev.com/ghpvc/?username=lakzexe-HasiiMusicBot&label=Repo%20views&color=0e75b6&style=for-the-badge)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![Telegram Support](https://img.shields.io/badge/Telegram-Support-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/Hasindu_Lakshan)
 
@@ -158,7 +158,7 @@ curl -fsSL https://deno.land/x/install/install.sh | sh
 Clone the repository.
 
 ```bash
-git clone https://github.com/hasindu-nagolla/HasiiMusicBot.git
+git clone https://github.com/lakzexe/HasiiMusicBot.git
 ```
 
 Move into the project directory.
@@ -234,7 +234,7 @@ COOKIE_URL=
 Clone the repository.
 
 ```bash
-git clone https://github.com/hasindu-nagolla/HasiiMusicBot.git
+git clone https://github.com/lakzexe/HasiiMusicBot.git
 ```
 
 Enter the project directory.
@@ -404,7 +404,7 @@ Feel free to reach out through the following platforms.
 
 | Platform | Link |
 |----------|------|
-| 💻 GitHub Repository | https://github.com/hasindu-nagolla/HasiiMusicBot |
+| 💻 GitHub Repository | https://github.com/lakzexe/HasiiMusicBot |
 | 📢 Telegram Channel | https://t.me/TheInfinityAI |
 | 💬 Telegram Support | https://t.me/Hasindu_Lakshan |
 
@@ -447,6 +447,6 @@ Your support helps increase the project's visibility and encourages future devel
 
 <br>
 
-**Made with ❤️ by <a href="https://github.com/hasindu-nagolla">Hasindu Nagolla</a>**
+**Made with ❤️ by <a href="https://github.com/lakzexe">Hasindu Nagolla</a>**
 
 </div>
