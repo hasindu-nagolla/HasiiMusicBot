@@ -52,7 +52,6 @@ async def set_lang_command(_, message: types.Message):
     await message.reply_text(
         text=message.lang["lang_menu_title"],
         reply_markup=keyboard,
-        quote=False
     )
 
 

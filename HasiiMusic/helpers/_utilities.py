@@ -111,7 +111,6 @@ class Utilities:
             return await message.reply_text(
                 text=text,
                 reply_markup=reply_markup,
-                quote=quote,
             )
         except (errors.ChatSendPlainForbidden, errors.ChatWriteForbidden):
             fallback_photo = getattr(config, "START_IMG", None)
@@ -122,7 +121,6 @@ class Utilities:
                     photo=fallback_photo,
                     caption=text,
                     reply_markup=reply_markup,
-                    quote=quote,
                 )
             except errors.RPCError:
                 return None
