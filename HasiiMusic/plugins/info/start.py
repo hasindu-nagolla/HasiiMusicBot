@@ -106,7 +106,6 @@ async def settings(_, message: types.Message):
         reply_markup=buttons.settings_markup(
             message.lang, admin_only, _language, message.chat.id
         ),
-        quote=True,
     )
 
 

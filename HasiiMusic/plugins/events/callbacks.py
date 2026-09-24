@@ -196,12 +196,12 @@ async def _controls(_, query: types.CallbackQuery):
         if action in ["skip", "replay", "stop"]:
             sent_msg = None
             try:
-                sent_msg = await query.message.reply_text(reply, quote=False)
+                sent_msg = await query.message.reply_text(reply)
             except FloodWait as e:
                 # If FloodWait occurs, wait and retry once
                 await asyncio.sleep(e.value)
                 try:
-                    sent_msg = await query.message.reply_text(reply, quote=False)
+                    sent_msg = await query.message.reply_text(reply)
                 except Exception:
                     pass
             except Exception:
@@ -292,8 +292,7 @@ async def handle_seek(query: types.CallbackQuery, chat_id: int, action: str, use
         # Try to send reply message with FloodWait handling and auto-delete after 5 seconds
         try:
             sent_msg = await query.message.reply_text(
-                f"✅ ꜱᴇᴇᴋᴇᴅ ᴛᴏ {time_str}\n\n<blockquote>ʙʏ {user}</blockquote>",
-                quote=False
+                f"✅ ꜱᴇᴇᴋᴇᴅ ᴛᴏ {time_str}\n\n<blockquote>ʙʏ {user}</blockquote>"
             )
             # Auto-delete after 5 seconds
             await asyncio.sleep(5)
@@ -327,7 +326,7 @@ async def handle_loop(query: types.CallbackQuery, chat_id: int, user: str):
     
     await db.set_loop(chat_id, new_loop)
     await query.answer(text, show_alert=False)
-    await query.message.reply_text(message, quote=False)
+    await query.message.reply_text(message)
 
 
 
